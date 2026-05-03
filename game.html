@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>人生体验卡 · 一日奇幻之旅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & VARIABLES
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF6B35;--orange-dark:#E55A2B;--yellow:#FFD000;--gold:#F59E0B;
+  --green:#00A86B;--pink:#FF2D78;--purple:#7C3AED;--blue:#3B82F6;
+  --teal:#0D9488;--dark:#1A1A2E;--darker:#0F0F23;--cream:#FFF8E7;
+  --white:#FFF;--gray:#94A3B8;--gray-light:#E2E8F0;
+  --font-display:'Bebas Neue','Impact',sans-serif;
+  --font-body:'Noto Sans SC',system-ui,-apple-system,sans-serif;
+  --shadow-card:0 8px 32px rgba(0,0,0,0.18);
+  --shadow-lg:0 20px 60px rgba(0,0,0,0.3);
+  --radius:18px;--radius-sm:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.page{display:none}
+.page.active{display:block}
+
+/* ============================================================
+   STICKY NAVIGATION
+   ============================================================ */
+.sticky-nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 32px;
+  background:rgba(15,15,35,0.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  transition:background 0.3s;
+}
+.sticky-nav.scrolled{background:rgba(15,15,35,0.97)}
+.nav-left{font-size:11px;color:var(--gray);letter-spacing:1px;white-space:nowrap}
+.nav-center{display:flex;gap:28px;align-items:center}
+.nav-center a{
+  font-family:var(--font-display);font-size:14px;letter-spacing:2px;
+  color:var(--white);text-decoration:none;cursor:pointer;transition:color 0.2s;
+}
+.nav-center a:hover{color:var(--orange)}
+.nav-right .nav-btn{
+  font-family:var(--font-display);font-size:13px;letter-spacing:2px;
+  background:var(--orange);color:#fff;border:none;padding:8px 18px;
+  border-radius:20px;cursor:pointer;transition:all 0.2s;
+}
+.nav-right .nav-btn:hover{background:var(--orange-dark)}
+
+/* ============================================================
+   COMPONENT 1 — FULL-SCREEN HERO
+   ============================================================ */
+.comp1{
+  position:relative;width:100%;height:100vh;min-height:600px;overflow:hidden;background:var(--dark);
+}
+.comp1-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.comp1-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 24px 120px;text-align:center;z-index:2;
+  background:linear-gradient(180deg,rgba(15,15,35,0.3) 0%,rgba(15,15,35,0.6) 50%,rgba(15,15,35,0.88) 100%);
+}
+.comp1-title{font-family:var(--font-body);font-size:clamp(40px,8vw,72px);font-weight:900;line-height:1.15;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 15%,#fff 40%,#fff 60%,rgba(255,255,255,0.15) 85%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.comp1-btn{
+  position:absolute;bottom:48px;left:48px;z-index:5;
+  font-family:var(--font-display);font-size:16px;letter-spacing:3px;
+  background:var(--orange);color:#fff;border:none;
+  padding:14px 36px;border-radius:30px;cursor:pointer;
+  transition:all 0.3s;box-shadow:0 8px 32px rgba(255,107,53,0.35);
+}
+.comp1-btn:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(255,107,53,0.5)}
+.comp1-btn:active{transform:scale(0.96)}
+
+/* ============================================================
+   COMPONENT 2 — CARDS CAROUSEL
+   ============================================================ */
+.comp2{background:var(--darker)}
+.comp2-upper{width:100%;height:60vh;min-height:400px;overflow:hidden;background:var(--dark)}
+.comp2-upper img{width:100%;height:100%;object-fit:cover;display:block}
+.comp2-lower{padding:48px 32px 64px;max-width:1200px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:32px}
+.section-tag{font-family:var(--font-display);font-size:12px;letter-spacing:3px;color:var(--orange)}
+.section-header h2{font-family:var(--font-body);font-size:32px;font-weight:900;color:#fff;margin:8px 0}
+.section-header .divider{display:block;width:48px;height:3px;background:var(--orange);margin:12px auto 0;border-radius:2px}
+
+/* ============================================================
+   COMPONENT 3 — UPPER PLACEHOLDER + LOWER DUAL CARDS
+   ============================================================ */
+.comp3{background:var(--darker)}
+.comp3-upper{width:100%;height:50vh;min-height:350px;overflow:hidden;background:var(--dark)}
+.comp3-upper img{width:100%;height:100%;object-fit:cover;display:block}
+.comp3-lower{
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;
+  gap:32px;max-width:1100px;margin:0 auto;padding:64px 32px;
+}
+.comp3-card{
+  background:linear-gradient(160deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);
+  padding:32px 28px;backdrop-filter:blur(8px);
+  cursor:pointer;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+}
+.comp3-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.3);border-color:var(--orange)}
+.comp3-card-a{grid-row:1;grid-column:1}
+.comp3-card-b{grid-row:2;grid-column:2}
+.comp3-card-icon{font-size:36px;margin-bottom:12px}
+.comp3-card-title{font-family:var(--font-body);font-size:18px;font-weight:900;color:#fff;margin-bottom:8px}
+.comp3-card-text{font-size:13px;color:rgba(226,232,240,0.6);line-height:1.75}
+.comp3-footer{text-align:center;padding:32px 20px 48px;font-size:11px;color:rgba(148,163,184,0.4);line-height:1.8}
+
+/* ============================================================
+   CAROUSEL
+   ============================================================ */
+.carousel-wrapper{position:relative}
+.carousel-track{
+  display:flex;gap:20px;overflow-x:auto;overflow-y:visible;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  padding:12px 32px 16px;scrollbar-width:none;
+}
+.carousel-track::-webkit-scrollbar{display:none}
+
+.carousel-slide{
+  flex:0 0 340px;scroll-snap-align:center;
+  border-radius:var(--radius);padding:24px 20px 18px;
+  cursor:pointer;transition:transform 0.35s,box-shadow 0.35s;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:8px;
+  user-select:none;min-height:440px;
+}
+.carousel-slide:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.carousel-slide:active{transform:scale(0.97)}
+
+/* Card color variants */
+.slide-lottery{background:linear-gradient(160deg,#FF6B35 0%,#FF8C42 30%,#E55A2B 100%);color:#fff}
+.slide-hogwarts{background:linear-gradient(160deg,#7C3AED 0%,#6366F1 40%,#4F46E5 100%);color:#fff}
+.slide-invisible{background:linear-gradient(160deg,#1E293B 0%,#334155 50%,#0F172A 100%);color:#E2E8F0}
+.slide-reunion{background:linear-gradient(160deg,#D97706 0%,#F59E0B 40%,#B45309 100%);color:#fff}
+.slide-gaokao{background:linear-gradient(160deg,#059669 0%,#10B981 40%,#047857 100%);color:#fff}
+.slide-timeloop{background:linear-gradient(160deg,#DB2777 0%,#EC4899 40%,#BE185D 100%);color:#fff}
+.slide-love-crush{background:linear-gradient(160deg,#F472B6 0%,#EC4899 40%,#DB2777 100%);color:#fff}
+.slide-love-reunion{background:linear-gradient(160deg,#A78BFA 0%,#8B5CF6 40%,#7C3AED 100%);color:#fff}
+
+.card-badge-top{
+  font-family:var(--font-display);font-size:10px;letter-spacing:2px;
+  background:rgba(255,255,255,0.2);color:inherit;backdrop-filter:blur(4px);
+  display:inline-block;padding:2px 10px;border-radius:10px;align-self:flex-start;
+}
+.card-emoji-large{font-size:36px;line-height:1}
+.card-title-large{font-family:var(--font-body);font-size:18px;font-weight:900;line-height:1.25;letter-spacing:1px}
+.card-img-area{
+  width:100%;aspect-ratio:16/10;border-radius:var(--radius-sm);
+  overflow:hidden;background:rgba(0,0,0,0.15);
+  display:flex;align-items:center;justify-content:center;
+}
+.card-img-area img{width:100%;height:100%;object-fit:cover;display:block}
+.card-stars{display:flex;align-items:center;gap:6px;font-size:13px}
+.card-stars .stars-yellow{color:var(--yellow);letter-spacing:1px}
+.card-stars .review-count{font-size:11px;opacity:0.85}
+.card-desc-short{font-size:12px;line-height:1.6;opacity:0.9;flex:1}
+
+.card-actions{display:flex;gap:8px;margin-top:auto}
+.card-actions button{flex:1;padding:9px 0;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;letter-spacing:1px}
+.btn-card-primary{background:#fff;color:var(--dark)}
+.btn-card-primary:hover{background:var(--yellow)}
+.btn-card-primary:active{transform:scale(0.95)}
+.btn-card-secondary{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)!important}
+.btn-card-secondary:hover{background:rgba(255,255,255,0.25)}
+.btn-card-secondary:active{transform:scale(0.95)}
+
+.carousel-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.15);color:#fff;
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.25s;
+}
+.carousel-arrow:hover{background:var(--orange);border-color:var(--orange)}
+.carousel-prev{left:4px}.carousel-next{right:4px}
+.carousel-dots{display:flex;justify-content:center;gap:8px;padding:8px 0 0}
+.carousel-dots .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s}
+.carousel-dots .dot.active{background:var(--orange);transform:scale(1.3);box-shadow:0 0 8px rgba(255,107,53,0.5)}
+
+/* ============================================================
+   CHAT PAGE
+   ============================================================ */
+#page-chat{background:var(--darker);max-width:520px;margin:0 auto;width:100%;min-height:100vh;display:none;flex-direction:column}
+#page-chat.active{display:flex}
+.chat-topbar{
+  background:rgba(15,15,35,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,107,53,0.2);
+  padding:12px 16px;text-align:center;position:sticky;top:0;z-index:10;
+}
+.chat-topbar .room-emoji{font-size:20px;display:block}
+.chat-room-name{font-size:14px;font-weight:700;color:#F1F5F9}
+.chat-room-count{font-size:11px;color:var(--orange);margin-top:2px}
+
+.system-banner{
+  position:fixed;top:78px;left:50%;transform:translateX(-50%);
+  z-index:20;max-width:500px;width:calc(100% - 20px);
+  padding:12px 14px;
+  background:linear-gradient(135deg,rgba(255,45,120,0.15),rgba(255,107,53,0.12));
+  border:1px solid rgba(255,45,120,0.3);border-radius:var(--radius-sm);
+  backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.35);
+}
+.system-banner .sys-label{
+  font-family:var(--font-display);font-size:11px;color:var(--pink);letter-spacing:2px;margin-bottom:6px;
+}
+.system-banner .sys-text{font-size:12px;color:#FCA5A5;line-height:1.7;margin-bottom:6px}
+.system-banner .sys-option{
+  display:block;font-size:13px;color:var(--yellow);margin-top:4px;font-weight:700;
+  padding:4px 10px;border-radius:8px;cursor:default;background:rgba(255,208,0,0.06);
+}
+
+.chat-messages{
+  flex:1;overflow-y:auto;padding:6px 10px 110px;
+  display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth;
+}
+
+.msg-row{display:flex;align-items:flex-start;gap:8px;animation:msgIn 0.35s ease-out}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;
+}
+.msg-body{max-width:78%}
+.msg-name{font-size:10px;color:var(--gray);margin-bottom:2px;font-weight:600}
+.msg-bubble{
+  font-size:13px;line-height:1.65;padding:10px 14px;border-radius:4px 14px 14px 14px;
+  background:rgba(255,255,255,0.06);color:#E2E8F0;word-break:break-word;
+}
+.msg-row.me .msg-bubble{
+  background:linear-gradient(135deg,rgba(255,107,53,0.25),rgba(245,158,11,0.2));
+  color:#FDE68A;border-radius:14px 4px 14px 14px;
+}
+.msg-row.me{flex-direction:row-reverse}
+.msg-row.me .msg-name{text-align:right}
+
+.typing-indicator{display:flex;align-items:center;gap:8px;padding:8px 14px}
+.typing-dots{display:flex;gap:4px}
+.typing-dots span{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:dotBounce 1.4s infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes dotBounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+
+.chat-input-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:520px;padding:8px 10px 12px;
+  background:linear-gradient(0deg,rgba(15,15,35,1) 60%,rgba(15,15,35,0.95) 100%);
+  border-top:1px solid rgba(255,107,53,0.12);
+  display:flex;gap:8px;align-items:center;
+}
+.chat-input-bar input{
+  flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;padding:10px 16px;font-size:14px;color:#E2E8F0;
+  outline:none;transition:border 0.2s;min-width:0;
+}
+.chat-input-bar input:focus{border-color:var(--orange)}
+.chat-input-bar input::placeholder{color:rgba(148,163,184,0.4)}
+.chat-input-bar .btn-primary{
+  padding:10px 20px;border-radius:24px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+  color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.chat-input-bar .btn-primary:active{transform:scale(0.95)}
+.chat-input-bar .btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.chat-input-bar .btn-end{
+  padding:10px 14px;border-radius:24px;
+  background:rgba(255,45,120,0.15);border:1px solid rgba(255,45,120,0.3);
+  color:#FCA5A5;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.chat-input-bar .btn-end:active{transform:scale(0.95)}
+
+/* ============================================================
+   RESULT PAGE
+   ============================================================ */
+#page-result{
+  background:linear-gradient(180deg,#0F0F23 0%,#1A1A2E 50%,#0F0F23 100%);
+  min-height:100vh;display:none;flex-direction:column;align-items:center;
+}
+#page-result.active{display:flex}
+.result-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.result-loading .loading-pill{font-size:64px;animation:bounce 1s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+.result-loading .loading-text{font-size:14px;color:var(--orange);margin-top:16px;letter-spacing:1px}
+
+.prescription-card{
+  background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
+  border-radius:var(--radius);padding:28px 24px 20px;
+  max-width:420px;width:92%;margin:24px auto;
+  box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(180,130,50,0.2);
+  color:#3D2E0A;position:relative;overflow:hidden;
+}
+.prescription-card .pc-watermark{
+  position:absolute;inset:0;opacity:0.025;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 35px,#000 35px,#000 36px);
+}
+.prescription-card .pc-badge{
+  font-family:var(--font-display);font-size:11px;letter-spacing:3px;color:var(--orange);margin-bottom:12px;
+}
+.prescription-card .pc-persona{font-size:26px;font-weight:900;color:#1A1A2E;line-height:1.2;margin-bottom:4px}
+.prescription-card .pc-path{font-size:11px;color:var(--orange);margin-bottom:16px;font-weight:600}
+.prescription-card .pc-section{margin-bottom:16px;position:relative;z-index:1}
+.prescription-card .pc-section h3{
+  font-family:var(--font-display);font-size:14px;letter-spacing:2px;color:#B45309;margin-bottom:6px;
+}
+.prescription-card .pc-diagnosis{font-size:13px;color:#3D2E0A;line-height:1.75;background:rgba(251,191,36,0.08);padding:10px 12px;border-radius:10px}
+.prescription-card .pc-med-box{background:rgba(255,255,255,0.6);border:1px solid rgba(180,130,50,0.2);border-radius:10px;padding:12px}
+.prescription-card .pc-med-name{font-size:17px;font-weight:900;color:#B45309}
+.prescription-card .pc-med-usage{font-size:12px;color:#6B5A3A;margin-top:4px;line-height:1.7}
+.prescription-card .pc-advice{font-size:13px;color:#3D2E0A;line-height:1.75;background:rgba(255,45,120,0.04);border:1px solid rgba(255,45,120,0.1);border-radius:10px;padding:10px 12px}
+.prescription-card .pc-doctor{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-top:12px;border-top:1px solid rgba(180,130,50,0.2)}
+.prescription-card .pc-doctor-name{font-size:17px;color:#991B1B;font-weight:900;letter-spacing:2px}
+.prescription-card .pc-stamp{border:2px solid rgba(185,28,28,0.3);border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;color:#991B1B;font-size:9px;font-weight:700;transform:rotate(12deg);line-height:1.2;text-align:center}
+
+.result-buttons{display:flex;flex-direction:column;gap:10px;padding:0 20px 32px;width:100%;max-width:420px}
+.result-buttons button{width:100%;padding:14px;border-radius:28px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
+.result-buttons .btn-retry{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 6px 24px rgba(255,107,53,0.3)}
+.result-buttons .btn-retry:active{transform:scale(0.96)}
+.result-buttons .btn-home{background:rgba(255,255,255,0.06);color:#CBD5E1;border:1px solid rgba(255,255,255,0.12)}
+.result-buttons .btn-home:active{transform:scale(0.96)}
+
+/* ============================================================
+   LOVE STORY PAGE (VISUAL NOVEL)
+   ============================================================ */
+#page-love-story{
+  position:fixed;inset:0;z-index:50;background:linear-gradient(180deg,#0F0F23 0%,#1A1A2E 40%,#0F0F23 100%);
+  display:none;flex-direction:column;overflow:hidden;
+}
+#page-love-story.active{display:flex}
+.ls-topbar{
+  display:flex;align-items:center;gap:16px;padding:12px 20px;
+  background:rgba(15,15,35,0.9);backdrop-filter:blur(8px);z-index:5;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.ls-back-btn{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  color:#CBD5E1;padding:6px 14px;border-radius:16px;font-size:12px;
+  cursor:pointer;transition:all 0.2s;
+}
+.ls-back-btn:hover{background:rgba(255,45,120,0.2);border-color:var(--pink);color:var(--pink)}
+.ls-story-title{font-size:13px;color:rgba(226,232,240,0.6);font-weight:600}
+
+.ls-stage{
+  flex:1;display:flex;align-items:center;justify-content:flex-start;
+  padding:20px 24px 0;position:relative;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.ls-char-area{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  flex-shrink:0;width:160px;align-self:center;margin-bottom:80px;
+  transition:all 0.35s;
+}
+.ls-char-avatar{
+  width:120px;height:120px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;color:#fff;
+  box-shadow:0 8px 40px rgba(0,0,0,0.35);
+  transition:background 0.35s;
+}
+.ls-char-name{
+  font-size:14px;font-weight:700;color:#E2E8F0;letter-spacing:1px;
+}
+
+.ls-dialog-area{
+  position:absolute;bottom:60px;right:32px;left:200px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  max-width:580px;margin:0 auto;
+}
+.ls-dialog-bubble{
+  width:100%;background:rgba(15,15,35,0.92);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:16px;
+  padding:20px 24px;position:relative;
+}
+.ls-dialog-bubble::before{
+  content:'';position:absolute;left:-14px;bottom:20px;
+  width:0;height:0;
+  border-top:10px solid transparent;
+  border-bottom:10px solid transparent;
+  border-right:14px solid rgba(15,15,35,0.92);
+}
+.ls-dialog-text{font-size:15px;color:#E2E8F0;line-height:1.8;margin:0}
+
+.ls-choices{display:flex;gap:12px;width:100%}
+.ls-choice-btn{
+  flex:1;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.05);color:#E2E8F0;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;line-height:1.5;text-align:center;
+  backdrop-filter:blur(6px);
+}
+.ls-choice-btn:hover{background:rgba(255,107,53,0.2);border-color:var(--orange);color:#fff}
+.ls-choice-btn:active{transform:scale(0.96)}
+
+.ls-tap-hint{
+  font-size:11px;color:rgba(148,163,184,0.5);letter-spacing:2px;
+  animation:lsTapPulse 2s infinite;
+}
+@keyframes lsTapPulse{0%,100%{opacity:0.3;transform:translateY(0)}50%{opacity:0.8;transform:translateY(4px)}}
+
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;background:rgba(15,15,35,0.96);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.5s;backdrop-filter:blur(12px);
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.overlay .overlay-icon{font-size:60px;animation:bounce 0.8s infinite}
+.overlay .overlay-text{font-family:var(--font-display);font-size:18px;color:var(--orange);margin-top:16px;text-align:center;letter-spacing:2px}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .carousel-track{padding:12px 20px 16px}
+  .carousel-slide{flex:0 0 300px;min-height:410px}
+  .nav-center{display:none}
+  .comp1-btn{left:32px;bottom:36px}
+  .ls-dialog-area{left:120px;right:20px;bottom:40px}
+}
+@media(max-width:640px){
+  .comp1{min-height:100vh;height:auto}
+  .comp1-btn{left:20px;bottom:24px;font-size:14px;padding:12px 28px;letter-spacing:2px}
+  .comp1-overlay{padding:100px 20px 140px}
+  .comp1-title{font-size:clamp(34px,10vw,48px)}
+  .comp2-upper{height:40vh;min-height:280px}
+  .comp2-lower{padding:32px 12px 48px}
+  .comp3-upper{height:35vh;min-height:260px}
+  .comp3-lower{grid-template-columns:1fr;grid-template-rows:auto;gap:20px;padding:40px 16px}
+  .comp3-card-a,.comp3-card-b{grid-row:auto;grid-column:auto}
+  .carousel-slide{flex:0 0 280px;min-height:380px;padding:18px 14px 14px}
+  .carousel-arrow{display:none}
+  .card-title-large{font-size:16px}
+  .card-emoji-large{font-size:28px}
+  .sticky-nav{padding:10px 16px}
+  .nav-left{font-size:10px}
+  .section-header h2{font-size:26px}
+  .section-tag{font-size:11px}
+  .chat-input-bar{gap:5px}
+  .chat-input-bar .btn-end{font-size:10px;padding:10px 8px}
+  .chat-input-bar .btn-primary{font-size:12px;padding:10px 14px}
+  .ls-char-area{width:100px}
+  .ls-char-avatar{width:80px;height:80px;font-size:32px}
+  .ls-char-name{font-size:12px}
+  .ls-dialog-area{left:110px;right:12px;bottom:32px;gap:8px}
+  .ls-dialog-bubble{padding:14px 16px}
+  .ls-dialog-text{font-size:13px;line-height:1.7}
+  .ls-choice-btn{font-size:13px;padding:12px 10px}
+  .ls-stage{padding:12px 12px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== STICKY NAVIGATION ==================== -->
+<nav class="sticky-nav" id="stickyNav">
+  <div class="nav-left">🎴 人生体验卡 · 一日奇幻之旅</div>
+  <div class="nav-center">
+    <a onclick="document.getElementById('comp1').scrollIntoView({behavior:'smooth'})">首页</a>
+    <a onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">体验卡</a>
+    <a onclick="document.getElementById('comp3').scrollIntoView({behavior:'smooth'})">关于</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">开始</button>
+  </div>
+</nav>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div id="page-home" class="page active">
+
+  <!-- ===== COMPONENT 1: FULL-SCREEN HERO ===== -->
+  <section class="comp1" id="comp1">
+    <!-- 组件1背景大图：替换此处 src -->
+    <img class="comp1-bg"
+         src="https://placehold.co/1600x900/1A1A2E/1A1A2E"
+         alt="Hero Background" loading="eager">
+    <div class="comp1-overlay">
+      <h1 class="comp1-title">体验奇幻之旅</h1>
+    </div>
+    <button class="comp1-btn" onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">
+      CHOOSE YOUR EXPERIENCE ▼
+    </button>
+  </section>
+
+  <!-- ===== COMPONENT 2: IMAGE + CAROUSEL ===== -->
+  <section class="comp2" id="comp2">
+    <!-- 中组件-上：占位图 -->
+    <div class="comp2-upper">
+      <!-- 组件2上部图片：替换此处 src -->
+      <img src="https://placehold.co/1600x800/2D1B4E/FFD000?text=YOUR+JOURNEY+AWAITS"
+           alt="Journey Banner" loading="lazy">
+    </div>
+    <!-- 中组件-下：体验卡轮播 -->
+    <div class="comp2-lower" id="comp2-cards">
+      <div class="section-header">
+        <span class="section-tag">EXPERIENCE CARDS</span>
+        <h2>选择你的体验卡</h2>
+        <span class="divider"></span>
+      </div>
+      <div class="carousel-wrapper" id="carouselWrapper">
+        <button class="carousel-arrow carousel-prev" onclick="carouselPrev()" aria-label="上一张">‹</button>
+        <div class="carousel-track" id="carouselTrack"><!-- JS rendered --></div>
+        <button class="carousel-arrow carousel-next" onclick="carouselNext()" aria-label="下一张">›</button>
+        <div class="carousel-dots" id="carouselDots"><!-- JS rendered --></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPONENT 3: UPPER PLACEHOLDER + LOWER DUAL CARDS ===== -->
+  <section class="comp3" id="comp3">
+    <!-- 中组件-上：占位图 -->
+    <div class="comp3-upper">
+      <!-- 组件3上部图片：替换此处 src -->
+      <img src="https://placehold.co/1600x800/0F4A3A/FF6B35?text=JOIN+THE+EXPERIENCE"
+           alt="Community Banner" loading="lazy">
+    </div>
+    <!-- 中组件-下：两个小组件（对角线布局） -->
+    <div class="comp3-lower">
+      <div class="comp3-card comp3-card-a" onclick="selectLoveCard('love_crush')">
+        <div class="comp3-card-icon">💌</div>
+        <div class="comp3-card-title">暗恋咖啡店：说不出口的那句话</div>
+        <div class="comp3-card-text">你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。有些话再不说，可能就再也没有机会了。</div>
+      </div>
+      <div class="comp3-card comp3-card-b" onclick="selectLoveCard('love_reunion')">
+        <div class="comp3-card-icon">💔</div>
+        <div class="comp3-card-title">重逢的十字路口：再见时该说什么</div>
+        <div class="comp3-card-text">分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"三条路在你们面前展开，你会怎么走？</div>
+      </div>
+    </div>
+    <div class="comp3-footer">
+      © 2026 人生体验卡 · 一日奇幻之旅<br>
+      人生没有重来，但体验卡可以再抽一张。
+    </div>
+  </section>
+</div>
+
+<!-- ==================== CHAT PAGE ==================== -->
+<div id="page-chat" class="page">
+  <div class="chat-topbar">
+    <span class="room-emoji">💬</span>
+    <div class="chat-room-name" id="chatRoomName">群聊</div>
+    <div class="chat-room-count" id="chatRoomCount"></div>
+  </div>
+  <div id="systemBanner" class="system-banner" style="display:none"></div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-bar">
+    <input type="text" id="chatInput" placeholder="输入 1 或 2 做出选择..." maxlength="1" inputmode="numeric">
+    <button class="btn-end" onclick="endExperience()">结束体验</button>
+    <button class="btn-primary" id="chatSendBtn" onclick="handleSend()">发送</button>
+  </div>
+</div>
+
+<!-- ==================== RESULT PAGE ==================== -->
+<div id="page-result" class="page">
+  <div id="resultLoading" class="result-loading">
+    <div class="loading-pill">💊</div>
+    <div class="loading-text">正在调配你的专属人格处方...</div>
+  </div>
+  <div id="resultContent" style="display:none;width:100%;flex-direction:column;align-items:center"></div>
+</div>
+
+<!-- ==================== LOVE STORY PAGE ==================== -->
+<div id="page-love-story" class="page">
+  <div class="ls-topbar">
+    <button class="ls-back-btn" onclick="endLoveStory()">✕ 退出</button>
+    <span class="ls-story-title" id="lsStoryTitle">暗恋咖啡店</span>
+  </div>
+  <div class="ls-stage" id="lsStage" onclick="loveTapAdvance()">
+    <div class="ls-char-area" id="lsCharArea">
+      <div class="ls-char-avatar" id="lsCharAvatar">💌</div>
+      <div class="ls-char-name" id="lsCharName"></div>
+    </div>
+    <div class="ls-dialog-area" id="lsDialogArea">
+      <div class="ls-dialog-bubble">
+        <p class="ls-dialog-text" id="lsDialogText"></p>
+      </div>
+      <div class="ls-choices" id="lsChoices" style="display:none">
+        <button class="ls-choice-btn" id="lsChoice1" onclick="event.stopPropagation();loveChoose(1)"></button>
+        <button class="ls-choice-btn" id="lsChoice2" onclick="event.stopPropagation();loveChoose(2)"></button>
+      </div>
+      <div class="ls-tap-hint" id="lsTapHint">点击继续 ▼</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TRANSITION OVERLAY ==================== -->
+<div class="overlay" id="overlay">
+  <div class="overlay-icon" id="overlayIcon">🔮</div>
+  <div class="overlay-text" id="overlayText"></div>
+</div>
+
+<script>
+// ============================================================
+// 数据层：6张体验卡 × 完整分支对话 × 人格结果
+// ============================================================
+
+const EXPERIENCE_CARDS = [
+  {
+    id:'lottery',emoji:'💰',badge:'MOST POPULAR',stars:5,reviews:'328 人体验过',
+    title:'突然中彩票100万一日体验卡',
+    desc:'假设你今天突然中了100万，但你必须在24小时内全部花完。朋友、家人、商家蜂拥而至——你会怎么选？',
+    slideClass:'slide-lottery',
+    // <!-- 体验卡1图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/FF6B35/FFFFFF?text=Lottery+Experience',
+    avatarColors:{'阿杰':'#4f46e5','小美':'#db2777','妈妈':'#059669','彩票店老板':'#d97706','投资顾问':'#7c3aed','记者':'#dc2626'},
+    startPhase:'lot_1',results:null,
+    phases:{
+      lot_1:{
+        chatName:'三人群聊（3人）',
+        messages:[
+          {sender:'阿杰',text:'卧槽！！！我刚刷到你朋友圈了！！！真的假的？！'},
+          {sender:'小美',text:'？？？什么朋友圈 我错过了什么'},
+          {sender:'阿杰',text:'TA中了100万！！！彩票！！'},
+          {sender:'小美',text:'？？？？？？？？？？？？'},
+          {sender:'小美',text:'不是p的吧？？？@我'},
+        ],
+        prompt:'朋友们已经炸了锅。你怎么回应？',
+        options:[{id:1,text:'低调处理，就说"只是个小奖，别大惊小怪"',next:'lot_2a'},{id:2,text:'大方承认："没错，今晚海底捞我包了！"',next:'lot_2b'}]
+      },
+      lot_2a:{
+        chatName:'三人群聊（3人）',
+        messages:[
+          {sender:'阿杰',text:'小奖？我看那个数字后面好多0啊...'},
+          {sender:'小美',text:'你就说实话吧，我们又不会抢你的'},
+          {sender:'阿杰',text:'就是，兄弟/姐妹之间还藏着掖着？'},
+        ],
+        prompt:'他们不太信。你怎么办？',
+        options:[{id:1,text:'继续低调："真的不多，交了税没剩多少"',next:'lot_3a'},{id:2,text:'松口坦白："好吧确实中了不少，但我得好好规划"',next:'lot_3a'}]
+      },
+      lot_2b:{
+        chatName:'三人群聊（8人）',
+        messages:[
+          {sender:'阿杰',text:'哈哈哈哈我就知道！！！吃什么海底捞，去吃米其林！'},
+          {sender:'小美',text:'我马上到！对了你那个钱打算怎么花啊？'},
+          {sender:'阿杰',text:'对啊对啊，买房？炒股？还是先买辆车？'},
+          {sender:'妈妈',text:'（被拉进群）宝贝啊，阿姨听说你中奖了？你表弟最近想开个奶茶店...'},
+        ],
+        prompt:'各方势力开始集结。',
+        options:[{id:1,text:'冷静："大家别急，我先做个财务规划"',next:'lot_3b'},{id:2,text:'豪爽："想吃啥随便点！想创业的明天来聊！"',next:'lot_3b'}]
+      },
+      lot_3a:{
+        chatName:'彩票兑奖中心附近',
+        messages:[
+          {sender:'彩票店老板',text:'恭喜恭喜！要不要考虑投资我们店？我们连锁品牌正在招合伙人！'},
+          {sender:'投资顾问',text:'（不知从哪搞到你的号码）先生/女士，我们有一款年化收益15%的产品...'},
+          {sender:'记者',text:'您好我是XX晚报的，想采访一下您中奖后的心情...'},
+        ],
+        prompt:'突然之间全世界都想认识你。',
+        options:[{id:1,text:'把钱捐出一半给慈善机构，剩下的存起来慢慢想',next:'end'},{id:2,text:'全部投资自己——报课、健身、旅行，让自己变得更好',next:'end'}]
+      },
+      lot_3b:{
+        chatName:'全世界都知道了',
+        messages:[
+          {sender:'阿杰',text:'内个...兄弟...我最近手头有点紧...'},
+          {sender:'小美',text:'其实我一直想开个花店...'},
+          {sender:'妈妈',text:'宝贝，你表弟的奶茶店就差20万了'},
+          {sender:'投资顾问',text:'（第8次来电）先生/女士，请给我5分钟...'},
+        ],
+        prompt:'钱还没到手，已经有人开始排队了。',
+        options:[{id:1,text:'给妈妈和最好的朋友各一笔，剩下的全部捐了',next:'end'},{id:2,text:'一分不给——这是我的钱，我自己规划未来',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'hogwarts',emoji:'🧙',badge:'FAN FAVORITE',stars:5,reviews:'256 人体验过',
+    title:'霍格沃茨一日交换生体验卡',
+    desc:'一封猫头鹰信把你送到了霍格沃茨。你只有一天时间，是去禁林冒险，还是在图书馆研究魔法史？分院帽在等你。',
+    slideClass:'slide-hogwarts',
+    // <!-- 体验卡2图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/7C3AED/FFFFFF?text=Hogwarts+Experience',
+    avatarColors:{'分院帽':'#8b5cf6','赫敏':'#f59e0b','海格':'#92400e','马尔福':'#10b981','邓布利多':'#6366f1'},
+    startPhase:'hw_1',results:null,
+    phases:{
+      hw_1:{
+        chatName:'🦁 霍格沃茨交换生群（4人）',
+        messages:[
+          {sender:'赫敏',text:'欢迎来到霍格沃茨！我是赫敏·格兰杰，今天由我来带你参观。'},
+          {sender:'赫敏',text:'不过在参观之前——你得先分院。分院帽已经在等你了。'},
+          {sender:'分院帽',text:'（清清嗓子）嗯...有意思...一个来自麻瓜世界的访客...让我看看你的脑袋里有什么...'},
+        ],
+        prompt:'分院帽在你的头上沉吟。它似乎在你身上看到了两种截然不同的特质在拉扯。',
+        options:[{id:1,text:'分院帽说："你渴望知识，有探索精神——拉文克劳！"',next:'hw_2a'},{id:2,text:'分院帽说："你有胆量，敢于冒险——格兰芬多！"',next:'hw_2b'}]
+      },
+      hw_2a:{
+        chatName:'📚 拉文克劳公共休息室',
+        messages:[
+          {sender:'赫敏',text:'拉文克劳！不错的选择。我们学院的图书馆有全魔法界最全的藏书。'},
+          {sender:'赫敏',text:'现在你有半天自由时间。你想去禁书区偷偷翻几本书，还是去天文塔观测星象？'},
+        ],
+        prompt:'拉文克劳的一天，你想怎样度过？',
+        options:[{id:1,text:'去禁书区——我想看看那些"不该看"的知识',next:'hw_3a'},{id:2,text:'去天文塔——仰望星空，思考宇宙和魔法的本质',next:'hw_3a'}]
+      },
+      hw_2b:{
+        chatName:'🦁 格兰芬多公共休息室',
+        messages:[
+          {sender:'赫敏',text:'格兰芬多！勇气可嘉。不过我得提醒你——'},
+          {sender:'海格',text:'（推门而入）听说来了个新朋友！要不要去禁林转转？我养了一只新宠物——一只刚孵出来的挪威脊背龙！'},
+          {sender:'赫敏',text:'海格！禁林是不允许学生进入的！'},
+          {sender:'海格',text:'嘿嘿...反正就一天嘛...'},
+        ],
+        prompt:'海格发出邀请。赫敏看起来不太赞同。',
+        options:[{id:1,text:'跟海格去禁林看龙——虽然危险但太酷了！',next:'hw_3b'},{id:2,text:'婉拒海格，跟赫敏去温室学习神奇生物知识',next:'hw_3b'}]
+      },
+      hw_3a:{
+        chatName:'🌙 霍格沃茨走廊（深夜）',
+        messages:[
+          {sender:'马尔福',text:'（在走廊里撞见你）哟，麻瓜交换生？我父亲说你这样的人不应该被允许进入霍格沃茨。'},
+          {sender:'邓布利多',text:'（突然出现）马尔福先生，我相信我们的客人有权享受霍格沃茨的款待。'},
+          {sender:'邓布利多',text:'（转向你）亲爱的孩子，我想送你一句话作为临别礼物——你认为人生最重要的是什么？'},
+        ],
+        prompt:'一天的体验即将结束。邓布利多校长看着你，等待你的回答。',
+        options:[{id:1,text:'"知识——了解这个世界的运作方式"',next:'end'},{id:2,text:'"爱——以及愿意为爱付出的勇气"',next:'end'}]
+      },
+      hw_3b:{
+        chatName:'🔥 海格的小屋',
+        messages:[
+          {sender:'海格',text:'来，尝尝我特制的岩皮饼！配上热腾腾的黄油啤酒——'},
+          {sender:'赫敏',text:'（气喘吁吁赶来）我就知道你会来海格这儿...不过，你的时间快到了。'},
+          {sender:'赫敏',text:'猫头鹰说你的交换期限只有一天。临走前，邓布利多校长想见你。'},
+        ],
+        prompt:'邓布利多在校长办公室等你，他问了你最后一个问题。',
+        options:[{id:1,text:'"如果只能带走一件东西回麻瓜世界，你会带走什么？" —— "一本魔法书"',next:'end'},{id:2,text:'"一段记忆——这段经历本身就是最珍贵的魔法"',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'invisible',emoji:'👻',badge:'MYSTERY',stars:4.5,reviews:'189 人体验过',
+    title:'透明人一日体验卡',
+    desc:'一觉醒来，你发现自己变成了透明人。没人看得见你，没人听得到你。这24小时，你会用来做什么？',
+    slideClass:'slide-invisible',
+    // <!-- 体验卡3图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/1E293B/94A3B8?text=Invisible+Experience',
+    avatarColors:{'同事小刘':'#2563eb','路人甲':'#6b7280','咖啡店老板':'#92400e','警察':'#1e40af'},
+    startPhase:'inv_1',results:null,
+    phases:{
+      inv_1:{
+        chatName:'☕ 公司茶水间 · 透明人频道',
+        messages:[
+          {sender:'同事小刘',text:'奇怪，刚才明明看到有人影晃过去...'},
+          {sender:'同事小刘',text:'算了可能是加班加出幻觉了'},
+          {sender:'同事小刘',text:'（对着空气）如果有人隐身了，那正好——今天下午的会议你就不用参加了，反正也没人叫你。'},
+        ],
+        prompt:'你站在茶水间里，意识到自己真的透明了。接下来你要做什么？',
+        options:[{id:1,text:'去旁听老板的秘密会议——看看他们到底在策划什么',next:'inv_2a'},{id:2,text:'走出公司大门，去外面看看透明的自己能做到什么',next:'inv_2b'}]
+      },
+      inv_2a:{
+        chatName:'🏢 公司顶层会议室 · 透明人频道',
+        messages:[
+          {sender:'同事小刘',text:'（系统自动记录）...所以我们要裁掉三个部门...'},
+          {sender:'同事小刘',text:'你赫然发现，自己所在的部门就在裁员名单上。'},
+          {sender:'同事小刘',text:'但你现在是透明人——你可以提前通知同事，也可以什么都不做。'},
+        ],
+        prompt:'你掌握了秘密信息，但你不是实体存在。',
+        options:[{id:1,text:'偷偷给自己信任的同事发一封匿名邮件提醒',next:'inv_3a'},{id:2,text:'保持沉默——你不是救世主，每个人都有自己的命运',next:'inv_3a'}]
+      },
+      inv_2b:{
+        chatName:'🌆 城市街头 · 透明人频道',
+        messages:[
+          {sender:'路人甲',text:'（边走边打电话）...我真的撑不下去了，这个月房租都交不起...'},
+          {sender:'咖啡店老板',text:'（对着空荡荡的座位叹气）这个月又亏了...'},
+          {sender:'路人甲',text:'你走在街上，看到了平时看不到的——人们的脆弱。'},
+        ],
+        prompt:'透明让你看清了世界的另一面。',
+        options:[{id:1,text:'帮助能看到的人——匿名给路人甲点一份午餐送过去',next:'inv_3b'},{id:2,text:'继续观察——你只是一个旁观者，不该干涉',next:'inv_3b'}]
+      },
+      inv_3a:{
+        chatName:'⏰ 倒计时：最后1小时',
+        messages:[
+          {sender:'警察',text:'（对讲机）注意，有一个透明人报告——有人目击了异常现象。'},
+          {sender:'警察',text:'你发现自己正在被追踪。透明人效应还有一小时就要消失了。'},
+        ],
+        prompt:'你选择如何度过透明的最后一小时？',
+        options:[{id:1,text:'回到办公室，在恢复前留下最后一条匿名提醒给同事们',next:'end'},{id:2,text:'利用最后的时间，去看一场日落——完全私人的日落',next:'end'}]
+      },
+      inv_3b:{
+        chatName:'⏰ 倒计时：最后1小时',
+        messages:[
+          {sender:'咖啡店老板',text:'（惊喜地发现柜台上多了一笔匿名捐款）是谁...？'},
+          {sender:'路人甲',text:'你的透明度正在减弱。镜子里已经能看到自己模糊的轮廓了。'},
+        ],
+        prompt:'透明即将结束，你还有最后一个小时。',
+        options:[{id:1,text:'在恢复之前，再匿名帮一个人',next:'end'},{id:2,text:'给自己写一封信——记下今天看到的一切，提醒自己做人要更善良',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'reunion',emoji:'🍚',badge:'HEARTWARMING',stars:5,reviews:'412 人体验过',
+    title:'和去世的亲人再吃一顿饭',
+    desc:'你获得了一次不可思议的机会：和已经离开的亲人再吃一顿饭。只有一顿饭的时间，你会说什么？你会问什么？',
+    slideClass:'slide-reunion',
+    // <!-- 体验卡4图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/D97706/FFFFFF?text=Reunion+Experience',
+    avatarColors:{'奶奶':'#d97706','妈妈':'#059669','爸爸':'#4f46e5','服务员':'#6b7280'},
+    startPhase:'reu_1',results:null,
+    phases:{
+      reu_1:{
+        chatName:'🏠 老家的餐桌（仅此一顿饭）',
+        messages:[
+          {sender:'服务员',text:'二位这边请。今天的菜还是老样子吧？'},
+          {sender:'奶奶',text:'（坐在你对面，和记忆中一模一样的笑容）好久不见啊，瘦了。'},
+          {sender:'奶奶',text:'来，先吃。有什么话，边吃边说。'},
+        ],
+        prompt:'奶奶夹了一块红烧肉放进你碗里。你的眼泪已经在眼眶打转。',
+        options:[{id:1,text:'先埋头吃饭——像小时候一样，什么都不说，享受这一刻',next:'reu_2a'},{id:2,text:'握住奶奶的手——"奶奶，我有好多话想跟你说..."',next:'reu_2b'}]
+      },
+      reu_2a:{
+        chatName:'🏠 老家的餐桌',
+        messages:[
+          {sender:'奶奶',text:'（笑着看你）好吃吧？还是那个味道吧？'},
+          {sender:'奶奶',text:'我知道你有好多问题想问奶奶。不过先等等——让奶奶再看看你。'},
+        ],
+        prompt:'奶奶的话让你更想哭了。整顿饭吃了一半，气氛安静而温暖。',
+        options:[{id:1,text:'问奶奶在那边过得好不好',next:'reu_3a'},{id:2,text:'跟奶奶讲讲自己这些年过得怎么样',next:'reu_3a'}]
+      },
+      reu_2b:{
+        chatName:'🏠 老家的餐桌',
+        messages:[
+          {sender:'奶奶',text:'（轻轻拍拍你的手）傻孩子，奶奶都知道。'},
+          {sender:'奶奶',text:'你每个月来扫墓，带的花奶奶都收到了。就是别再买菊花了，奶奶喜欢栀子花。'},
+          {sender:'奶奶',text:'（笑）好了，说正事——你觉得奶奶最想听你问什么？'},
+        ],
+        prompt:'奶奶好像什么都知道。但你的时间不多了。',
+        options:[{id:1,text:'"奶奶，你最大的遗憾是什么？"',next:'reu_3b'},{id:2,text:'"奶奶，你对我最大的期望是什么？"',next:'reu_3b'}]
+      },
+      reu_3a:{
+        chatName:'🕯️ 即将散席',
+        messages:[
+          {sender:'奶奶',text:'时间快到了。奶奶在那边挺好的，你别太惦记。'},
+          {sender:'奶奶',text:'不过奶奶也有话想问你——你觉得自己这些年，过得开心吗？'},
+        ],
+        prompt:'奶奶把问题抛了回来。这顿饭只剩下最后几分钟。',
+        options:[{id:1,text:'诚实回答："有时候开心，有时候不开心——但我在努力。"',next:'end'},{id:2,text:'反问奶奶："奶奶觉得我过得好吗？"',next:'end'}]
+      },
+      reu_3b:{
+        chatName:'🕯️ 即将散席',
+        messages:[
+          {sender:'奶奶',text:'（沉默了一会儿）你问了个好问题。'},
+          {sender:'奶奶',text:'奶奶最后跟你说一句：活着的时候要勇敢一点。不要等到人不在了才后悔没说的话。'},
+        ],
+        prompt:'奶奶的身影开始变得模糊。时间要到了。',
+        options:[{id:1,text:'抱住奶奶——"我会的，奶奶，我保证"',next:'end'},{id:2,text:'说"谢谢"——不需要多说什么，奶奶都懂',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'gaokao',emoji:'📝',badge:'TRENDING',stars:5,reviews:'291 人体验过',
+    title:'重启人生：回到高考那天',
+    desc:'你睁眼发现今天是6月7日——但不是202X年，而是你高考那年的6月7日。你带着现在的记忆回去了。你要怎么改写人生？',
+    slideClass:'slide-gaokao',
+    // <!-- 体验卡5图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/059669/FFFFFF?text=Gaokao+Experience',
+    avatarColors:{'同桌':'#2563eb','班主任':'#7c3aed','妈妈':'#059669','面试官':'#d97706'},
+    startPhase:'gk_1',results:null,
+    phases:{
+      gk_1:{
+        chatName:'🏫 高考考点 · 考前30分钟',
+        messages:[
+          {sender:'同桌',text:'（递过来一块巧克力）吃一块，能考好。你紧张吗？'},
+          {sender:'同桌',text:'说实话我昨晚一夜没睡。万一考砸了怎么办？'},
+          {sender:'班主任',text:'同学们，放轻松，就当是一次普通考试。你们都是最棒的！'},
+        ],
+        prompt:'你带着未来的记忆站在考场外。你知道这场考试对你意味着什么——但你也知道人生不止这一条路。',
+        options:[{id:1,text:'认真考试——既然回来了，就全力以赴看看能考多好',next:'gk_2a'},{id:2,text:'放松心态——你知道未来还有其他可能，不再把高考当唯一出路',next:'gk_2b'}]
+      },
+      gk_2a:{
+        chatName:'📊 高考估分群（出分后）',
+        messages:[
+          {sender:'同桌',text:'你估了多少！我算来算去大概620左右...'},
+          {sender:'同桌',text:'你觉得我报哪个学校比较好？'},
+          {sender:'妈妈',text:'（私聊）要不报个稳妥点的？你爸说学医好...'},
+        ],
+        prompt:'分数出来了，你有机会重新选一次大学和专业。',
+        options:[{id:1,text:'选自己真正热爱的专业——这次不妥协',next:'gk_3a'},{id:2,text:'选一个"有用"的专业——你比年轻时更务实了',next:'gk_3a'}]
+      },
+      gk_2b:{
+        chatName:'☕ 考后散伙饭',
+        messages:[
+          {sender:'同桌',text:'你考试的时候一直在笑诶，是题目很简单吗？'},
+          {sender:'同桌',text:'我不管了，反正考完了。接下来你有什么打算？'},
+          {sender:'班主任',text:'（走过来敬你）你看起来特别平静——跟之前判若两人。'},
+        ],
+        prompt:'你不再害怕结果，因为你知道世界比高考大得多。',
+        options:[{id:1,text:'告诉同桌：我打算gap一年，去看看世界',next:'gk_3b'},{id:2,text:'正常升学，但这次我会选择不一样的生活方式',next:'gk_3b'}]
+      },
+      gk_3a:{
+        chatName:'🎓 四年后 · 毕业季',
+        messages:[
+          {sender:'同桌',text:'时间好快，我们毕业了！你后悔选这个专业吗？'},
+          {sender:'面试官',text:'你好，看了你的简历，你的专业跨度挺大的...可以解释一下吗？'},
+        ],
+        prompt:'你走到了上一次人生没走到的路口。',
+        options:[{id:1,text:'"不后悔。我选了热爱的东西，每一天都是为自己而活"',next:'end'},{id:2,text:'"有时候后悔，但更多是感谢自己做了这个选择"',next:'end'}]
+      },
+      gk_3b:{
+        chatName:'🎓 四年后 · 毕业季',
+        messages:[
+          {sender:'同桌',text:'我一直想问你——当时高考你为什么那么淡定？'},
+          {sender:'同桌',text:'是不是你其实知道什么我们不知道的事？'},
+        ],
+        prompt:'你笑了笑。你确实知道——你知道人生有无限种可能。',
+        options:[{id:1,text:'"其实我也不知道。我只是决定不再被别人的标准绑架"',next:'end'},{id:2,text:'"因为我来过一遍了——这是第二遍"（笑着说真话）',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'timeloop',emoji:'🔄',badge:'NEW',stars:4.5,reviews:'73 人体验过',
+    title:'时间循环一日体验卡',
+    desc:'你被困在了同一天里。无论你做什么，每天早上醒来都是5月3日。你会用这无限循环的一天来做什么？',
+    slideClass:'slide-timeloop',
+    // <!-- 体验卡6图片链接：替换此处 src -->
+    imgSrc:'https://placehold.co/600x400/DB2777/FFFFFF?text=Time+Loop+Experience',
+    avatarColors:{'同事':'#2563eb','咖啡师':'#d97706','神秘人林':'#7c3aed','暗恋对象':'#db2777','妈妈':'#059669'},
+    startPhase:'tl_1',results:null,
+    phases:{
+      tl_1:{
+        chatName:'🔄 时间循环 · 第N次5月3日',
+        messages:[
+          {sender:'同事',text:'早啊！又是美好的一天——等等，这话我是不是昨天说过？'},
+          {sender:'同事',text:'奇怪，我总有一种既视感...算了不管了，今天开会别忘了。'},
+          {sender:'神秘人林',text:'（一条匿名短信）你知道今天是第几次了吗？我在咖啡店等你。'},
+        ],
+        prompt:'你确定今天已经重复了至少10次。你看了看手机上的日期——又是5月3日。',
+        options:[{id:1,text:'去咖啡店见那个神秘人——也许TA知道答案',next:'tl_2a'},{id:2,text:'忽略短信，既然循环了，今天就做点疯狂的',next:'tl_2b'}]
+      },
+      tl_2a:{
+        chatName:'☕ 街角咖啡馆',
+        messages:[
+          {sender:'咖啡师',text:'还是老样子？拿铁加燕麦奶？——等等，我怎么知道你的order？'},
+          {sender:'咖啡师',text:'（困惑地摇头）可能只是巧合...'},
+          {sender:'神秘人林',text:'（坐在角落对你招手）第17次了。你终于来了。'},
+          {sender:'神秘人林',text:'我叫林。和你一样，我也被困在这个循环里。但我已经循环了三年。'},
+        ],
+        prompt:'林说TA能帮你——但需要你做一个选择。',
+        options:[{id:1,text:'"告诉我怎么出去——无论什么代价"',next:'tl_3a'},{id:2,text:'"三年？你怎么还没疯？先告诉我怎么在里面活得好一点"',next:'tl_3a'}]
+      },
+      tl_2b:{
+        chatName:'🌆 城市 · 无规则日',
+        messages:[
+          {sender:'同事',text:'（电话）你去哪了？全公司都在等你开会！'},
+          {sender:'同事',text:'（你挂掉电话。反正明天一切都会重置。）'},
+          {sender:'暗恋对象',text:'（在街角偶遇）诶，你怎么没去上班？'},
+        ],
+        prompt:'你站在城市最高楼的楼顶，看着日落。反正明天一切重置——你想做什么真正重要的事？',
+        options:[{id:1,text:'去找你暗恋了三年的人，把心里话全说出来',next:'tl_3b'},{id:2,text:'去父母家，陪他们好好吃一顿饭',next:'tl_3b'}]
+      },
+      tl_3a:{
+        chatName:'⏳ 循环的边缘',
+        messages:[
+          {sender:'神秘人林',text:'每个人被困的原因不同。你得找到你的"未完成之事"。'},
+          {sender:'神秘人林',text:'我不是来救你的——我是来告诉你，循环不是诅咒，是机会。'},
+          {sender:'神秘人林',text:'大部分人一辈子都没有"重来"的机会。你有了。你想清楚——出去，还是留下？'},
+        ],
+        prompt:'林看着你，等待你的最终决定。',
+        options:[{id:1,text:'"我要出去。我还有没完成的事在真实世界里等着我"',next:'end'},{id:2,text:'"我想再待一段时间。这里还有我没学会的东西"',next:'end'}]
+      },
+      tl_3b:{
+        chatName:'🌅 最后一遍日落',
+        messages:[
+          {sender:'暗恋对象',text:'（脸红）你...你认真的？这些话你藏了多久？'},
+          {sender:'妈妈',text:'（开门）你怎么突然回来了？出什么事了？'},
+          {sender:'妈妈',text:'不管为什么——进来吧，妈给你做饭。'},
+        ],
+        prompt:'你做到了在正常生活中不敢做的事。现在午夜将至，循环可能就此结束。',
+        options:[{id:1,text:'"如果明天是新的一天，我发誓不再浪费任何一天"',next:'end'},{id:2,text:'"即使明天还是循环，我也不怕了——我学会了珍惜"',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'love_crush',emoji:'💌',badge:'LOVE STORY',stars:5,reviews:'156 人体验过',
+    title:'暗恋咖啡店：说不出口的那句话',
+    desc:'你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。',
+    slideClass:'slide-love-crush',
+    imgSrc:'https://placehold.co/600x400/F472B6/FFFFFF?text=Love+Crush',
+    avatarColors:{'咖啡师小鹿':'#d97706','林学长':'#8b5cf6','闺蜜小乔':'#ec4899','TA':'#f59e0b'},
+    startPhase:'crush_1',results:null,
+    phases:{
+      crush_1:{
+        chatName:'☕ 公司楼下咖啡店 · 早上8:30',
+        messages:[
+          {sender:'咖啡师小鹿',text:'你的拿铁。对了——靠窗那个人让我把这个给你。'},
+          {sender:'咖啡师小鹿',text:'（递过来一张折好的纸条）'},
+          {sender:'咖啡师小鹿',text:'TA每天都坐同一个位置，我今天终于忍不住问了TA。TA说也在等你主动。'},
+        ],
+        prompt:'纸条上写着："如果你也想认识我，明天同一时间，这里见。——窗边的人"',
+        options:[{id:1,text:'心跳加速，决定明天准时赴约',next:'crush_2a'},{id:2,text:'把纸条收好，但装作若无其事继续上班',next:'crush_2b'}]
+      },
+      crush_2a:{
+        chatName:'☕ 第二天 · 同一张桌子',
+        messages:[
+          {sender:'TA',text:'你真的来了。'},
+          {sender:'TA',text:'说实话，我写那张纸条的时候手都在抖。'},
+          {sender:'TA',text:'我观察你两周了。你每次都坐离我最远的位置，但其实你一直在看我。'},
+          {sender:'闺蜜小乔',text:'（手机震动）怎么样了！！！他帅吗？！！'},
+        ],
+        prompt:'TA看着你，等你说点什么。',
+        options:[{id:1,text:'坦率承认："对，我确实每天都在看你。"',next:'crush_3a'},{id:2,text:'笑着说："我只是喜欢这家店的拿铁。"',next:'crush_3a'}]
+      },
+      crush_2b:{
+        chatName:'☕ 第三天 · 你照常去买咖啡',
+        messages:[
+          {sender:'咖啡师小鹿',text:'TA昨天等了你好久...最后留了这个。'},
+          {sender:'咖啡师小鹿',text:'（递过来第二张纸条，字迹比上一张用力）'},
+          {sender:'咖啡师小鹿',text:'纸条上写："如果你需要时间，我可以等。但不是无限期的。"'},
+          {sender:'闺蜜小乔',text:'（夺过纸条）你疯了吗！！快去！！'},
+        ],
+        prompt:'纸条上的字迹有些急促。TA的耐心在消耗。',
+        options:[{id:1,text:'立刻冲出咖啡店去找TA',next:'crush_3b'},{id:2,text:'给TA发一条消息，先解释你的犹豫',next:'crush_3b'}]
+      },
+      crush_3a:{
+        chatName:'🌇 咖啡店角落 · 黄昏',
+        messages:[
+          {sender:'TA',text:'我下个月要调到另一个城市了。'},
+          {sender:'TA',text:'所以我才决定写那张纸条——我不想留遗憾。'},
+          {sender:'TA',text:'但如果你觉得我们只是咖啡店里的陌生人...我也可以接受。'},
+        ],
+        prompt:'TA在等你的答案。这可能是一段关系的开始，也可能是结束。',
+        options:[{id:1,text:'"别走——至少先试试。我不想以后每天都在想如果当初"',next:'end'},{id:2,text:'"那就好好享受今天吧。不留遗憾地告别也是浪漫的一种。"',next:'end'}]
+      },
+      crush_3b:{
+        chatName:'🌧️ 咖啡店门口 · 下雨天',
+        messages:[
+          {sender:'TA',text:'（撑着伞）我就知道你会来。'},
+          {sender:'TA',text:'你这个人很奇怪——明明每天来偷看我，但又不敢上前。'},
+          {sender:'TA',text:'你到底在害怕什么？'},
+        ],
+        prompt:'雨声很大。TA的问题更直接。',
+        options:[{id:1,text:'"我怕被拒绝。也怕开始了以后不知道怎么继续。"',next:'end'},{id:2,text:'"我没害怕。我只是需要一个完美的开场白。"',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  },
+  {
+    id:'love_reunion',emoji:'💔',badge:'LOVE STORY',stars:5,reviews:'203 人体验过',
+    title:'重逢的十字路口：再见时该说什么',
+    desc:'分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"',
+    slideClass:'slide-love-reunion',
+    imgSrc:'https://placehold.co/600x400/A78BFA/FFFFFF?text=Love+Reunion',
+    avatarColors:{'TA':'#8b5cf6','好友阿哲':'#2563eb','TA的现朋友':'#d97706','咖啡店老板':'#92400e'},
+    startPhase:'reun_1',results:null,
+    phases:{
+      reun_1:{
+        chatName:'🚦 市中心十字路口 · 下午5:30',
+        messages:[
+          {sender:'TA',text:'......好久不见。'},
+          {sender:'TA',text:'你看起来挺好的。'},
+          {sender:'TA',text:'绿灯了。——不过我也不急。你赶时间吗？'},
+        ],
+        prompt:'红灯又亮了。你们站在路中间的安全岛上，周围是川流不息的车。',
+        options:[{id:1,text:'"不赶。我们去旁边的咖啡店坐坐吧。"',next:'reun_2a'},{id:2,text:'"好久不见。我确实有点赶。"',next:'reun_2b'}]
+      },
+      reun_2a:{
+        chatName:'☕ 街角咖啡馆',
+        messages:[
+          {sender:'咖啡店老板',text:'二位要点什么？...诶，你们以前是不是常来？'},
+          {sender:'TA',text:'（低头笑）还是老样子？我记得你喝美式，不加糖。'},
+          {sender:'TA',text:'三年了。你有没有什么想问我的？'},
+        ],
+        prompt:'TA把问题抛给了你。你想问什么？',
+        options:[{id:1,text:'"当初为什么要分手？"',next:'reun_3a'},{id:2,text:'"你现在过得好吗？"',next:'reun_3a'}]
+      },
+      reun_2b:{
+        chatName:'🚶 十字路口 · 你转身离开',
+        messages:[
+          {sender:'好友阿哲',text:'（电话）我刚才好像看到你和TA在一起？？什么情况？？'},
+          {sender:'好友阿哲',text:'你还好吗？要不要我去找你？'},
+          {sender:'好友阿哲',text:'你说走就走了？没说什么？'},
+        ],
+        prompt:'你走了两个街区。心跳还是很快。',
+        options:[{id:1,text:'掉头回去——有些话不说不甘心',next:'reun_3b'},{id:2,text:'给TA发一条消息："刚才走太快了。下次有空聊。"',next:'reun_3b'}]
+      },
+      reun_3a:{
+        chatName:'🕯️ 咖啡馆 · 灯光暗下来',
+        messages:[
+          {sender:'TA',text:'你想知道为什么分手...'},
+          {sender:'TA',text:'那时候我刚被公司裁员，觉得自己一无所有。我不想拖累你。'},
+          {sender:'TA',text:'但我没勇气告诉你真相。我选择让你觉得是感情淡了。这是我这辈子最后悔的决定。'},
+        ],
+        prompt:'TA的眼睛红了。你发现自己三年来的疑问，答案竟然是这样。',
+        options:[{id:1,text:'"你应该告诉我的。我可以陪你一起扛。"',next:'end'},{id:2,text:'"谢谢你告诉我。过去的就让它过去吧。"',next:'end'}]
+      },
+      reun_3b:{
+        chatName:'🌙 河边步道 · 你走回来了',
+        messages:[
+          {sender:'TA',text:'（看到你出现）你回来了？'},
+          {sender:'TA',text:'我以为你走了就不会回头。'},
+          {sender:'TA',text:'这三年...我学会了一件事：感情里最可怕的不是吵架，是沉默。'},
+        ],
+        prompt:'河面反射着路灯的光。TA离你很近。',
+        options:[{id:1,text:'"我也是。所以这次我不想沉默了——我还喜欢你。"',next:'end'},{id:2,text:'"我们都不再是三年前的人了。保持联系吧，不用急着定义什么。"',next:'end'}]
+      },
+      end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
+    }
+  }
+];
+
+// ============================================================
+// 人格结果映射表
+// ============================================================
+
+function buildResults(cardId,resultsData){
+  const card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
+  if(!card)return;
+  card.results={};
+  for(const[path,data]of Object.entries(resultsData))card.results[path]=data;
+}
+
+// --- 彩票卡 ---
+buildResults('lottery',{
+  '1-1-1':{persona:'「暗中操盘手」',dia:'你是一个极度理性的人。中了一百万第一反应不是庆祝而是隐藏——这说明你对风险的敏感度远超常人。你的防御机制强大到连最好的朋友都很难真正走进你的世界。你在保护自己，但也可能错过了被人理解和分享快乐的机会。',med:'「适当卸下盔甲」胶囊',usage:'每周主动约一位朋友出来，不用花钱请客，只需要真诚地聊聊。副作用：可能会感到被理解的快乐。',advice:'你的谨慎是保护色，但不需要24小时穿着。偶尔露出真实的自己，世界会回馈你意想不到的温暖。'},
+  '1-1-2':{persona:'「孤独的战略家」',dia:'你选择了低调面对惊喜，又在最后时刻把资源全部投入自我提升。这证明你有着强大的长期主义思维——但你同时也筑起了一道高墙。你把安全感建立在"只靠自己"上，这让你强大，但也让你孤独。',med:'「信任他人」体验胶囊',usage:'试着把一件小事交给别人去做，不用盯着结果。用法：看看会不会有天塌下来。',advice:'独自强大是能力，与人共享是勇气。你不是一座孤岛，偶尔允许别人登上你的海岸。'},
+  '1-2-1':{persona:'「温柔的吝啬鬼」',dia:'你是个矛盾而可爱的人。你一边否认自己中了奖，一边在最后把一半捐了出去。这说明你的低调不是冷漠，而是——你不知道怎么面对突然的关注。你习惯躲在后面做一些善良的事，然后假装什么都没发生。',med:'「接受赞美」勇气糖',usage:'每次被人夸奖时，先别急着否认。深呼吸，微笑着说"谢谢"。副作用：可能会发现自己原来挺不错的。',advice:'你的低调里藏着善良。但请允许别人看见你的好——不是为了炫耀，而是为了让那些爱你的人有机会为你骄傲。'},
+  '1-2-2':{persona:'「沉默的金库」',dia:'你选择对外低调，对内却果断地把钱全部投向自己——课程、健身、旅行。这说明你不是不敢花钱，你只是不想花在无关紧要的人身上。你是一个高度自洽的投资者，把世界分成"值得"和"不值得"两类。效率很高，但界限分明。',med:'「偶尔挥霍」放纵片',usage:'找一个没有理由的花钱方式，just for fun。不需要收益，不需要回报。',advice:'你的界限给了你自由，但偶尔打破界限可以给你惊喜。有些东西的价值不能用ROI衡量——比如一个毫无目的的下午。'},
+  '2-1-1':{persona:'「体面的慈善家」',dia:'你大方承认了好运，又在各路人马面前保持了理智。最后把钱捐了出去——这证明你有着罕见的社会责任感和判断力。你享受成功的喜悦，也愿意分享。但你把自己的需求排在了最后。',med:'「优先自己」补充剂',usage:'每次想帮助别人之前，先问自己三个字："我呢？"副作用：可能会有一种叫"自我照顾"的新鲜体验。',advice:'乐于分享是美德，但先把自己的杯子装满再给别人倒水——那不叫自私，那叫可持续的善良。'},
+  '2-1-2':{persona:'「快乐的理性派」',dia:'你毫不掩饰自己的好运，大方请客，但也知道什么时候该收手。最后你选择全部投资自己——这说明你的快乐分享是有底线的。你是一个能在人群里发光但不会被人群吞噬的人。',med:'「保持平衡」养生茶',usage:'你已经很懂得如何平衡自我和他人了。继续保持，偶尔奖励自己一杯奶茶。',advice:'你知道聚光灯下和一个人独处都是一种享受。这份平衡感是你的天赋，珍惜它。'},
+  '2-2-1':{persona:'「人形提款机·善良版」',dia:'你是那种"有福同享"的典型——但你的"同享"没有上限。你对喜欢的人几乎来者不拒，最后又选择捐出去——这说明你的慷慨是深入骨髓的。你害怕拒绝别人，因为你把"被需要"等同于"被爱"。',med:'「学会拒绝」练习簿',usage:'每天练习对一个请求说"不"——从外卖要不要加辣开始练起。',advice:'你的慷慨让你闪闪发光，但请记住：真正爱你的人，不需要用你给的糖来证明。设立边界不是为了推开别人，而是为了留住自己。'},
+  '2-2-2':{persona:'「人间饕餮」',dia:'你选择了最张扬的路线：公开中奖、大方挥霍、最后还决定继续投资自己。你是燃尽型人格——要么不玩，要玩就玩到极致。你做决定很快，后悔也很快，但从不回头看。你的人生信条是：体验即正义。',med:'「三思而后行」缓释胶囊',usage:'每次做重大决定前，先吃一颗，等30分钟再回复。副作用：可能会减少"我后悔了"出现的频率。',advice:'你的热情能点燃整个房间，但请记得留一根火柴给自己。燃尽不是目的，持续发光才是。'},
+});
+
+// --- 霍格沃茨卡 ---
+buildResults('hogwarts',{
+  '1-1-1':{persona:'「终身学习者」',dia:'你在霍格沃茨选择了拉文克劳，在禁书区追求被禁止的知识，最后还选择了带走一本魔法书。你的灵魂深处就是一个纯粹的求知者——对未知的渴望超过了对风险的恐惧。',med:'「偶尔放下书本」提醒贴',usage:'每看完三本书，奖励自己一次户外散步。世界不在纸页之间，也在风吹过的树梢上。',advice:'知识是你最忠诚的朋友，但不要把生活也当成一本书来读。有些东西不需要理解，只需要感受。'},
+  '1-1-2':{persona:'「智慧的收藏家」',dia:'你追寻知识但又不执着于占有它。你选择带走一段记忆而非实物——这证明你懂得：真正的魔法不在于你知道什么，而在于你经历了什么。你是一个懂得"体验比拥有更珍贵"的人。',med:'「记录美好」笔记本',usage:'把每一次让你心动的体验写下来。不用给别人看，这是你与自己的秘密。',advice:'你的领悟力让你与众不同。在这个人人追求拥有的世界里，你选择了体验——这是最聪明的选择。'},
+  '1-2-1':{persona:'「星空下的哲人」',dia:'你选择了拉文克劳，但在天文塔的星空下思考宇宙，最后还想带走知识。你把"学习"从书包里拿出来，放到了星空下——这说明你追求的从来不是死记硬背，而是对世界本质的理解。',med:'「接地气」练习片',usage:'每思考一个问题半小时后，站起来喝杯水，看看窗外的真实世界。',advice:'你的思想在云端飞翔，这是天赋。但偶尔降落到地面——人间烟火也是魔法的一种。'},
+  '1-2-2':{persona:'「浪漫的观察者」',dia:'你在拉文克劳选择了仰望星空，又把魔法本身看做一段记忆。你是一个浪漫主义者，相信世界的意义不在于可以触摸的东西，而在于那些无法被定义的瞬间。',med:'「保持浪漫」续命针',usage:'永远不要停止仰望星空。你是这个功利世界里的稀有物种。',advice:'你看到了这个世界最柔软的部分。永远不要让任何人告诉你"这没有用"——美本身就有价值。'},
+  '2-1-1':{persona:'「勇敢的冒险家」',dia:'格兰芬多、禁林看龙、还想带走魔法书——你是一个把勇气当燃料的人。你对危险有着一种健康的忽视，这不是鲁莽，而是一种对世界深刻的信任。',med:'「偶尔谨慎」护身符',usage:'冒险之前先问一句：如果最坏的情况发生，我能承受吗？如果能，那就去吧。',advice:'勇气是你的火种，但别把自己烧着了。最好的冒险家知道什么时候该停下来烤烤火。'},
+  '2-1-2':{persona:'「故事的收集者」',dia:'你选择了最勇敢的路径——格兰芬多和禁林，但最后你更珍视的是记忆而非物品。这说明你的勇气不是为了炫耀，而是为了体验。你不收集战利品，你收集故事。',med:'「继续做自己」认可证书',usage:'你不需要改变什么。你已经在用最勇敢的方式活出了最温柔的人生。',advice:'你选择了一条最难也最美的路：勇敢地去经历，然后把一切变成记忆带走。愿你永远有一口袋的故事可以讲。'},
+  '2-2-1':{persona:'「温和的勇者」',dia:'你被分到了格兰芬多但选择了温室而不是禁林——这证明了勇气不一定是冲向危险，有时候勇气是选择温和地坚持自己的兴趣。最后你想带走知识，说明你的英雄主义和别人不一样：你的武器是智慧。',med:'「定义自己的勇敢」宣言',usage:'勇气有很多种形式。你的勇气是温柔的、安静的、但同样有力的。',advice:'不是所有英雄都穿盔甲。有些英雄在温室里安静地种花——那也是一种战斗。'},
+  '2-2-2':{persona:'「温暖的守护者」',dia:'格兰芬多、温室、珍视记忆——你是一个把勇敢藏在温柔里的人。你不去禁林不是害怕，而是觉得温室里的生命同样值得尊重。你选择了魔法不是作为力量，而是作为记忆。这是一种罕见的智慧。',med:'「你的温柔就是力量」温补汤',usage:'不要因为自己不够"锋利"而感到不安。你的温和是一种更持久的力量。',advice:'世界需要锋芒，也需要柔软。你是后者——愿你永远珍惜自己的这份温柔。'},
+});
+
+// --- 透明人卡 ---
+buildResults('invisible',{
+  '1-1-1':{persona:'「暗处的正义使者」',dia:'你选择了窥探秘密、匿名提醒同事、最后在消失前留下最后一条消息。你有一种强烈的道德直觉——你无法对不公沉默。但你不擅长当面表达，你更喜欢在幕后行动。',med:'「让正义晒晒太阳」勇气片',usage:'偶尔走出幕后，用真实的声音表达你的立场。你的声音有分量。',advice:'你的正义感像黑夜里的烛火——虽然安静，但确实在照亮别人。但请相信，你自己也值得被看到。'},
+  '1-1-2':{persona:'「冷静的告密者」',dia:'你获取了秘密、选择了行动、然后在最后选择为自己留一份平静——看一场完全私人的日落。这说明你不只是一个正义使者，你也是一个懂得自我照顾的人。你帮了别人，也没有忘记自己。',med:'「你做得很好」肯定剂',usage:'你已经做得很好了。记得奖励自己——你值得那场日落。',advice:'你找到了助人与爱己的平衡线。这是世界上最难的事之一，而你做到了。'},
+  '1-2-1':{persona:'「悲悯的旁观者」',dia:'你看到了不公，但选择了沉默。然后在最后用匿名行动来弥补。你相信每个人都有自己要面对的命运，但你的良心又让你无法完全袖手旁观。你是一个矛盾的善良者——你的善良是静默的，但真实存在。',med:'「发声练习」勇气含片',usage:'下一次有不公发生时，试着说一句"这不公平"。不需要改变世界，只需要发出声音。',advice:'沉默可以是智慧，但也可以是枷锁。你不需要对每一个不公负责，但你的声音至少应该属于你自己。'},
+  '1-2-2':{persona:'「豁达的隐士」',dia:'你获取了秘密、选择了沉默、最后给自己留了一场日落。你不认为自己有义务拯救世界，这让你免于许多精神内耗。你是一个"看清了世界的不完美但依然热爱自己生活"的人。',med:'「保持豁达」维持片',usage:'你已经很会照顾自己的内心了。继续保持——偶尔也可以分享一些温暖给别人。',advice:'你看清了很多，这很珍贵。但不必看得太清——有时候模糊一点，生活反而更有温度。'},
+  '2-1-1':{persona:'「匿名英雄」',dia:'你选择走出公司去观察世界、主动帮助陌生人、在最后再帮一个人。透明对你来说不是消失，而是一种新的存在方式——你不被看见，却更真实地存在着。',med:'「脱下隐身衣」勇气糖',usage:'你已经证明了你有帮助别人的能力。试着在看得见的时候也这样做。',advice:'你匿名时的善良，是真正的善良。但请记住——你不需要隐藏自己才有资格帮助别人。你本身就有发光的权利。'},
+  '2-1-2':{persona:'「温柔的记录者」',dia:'你观察了世界、伸出过援手、最后选择给自己写信。你的透明体验变成了一场自我教育——你从帮助别人的过程中学会了如何更好地对待自己。',med:'「重新读那封信」提醒卡',usage:'把今天写给自己的信念大声读一遍。那些话是真的，作者是你自己。',advice:'你通过帮助别人治愈了自己。但请记住你不需要通过帮助别人来证明自己的价值。你本身就值得。'},
+  '2-2-1':{persona:'「安静的见证者」',dia:'你选择走出公司去观察、保持旁观、但最后在透明的终点还是帮了一个人。你是一个慢热的善良者——你不急于行动，但你不会什么都不做。你的善良需要时间发酵，但最终会到达。',med:'「相信自己」小糖丸',usage:'你的直觉很好。相信它，即使它比别人慢半拍。',advice:'你的善良有它自己的节奏。不需要催促，不需要比较。它会在对的时间做对的事。'},
+  '2-2-2':{persona:'「哲学的路人」',dia:'你不插手、不强求、最后选择用一封信来铭记这一切。你是一个用观察代替参与的人——你的透明体验变成了一堂关于人性的大课。你在世界的角落里上了一天课，然后给自己留了作业。',med:'「偶尔参与」体验糖',usage:'观察够了之后，试着参与一次。不需要改变什么，只需要说一句话——让世界知道你在。',advice:'旁观是一种视角，但参与是一种温度。你不需要每次都参与，但偶尔加入一下，你会发现——入局的感觉也不错。'},
+});
+
+// --- 团圆饭卡 ---
+buildResults('reunion',{
+  '1-1-1':{persona:'「安静的思念者」',dia:'你选择先吃饭、问奶奶过得好不好、最后坦诚面对自己。你的思念在安静中流淌——不张扬，但很深。你不擅长表达情感，但你用行动（吃饭、扫墓、努力生活）来证明爱。',med:'「大声说出来」勇气胶囊',usage:'思念不需要安静。下一次想念的时候，跟你说的人说一声——就当自言自语。',advice:'你把思念藏在碗里、藏在沉默里、藏在每一个月去扫墓的路上。但思念其实可以大声一点——奶奶听得见。'},
+  '1-1-2':{persona:'「反向关怀者」',dia:'你埋头吃饭、问奶奶在那边好不好、然后反问奶奶"我过得好吗"。你是一个把"被看见"放在第一位的孩子——你需要确认自己是被爱着的。这并不可耻，这是人类最基本的需求。',med:'「自我确认」镜子练习',usage:'每天对着镜子说一次："我过得挺好的。"不是在问别人，是在告诉自己。',advice:'你把确认自己价值的权利交给了奶奶。但奶奶已经走了——请把这个权利拿回来，自己保管。你过得很好，你自己知道。'},
+  '1-2-1':{persona:'「故事的传承者」',dia:'你选择安静陪伴、讲述自己、最后诚实面对奶奶的问题。你是一个懂得"爱与表达"的人——你接受爱（先吃饭），也给予爱（讲自己的故事）。你的情感是双向流动的。',med:'「继续讲故事」续杯茶',usage:'把奶奶的故事讲给下一代人听。这是你对奶奶最好的纪念。',advice:'你让奶奶看到了你的人生——这比任何问题都重要。继续做你自己，继续讲故事。奶奶在听。'},
+  '1-2-2':{persona:'「敏感的追问者」',dia:'你低头吃饭、讲自己的故事、最后反问奶奶是否满意。你内心有一个渴望被认可的小孩。你做了很多事——努力、成长、变好——但你需要听到一句"你做得不错"才能安心。',med:'「自我认可」练习册',usage:'列出三件你最近做得好的事——不用问任何人的意见，你才是裁判。',advice:'你不需要奶奶告诉你"你很好"。你已经很好了。相信你自己——这是给奶奶最好的回答。'},
+  '2-1-1':{persona:'「勇敢的追问者」',dia:'你直接握住奶奶的手、问她的遗憾、最后给出承诺。你是一个直面情感的人——不躲避、不拖延。你用了一顿饭的时间读完了一本关于爱的教科书。',med:'「你已经很强了」肯定糖',usage:'你不需要变强了——你已经够强了。接下来的任务：让自己偶尔也可以软弱一下。',advice:'你在最短的时间内做了最难的事：直面告别。你握住奶奶的手的那一刻，你已经赢了。'},
+  '2-1-2':{persona:'「温顺的巨人」',dia:'你握住了手、问了奶奶的期望、最后只说了一句"谢谢"。你用最少的语言表达了最深的情感。你不是不会说话，你是觉得有些东西说了反而轻了。',med:'「多说一句」润喉糖',usage:'下次"谢谢"可以多说半句，比如"谢谢——你让我成了现在的我"。半句就够了。',advice:'"谢谢"两个字很重，但请让它落地。让奶奶知道你的谢谢是什么意思——她已经懂了，但再说一遍也无妨。'},
+  '2-2-1':{persona:'「拥抱型人格」',dia:'你握住手、问了遗憾、最后给了一个拥抱。你是用身体记住爱的人。语言对你来说是辅助——拥抱才是你的终极表达。这顿饭，你用最温暖的方式画上了句号。',med:'「继续拥抱」取暖贴',usage:'把你从奶奶那里得到的温暖传给其他人。你的拥抱有治愈力——你自己可能不知道。',advice:'你用拥抱穿越了生死。这世界上没有什么是一个真诚的拥抱不能解决的。如果不能，就拥抱久一点。'},
+  '2-2-2':{persona:'「感恩的修行者」',dia:'你握住了手、问了期望、最后用"谢谢"结尾。你用最简洁的方式完成了最复杂的告别。你是一个相信"有些话不用说出来"的人——但你说了该说的。',med:'「表达感恩」日常练习',usage:'每天睡前想一件你感恩的事。这会让你成为一个更幸福的人。',advice:'你选择了最优雅的告别方式：感恩。奶奶会为你骄傲的——不是因为你的成就，而是因为你是这样的人。'},
+});
+
+// --- 高考卡 ---
+buildResults('gaokao',{
+  '1-1-1':{persona:'「热血的修正者」',dia:'你认真考试、选择了热爱的专业、并在四年后说不后悔。你把这场"重来"变成了对年轻自己的补偿——你终于选择了心之所向。这是一个关于"勇气"的故事。',med:'「继续热爱」补气丸',usage:'你已经找到了热爱。守护它——不管别人说什么。',advice:'你给年轻时的自己补了一课：热爱比正确更重要。愿你带着这份热爱，继续改写关于未来的每个章节。'},
+  '1-1-2':{persona:'「现实的理想家」',dia:'你全力以赴考了好成绩、选择了热爱但承认有时候会后悔。这说明你很诚实——你会为了理想冲刺，但你不会自欺欺人地说每条路都完美的。你是一个有理想的成年人，这很珍贵。',med:'「接受不完美」咖啡杯',usage:'每一个选择都有遗憾。接受遗憾，然后继续喝你的咖啡，过你的日子。',advice:'后悔不是失败的标志——它是你在成长的证明。你选了一条路，然后诚实地面对了它的一切，这已经很了不起了。'},
+  '1-2-1':{persona:'「成熟的重启者」',dia:'你认真考试但选了务实的专业——然后说不后悔。这说明你在"重来一次"的时候选择了智慧而不是冲动。你不再是当年那个为了远方不顾脚下的年轻人了——你学会了在理想和现实之间找到自己的路。',med:'「你成熟了」成人证书',usage:'从年轻人到成年人——你完成了过渡。恭喜。副作用：可能会被年轻人叫"叔叔/阿姨"。',advice:'你选择了务实的路，但这不代表你放弃了理想。你把理想藏在了一个更安全的地方——等你准备好了自然会去拿。'},
+  '1-2-2':{persona:'「清醒的选择者」',dia:'你全力以赴、选了务实的专业、但承认有遗憾。你是一个清醒的人——你做出了理性的选择，但没有粉饰它。你接受了"人生不是童话"这件事，但你也没有因此沮丧。',med:'「与现实和解」安慰剂',usage:'你做的选择是对的——对于现在的你来说。不要用年轻时的标准来评判现在的自己。',advice:'你的遗憾不来自选择错了——它来自于你终于理解了：每个选择都有代价。接受代价的人，才能拥有真正的自由。'},
+  '2-1-1':{persona:'「自由的先行者」',dia:'你带着笃定走入考场、gap了一年去看世界、然后说不后悔。你在这场"重来"中做了一个最彻底的选择——你让年轻的身体拥有了一颗中年的心。你终于有勇气说出了"等等"——等等再长大。',med:'「保持自由」护照续签',usage:'你的自由来之不易。保护好它，但也不要害怕在未来的某天选择"安定"。自由和安定不是敌人。',advice:'你用了穿越回来的机会，给了自己最大的礼物：时间。你让年轻的自己等一等、看一看、想一想。这是最奢侈的勇敢。'},
+  '2-1-2':{persona:'「微笑的穿越者」',dia:'你gap了一年、正常升学、最后笑着说出了真相。你在这场"重来"中玩得很尽兴——你既体验了自由又回到了正轨。你是一个懂得"平衡"的人。',med:'「保持微笑」笑气补充剂',usage:'你已经掌握了人生的秘密：笑着看一切。继续笑——你的笑容有感染力。',advice:'你笑着说出了真相，这说明你不怕被质疑。你穿越回来不是为了成为别人想要的样子——你只是来做你自己的。你做到了。'},
+  '2-2-1':{persona:'「淡定的革命者」',dia:'你风轻云淡地度过了高考、选择了不一样的生活方式、不后悔。你用一种"温柔的对抗"改变了人生轨迹——你没有对抗高考本身，你只是不再把高考当一切。这是一种更高级的对抗。',med:'「温柔的力量」暖茶',usage:'你不需要大声喊叫也能改变世界——你已经证明了。继续这样活着。',advice:'你用平静击败了焦虑。在一个所有人都在奔跑的世界里，你选择了走路——这不是落后，而是你在用自己的速度丈量人生。'},
+  '2-2-2':{persona:'「终极的自由灵魂」',dia:'你考出了一个好心态、选了新活法、最后说了一句世界上最好笑的真话。你是一个完全不在乎别人眼光的人。你穿越回来不是为了"修正"什么——你是来"享受"的。',med:'「继续保持」自由勋章',usage:'你已经做到了最难的事：不在乎。继续保持，但偶尔也在乎一下——比如在乎一下今天吃什么。',advice:'你达到了一种罕见的精神状态——你知道了人生的答案然后决定：反正我也要说出来的。这种坦然，是多少人求而不得的东西。'},
+});
+
+// --- 时间循环卡 ---
+buildResults('timeloop',{
+  '1-1-1':{persona:'「破局者」',dia:'你选择直面问题、寻找答案、最后果断选择了离开循环。你是一个目标导向的人——一旦找到方向就会毫不犹豫地执行。你相信真实的人生在外面，而不是在无限的重来里。',med:'「面对现实」勇气片',usage:'每天做一件你一直在拖延的事——不需要很大，比如给某人发一条消息，或整理一个抽屉。',advice:'你选择了离开循环，说明你内心深处相信生活有比"重来"更重要的事。带着这份信念活在真实世界里。'},
+  '1-1-2':{persona:'「循环的学生」',dia:'你找到了答案，却选择留下来继续学习。你是一个把任何经历都当成课程的人——你不急于逃离困境，而是想从中学到更多。这种态度让你在任何环境中都能成长。',med:'「深度体验」专注丸',usage:'花时间深入一件事，而不是浅尝辄止。你已经知道怎么做了。',advice:'循环对你来说不是监狱，而是教室。你懂得从每一次重复中发现新的东西——这是世界上最稀缺的能力之一。'},
+  '1-2-1':{persona:'「务实的追求者」',dia:'你追求的不是答案而是生活质量——先学会怎么在循环里活好，然后再选择出去。你是一个务实主义者，相信"如果无法改变环境，就先优化自己的体验"。',med:'「适应力」弹性胶囊',usage:'你已经展示了极强的适应能力。在现实生活中也保持这种灵活心态。',advice:'你先学会了游泳再决定要不要上岸——这种"先立足再突破"的思维方式让你在什么环境都能活下去且活得好。'},
+  '1-2-2':{persona:'「永恒的旅人」',dia:'你选择先学会怎么在循环里生活，然后决定继续留在这里。你不是被动地被困住，而是主动选择了这种生活方式。你是一个能在任何环境中找到意义的人。',med:'「享受当下」时光片',usage:'不必总是想着"下一步"。现在的每一刻都很珍贵——你已经证明了。',advice:'你选择留在循环里不是因为害怕出去，而是因为你学会了在限制中找到无限。这其实是最深刻的人生智慧。'},
+  '2-1-1':{persona:'「觉醒的浪漫主义者」',dia:'你选择打破常规、向暗恋的人告白、最后发誓不再浪费每一天。你是一个被恐惧困住太久但终于觉醒的人。循环给了你勇气，但这勇气一直都在你心里。',med:'「勇敢表达」爱情糖',usage:'下次有想说的话，别等循环——直接在现实中说。人生的每一天都是循环的倒数。',advice:'你终于说出了那些藏在心里三年的话。循环帮你做了这件事，但你不需要循环来获得勇气。相信自己。'},
+  '2-1-2':{persona:'「珍惜当下的悟者」',dia:'你打破了常规去告白，然后学会了珍惜——不管明天会不会来。你是一个通过极端体验获得人生领悟的人。循环让你明白了：每一天都可能是最后一次，所以每一天都值得认真对待。',med:'「珍惜当下」感恩日记',usage:'每天写下三件让你感到温暖的小事。不需要惊天动地，只需要真实。',advice:'告白之后你说"即使明天还是循环我也不怕了"——这不是放弃，而是真正的自由。当你不怕重复的时候，你其实已经赢了。'},
+  '2-2-1':{persona:'「归家的孩子」',dia:'你没有选择刺激而是选择了回家。你去了父母家，吃了一顿饭，然后发誓要改变。你是一个在浮躁世界中记得"根"在哪里的人。',med:'「家庭时光」回归丸',usage:'定期回家吃饭。不是节日也可以——你的存在本身就是最好的礼物。',advice:'你在无限的循环中选择了回家——这说明无论世界多大多精彩，你的心里永远有一盏灯亮在父母家。别让那盏灯只能在循环里亮。'},
+  '2-2-2':{persona:'「安住当下的智者」',dia:'你选择回家吃饭，然后平静地接受了循环。你不需要改变什么——因为你已经找到了最重要的东西。家人、一顿饭、安宁的心——这些才是你真正需要的。',med:'「内心平静」禅意茶',usage:'你已经找到了自己的锚。无论生活如何变化，记得常常回到这个锚旁边。',advice:'你在循环中而不是在远方找到了答案——这说明你真正理解了什么是"家"。不是地点，是心境。愿你永远保有这份平静。'},
+});
+
+// --- 暗恋咖啡店卡 ---
+buildResults('love_crush',{
+  '1-1-1':{persona:'「勇敢的浪漫主义者」',dia:'你收到纸条立刻赴约、坦率承认、最后果断选择了不让自己后悔。你在爱情里是一个敢于主动、不怕被拒绝的人。你的勇气不是莽撞，而是你比一般人更清楚：比起失败，遗憾才是更难以承受的东西。',med:'「继续保持勇敢」勇气糖',usage:'你已经很会主动了。偶尔也可以停下来，让对方也有机会走向你。',advice:'你的浪漫不是柔弱的，而是带着行动力的。你相信爱情值得争取，也相信自己的心意值得被听见。一直保持这样。'},
+  '1-1-2':{persona:'「洒脱的旅人」',dia:'你来了、坦率了、但在最后选择了不纠缠。你在爱情里有一种罕见的洒脱——你敢于走近，也敢于告别。你不把每一段关系都看成必须有结果，而是把每一次相遇都看成生命中的风景。',med:'「享受当下」旅行贴',usage:'你已经懂得如何不留遗憾地告别。继续保持这份轻盈。',advice:'你的洒脱不是逃避，而是你理解了：有些人的意义不在于陪你走完一生，而在于陪你走好这一段。'},
+  '1-2-1':{persona:'「真诚的脆弱者」',dia:'你选择赴约却不敢直说——但最终在关键时刻袒露了自己的恐惧。你在爱情里是一个需要安全感的类型，但不代表你懦弱。恰恰相反，承认自己害怕被拒绝需要更大的勇气。你的真诚比任何华丽的开场白都动人。',med:'「自我肯定」勇气片',usage:'每天对自己说一句：我的真诚本身就是一种力量。',advice:'很多人用潇洒来保护自己，你却选择了用脆弱来连接对方。这不是缺点，这是你最珍贵的特质。'},
+  '1-2-2':{persona:'「慢热的守护者」',dia:'你赴约了却用玩笑掩饰真心，最后需要一个完美开场白。你在爱情里是一个慢热型——你需要时间确认自己的感受，也需要完美的时机才敢行动。但你知道自己一旦认定了就不会轻易放手。',med:'「接受不完美」松绑丸',usage:'不用等完美时机。完美的时机就是——现在。',advice:'你一直在等一个完美的开场白。但爱情不需要开场白，只需要一句真话。你的真话已经够好了。'},
+  '2-1-1':{persona:'「冲动的行动派」',dia:'你起初犹豫了，但一看到第二张纸条就立刻冲了出去。你在爱情里有一个开关——平时可能瞻前顾后，但一旦被触发就会毫不犹豫。你的这种爆发力让你在关键时刻不会错过重要的人和事。',med:'「信任直觉」加速器',usage:'你的第一反应往往是对的。不要用过度思考来覆盖它。',advice:'犹豫是正常的，但你的可贵之处在于：犹豫之后你选择了行动。比永远不犹豫更重要的，是犹豫后还能迈出那一步。'},
+  '2-1-2':{persona:'「理性的沟通者」',dia:'你起初犹豫、然后选择先发消息解释而不是冲动行事。你在爱情里是一个理性先行的人——你相信沟通比冲动更重要，宁愿先把自己的想法说清楚也不愿在情绪中做决定。',med:'「保持平衡」冷静丸',usage:'你的理性是你的超能力。但偶尔也让感性驾驶一下——它可能带你去更好的地方。',advice:'在所有人都让你快去的时候，你选择了先说清楚。这不是怯懦，这是你在保护一段可能的关系不受冲动的伤害。'},
+  '2-2-1':{persona:'「温柔的直球手」',dia:'你经历了犹豫、纠结，但最后把真心话说了出来。你在爱情里看似慢热，但一旦开口就一击即中。你用时间确认了自己的心意，所以说出来的时候比谁都坚定。',med:'「你很好」暖心茶',usage:'你已经找到了自己的节奏。不用和别人比快慢——你的节奏就是最好的节奏。',advice:'你不是不敢说，你只是不想随便说。当你说出口的时候，每一个字都是真的。这份重量，速食爱情里找不到。'},
+  '2-2-2':{persona:'「细水长流的陪伴者」',dia:'你从头到尾都在犹豫——但每一次犹豫之后你都没有放弃。你在爱情里是一个慢慢来的类型。你不相信一见钟情，你相信日久生情。你的喜欢像水一样——不汹涌，但一直都在流。',med:'「珍惜自己的节奏」慢炖锅',usage:'你不需要变成别人那样的勇敢。你的慢和稳也是一种魅力。',advice:'所有人都告诉你在爱情里要快、要主动、要冲动。但你选择慢慢来。慢慢来的感情往往更持久——因为它是建立在了解之上的。'},
+});
+
+// --- 重逢十字路口卡 ---
+buildResults('love_reunion',{
+  '1-1-1':{persona:'「勇敢的追问者」',dia:'你选择了坐下来、直面过去、在真相面前表达了"我本可以陪你"的心情。你在感情里是一个不怕面对真相的人——你宁可痛苦也不要模糊。你的追问不是纠缠，而是你在为自己的感情寻找一个句号。',med:'「释放过去」解脱片',usage:'你已经问到了答案。现在请允许自己向前走——不管有没有TA。',advice:'你敢于问了最难的问题。不是所有人都有面对真相的勇气。你得到了答案——无论它是什么，这都比永远在猜好。'},
+  '1-1-2':{persona:'「释怀的智者」',dia:'你坐在了TA对面、问了TA过得怎么样、在听到真相后选择了放下。你在感情里有一种超越年龄的成熟——你知道有些答案很重要，但更重要的是得到答案后继续走自己的路。',med:'「你已经成长了」肯定剂',usage:'放下不是忘记。放下是——你终于可以带着这段经历继续往前走了。',advice:'你在十字路口遇到了过去，和它坐下来喝了一杯咖啡，然后平静地道了别。这是最高级的重逢。'},
+  '1-2-1':{persona:'「回头的勇者」',dia:'你本来已经走了，但是折返了——然后在TA面前把自己的心意说了出来。你在感情里不怕丢脸——或者说，你觉得和丢脸相比，沉默的代价更大。你的回头不是软弱，而是你知道什么才重要。',med:'「不怕丢脸」护心丸',usage:'面子是最不值钱的东西。你已经证明了。继续保持。',advice:'你走了一段路，然后决定回头。这个转身的重量——比一百次不假思索的向前都要重。回头不是倒退，是你在重新选择。'},
+  '1-2-2':{persona:'「成熟的重逢者」',dia:'你走了但发了消息，最后选择用保持联系来重新定义你们的关系。你在感情里是一个成年人——你不急着复合，也不急着告别。你相信有些关系需要被重新定义，而不是简单地回到过去或彻底断开。',med:'「边界感」平衡尺',usage:'保持联系但不急于定义——这是最健康的重逢方式。你已经做到了。',advice:'很多人重逢不是回到过去就是形同陌路。你找到了第三条路——重新认识彼此。你们都不是三年前的人了，所以重新认识的才是真实的对方。'},
+  '2-1-1':{persona:'「迟到的坦诚者」',dia:'你在十字路口说了"我赶时间"，但后来后悔了——然后你选择用行动弥补。你在感情里的模式是"先回避后面对"。你的本能是逃避，但你有一个更强大的能力：克服本能。',med:'「缩短反射弧」练习卡',usage:'下一次，试着把掉头回去的间隔缩短到五分钟以内。',advice:'你差点就错过了。但你最终没有。谁说迟到的坦诚就不算坦诚了？你到了——这才是最重要的。'},
+  '2-1-2':{persona:'「温和的试探者」',dia:'你选择擦肩而过、发了消息、最后用不紧不慢的方式重新连接。你在感情里是一个懂得留白的人——你不喜欢太激烈的重逢，你更喜欢慢慢地、有距离地、一步一步靠近。',med:'「保持温柔」暖手宝',usage:'你的方式是温和的，但你的心意是坚定的。这两者不矛盾。',advice:'你用一条消息打开了一扇门——不急促、不迫切、不尴尬。最舒服的重逢往往就是这样开始的。'},
+  '2-2-1':{persona:'「坚定的回归者」',dia:'你经历了最初的回避、后来折返、最后坚定地表达了自己。你在感情里是一个"一旦想清楚了就不会再犹豫"的人。你前摇很长，但一旦启动就不会停下来。',med:'「你已经想清楚了」坚定丸',usage:'犹豫之后的坚定是最可靠的。相信你现在的判断。',advice:'你走了一大段路才回到TA面前，但你说的话比任何时候都真。因为这不是冲动——是你在两个街区之外反复思量后的决定。'},
+  '2-2-2':{persona:'「平和的老朋友」',dia:'你选择了远离、发消息试探、最后选择了"保持联系不急着定义"。你在感情里是一个不喜欢戏剧化的人——你相信真正的感情不需要大起大落，而需要细水长流的重新认识。',med:'「你的方式很好」点头片',usage:'不是所有人都需要激烈的重逢。你的平和对某些人来说就是最好的重逢方式。',advice:'你用一条消息保持了联系。不热烈、不冷淡、刚刚好。有些人不需要大团圆结局——保持联系本身就是最好的结局。'},
+});
+
+// ============================================================
+// 游戏引擎
+// ============================================================
+
+let state={
+  currentCard:null,currentPhase:null,choicePath:[],
+  isPlaying:false,awaitingChoice:false,currentOptions:null,
+  messageQueue:[],isShowingMessages:false,
+};
+
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById(pageId);
+  if(pg)pg.classList.add('active');
+  // Toggle nav & body scroll
+  const nav=document.getElementById('stickyNav');
+  const isHome=pageId==='page-home';
+  if(nav)nav.style.display=isHome?'flex':'none';
+  document.body.style.overflow=isHome?'':'hidden';
+}
+
+function showOverlay(icon,text,duration,callback){
+  const overlay=document.getElementById('overlay');
+  document.getElementById('overlayIcon').textContent=icon;
+  document.getElementById('overlayText').textContent=text;
+  overlay.classList.add('show');
+  if(duration&&callback){setTimeout(()=>{overlay.classList.remove('show');callback();},duration)}
+}
+
+// ===== Sticky Nav scroll effect =====
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('stickyNav');
+  if(nav)nav.classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ===== Carousel =====
+let carouselIndex=0;
+const CARDS=EXPERIENCE_CARDS;
+
+function makeCardHTML(card,i){
+  // <!-- 体验卡图片链接：替换 .card-img-area 中的 src -->
+  return `
+    <div class="carousel-slide ${card.slideClass}" onclick="selectCard('${card.id}')" data-index="${i}">
+      <span class="card-badge-top">${card.badge}</span>
+      <div class="card-emoji-large">${card.emoji}</div>
+      <div class="card-title-large">${card.title}</div>
+      <div class="card-img-area"><img src="${card.imgSrc}" alt="${card.title}" loading="lazy"></div>
+      <div class="card-stars">
+        <span class="stars-yellow">${'★'.repeat(Math.floor(card.stars))}${card.stars%1?'☆':''}</span>
+        <span class="review-count">${card.reviews}</span>
+      </div>
+      <div class="card-desc-short">${card.desc}</div>
+      <div class="card-actions">
+        <button class="btn-card-primary" onclick="event.stopPropagation();selectCard('${card.id}')">⚡ 立即体验</button>
+        <button class="btn-card-secondary" onclick="event.stopPropagation();selectCard('${card.id}')">ℹ 了解更多</button>
+      </div>
+    </div>`;
+}
+
+function renderCarousel(){
+  const track=document.getElementById('carouselTrack');
+  const dots=document.getElementById('carouselDots');
+  track.innerHTML=CARDS.map((c,i)=>makeCardHTML(c,i)).join('');
+  dots.innerHTML=CARDS.map((_,i)=>`<span class="dot${i===0?' active':''}" onclick="carouselGoTo(${i})"></span>`).join('');
+  carouselIndex=0;
+}
+
+function updateCarouselDots(){
+  document.querySelectorAll('#carouselDots .dot').forEach((d,i)=>d.classList.toggle('active',i===carouselIndex));
+}
+
+function scrollCarouselTo(index){
+  const track=document.getElementById('carouselTrack');
+  const slides=track.children;
+  if(!slides.length)return;
+  const target=slides[Math.min(index,slides.length-1)];
+  track.scrollTo({left:target.offsetLeft-track.offsetLeft-(track.clientWidth-target.clientWidth)/2,behavior:'smooth'});
+}
+
+function carouselNext(){carouselIndex=Math.min(carouselIndex+1,CARDS.length-1);scrollCarouselTo(carouselIndex);updateCarouselDots()}
+function carouselPrev(){carouselIndex=Math.max(carouselIndex-1,0);scrollCarouselTo(carouselIndex);updateCarouselDots()}
+function carouselGoTo(index){carouselIndex=index;scrollCarouselTo(index);updateCarouselDots()}
+
+// Track scroll to sync dots
+document.addEventListener('DOMContentLoaded',()=>{
+  const track=document.getElementById('carouselTrack');
+  if(!track)return;
+  track.addEventListener('scroll',()=>{
+    const slides=track.children;
+    if(!slides.length)return;
+    const tc=track.scrollLeft+track.clientWidth/2;
+    let closest=0,closestDist=Infinity;
+    for(let i=0;i<slides.length;i++){
+      const sc=slides[i].offsetLeft+slides[i].clientWidth/2;
+      const dist=Math.abs(tc-sc);
+      if(dist<closestDist){closestDist=dist;closest=i}
+    }
+    if(closest!==carouselIndex){carouselIndex=closest;updateCarouselDots()}
+  });
+});
+
+// ===== 首页渲染 =====
+function renderHome(){
+  renderCarousel();
+}
+
+// ===== 选择体验卡 =====
+function selectCard(cardId){
+  const card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
+  if(!card)return;
+  state.currentCard=card;state.choicePath=[];state.currentPhase=card.startPhase;
+  state.isPlaying=true;state.awaitingChoice=false;state.messageQueue=[];state.isShowingMessages=false;
+  document.getElementById('chatMessages').innerHTML='';
+  document.getElementById('systemBanner').style.display='none';
+  document.getElementById('chatInput').value='';
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  updateChatRoomName('');updateChatRoomCount('');
+  showPage('page-chat');
+  startPhase(state.currentPhase);
+}
+
+// ===== 阶段推进 =====
+function startPhase(phaseId){
+  const card=state.currentCard;
+  const phase=card.phases[phaseId];
+  if(!phase)return console.error('Phase not found:',phaseId);
+  state.currentPhase=phaseId;
+  if(phase.isEnd){finishGame();return}
+  updateChatRoomName(phase.chatName);
+  if(phase.messages&&phase.messages.length>0){
+    playMessages(phase.messages,()=>{
+      updateSystemBanner(phase.prompt,phase.options);
+      scrollToBottom();
+      state.awaitingChoice=true;state.currentOptions=phase.options;
+      document.getElementById('chatInput').disabled=false;
+      document.getElementById('chatSendBtn').disabled=false;
+      document.getElementById('chatInput').focus();
+    });
+  }else{
+    updateSystemBanner(phase.prompt,phase.options);
+    scrollToBottom();
+    state.awaitingChoice=true;state.currentOptions=phase.options;
+    document.getElementById('chatInput').disabled=false;
+    document.getElementById('chatSendBtn').disabled=false;
+    document.getElementById('chatInput').focus();
+  }
+}
+
+function playMessages(messages,onComplete){
+  const container=document.getElementById('chatMessages');
+  state.isShowingMessages=true;
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  const typingDiv=document.createElement('div');
+  typingDiv.className='typing-indicator';
+  typingDiv.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#94A3B8">对方正在输入...</span>';
+  container.appendChild(typingDiv);scrollToBottom();
+  let index=0;
+  function showNext(){
+    if(index>=messages.length){typingDiv.remove();state.isShowingMessages=false;if(onComplete)onComplete();return}
+    const msg=messages[index];typingDiv.remove();
+    container.appendChild(createMessageBubble(msg));scrollToBottom();
+    index++;
+    if(index<messages.length){
+      const nt=document.createElement('div');nt.className='typing-indicator';
+      nt.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#94A3B8">对方正在输入...</span>';
+      container.appendChild(nt);scrollToBottom();
+    }
+    setTimeout(showNext,400+Math.random()*700);
+  }
+  setTimeout(showNext,500);
+}
+
+function createMessageBubble(msg){
+  const card=state.currentCard;
+  const isMe=!msg.sender||msg.sender==='我';
+  const row=document.createElement('div');
+  row.className='msg-row'+(isMe?' me':'');
+  let avatarColor='#6b7280';
+  if(!isMe&&card.avatarColors&&card.avatarColors[msg.sender])avatarColor=card.avatarColors[msg.sender];
+  if(isMe)avatarColor='#f59e0b';
+  const initials=isMe?'我':(msg.sender||'?').charAt(0);
+  row.innerHTML=`<div class="msg-avatar" style="background:${avatarColor}">${initials}</div><div class="msg-body"><div class="msg-name">${isMe?'你':(msg.sender||'')}</div><div class="msg-bubble">${escapeHtml(msg.text)}</div></div>`;
+  return row;
+}
+
+function createUserChoiceBubble(optionText){
+  const row=document.createElement('div');row.className='msg-row me';
+  row.innerHTML=`<div class="msg-avatar" style="background:#f59e0b">我</div><div class="msg-body"><div class="msg-name">你</div><div class="msg-bubble">"${escapeHtml(optionText)}"</div></div>`;
+  return row;
+}
+
+function updateSystemBanner(prompt,options){
+  const banner=document.getElementById('systemBanner');
+  if(!prompt){banner.style.display='none';return}
+  banner.style.display='block';
+  let html=`<div class="sys-label">⚡ 系统提示</div><div class="sys-text">${escapeHtml(prompt)}</div>`;
+  if(options&&options.length>0)options.forEach(opt=>{html+=`<span class="sys-option">${opt.id}. ${escapeHtml(opt.text)}</span>`});
+  banner.innerHTML=html;
+}
+
+function updateChatRoomName(name){document.getElementById('chatRoomName').textContent=name||'群聊'}
+function updateChatRoomCount(count){document.getElementById('chatRoomCount').textContent=count||''}
+function scrollToBottom(){const c=document.getElementById('chatMessages');setTimeout(()=>{c.scrollTop=c.scrollHeight},50)}
+
+// ===== 用户发送选择 =====
+function handleSend(){
+  if(!state.awaitingChoice||state.isShowingMessages)return;
+  const input=document.getElementById('chatInput');
+  const choice=parseInt(input.value.trim());
+  if(choice!==1&&choice!==2){alert('请输入 1 或 2');return}
+  const option=state.currentOptions.find(o=>o.id===choice);
+  if(!option)return;
+  state.choicePath.push(choice);state.awaitingChoice=false;
+  input.value='';input.disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  const container=document.getElementById('chatMessages');
+  container.appendChild(createUserChoiceBubble(option.text));scrollToBottom();
+  document.getElementById('systemBanner').style.display='none';
+  setTimeout(()=>{startPhase(option.next)},800);
+}
+
+// Enter key
+document.addEventListener('DOMContentLoaded',()=>{
+  const input=document.getElementById('chatInput');
+  if(input)input.addEventListener('keydown',function(e){if(e.key==='Enter')handleSend()});
+});
+
+// ===== 游戏结束 =====
+function finishGame(){
+  state.isPlaying=false;
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  showPage('page-result');showResultLoading();
+  setTimeout(()=>{renderResult()},2000);
+}
+
+// ===== 结果页 =====
+function showResultLoading(){
+  document.getElementById('resultLoading').style.display='flex';
+  const rc=document.getElementById('resultContent');rc.innerHTML='';rc.style.display='none';
+}
+
+function renderResult(){
+  document.getElementById('resultLoading').style.display='none';
+  const container=document.getElementById('resultContent');container.style.display='flex';
+  const card=state.currentCard;
+  const pathKey=state.choicePath.join('-');
+  const result=(card.results&&card.results[pathKey])?card.results[pathKey]:getFallbackResult();
+  container.innerHTML=`
+    <div class="prescription-card">
+      <div class="pc-watermark"></div>
+      <div class="pc-badge">PERSONALITY DIAGNOSIS</div>
+      <div class="pc-persona">${escapeHtml(result.persona)}</div>
+      <div class="pc-path">基于「${escapeHtml(card.title)}」· 路径 ${pathKey}</div>
+      <div class="pc-section"><h3>【诊断结果】</h3><div class="pc-diagnosis">${escapeHtml(result.dia)}</div></div>
+      <div class="pc-section"><h3>【处方】Rp.</h3><div class="pc-med-box"><div class="pc-med-name">${escapeHtml(result.med)}</div><div class="pc-med-usage"><strong>用法用量：</strong>${escapeHtml(result.usage)}</div></div></div>
+      <div class="pc-section"><h3>【医嘱】</h3><div class="pc-advice">${escapeHtml(result.advice)}</div></div>
+      <div class="pc-doctor"><div><div style="font-size:10px;color:rgba(180,130,50,0.7)">主治医师</div><div class="pc-doctor-name">赛博华佗</div></div><div class="pc-stamp">处方<br>专用</div></div>
+    </div>
+    <div class="result-buttons">
+      <button class="btn-retry" onclick="retrySameCard()">🔄 再测一次当前体验</button>
+      <button class="btn-home" onclick="goHome()">🎴 重新挑选体验卡</button>
+    </div>
+    <p style="font-size:10px;color:rgba(148,163,184,0.4);text-align:center;padding:0 20px 30px;line-height:1.8">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
+}
+
+function getFallbackResult(){
+  return{
+    persona:'「独特的体验者」',
+    dia:'你的选择组合非常特别，在数据库中找不到完全匹配的人格档案。这说明你是一个无法被简单分类的人——恭喜，这是最高级别的赞美。你的灵魂拒绝被标签化，你的每一个选择都来自当下的真实感受，而不是任何预设的模式。继续保持这样活着。',
+    med:'「做自己」终身处方',usage:'不需要任何用法。你已经在做了。',
+    advice:'你是一个无法被归类的人。在这个人人都想做标准答案的世界里，你选择做一道开放题。你不需要处方——你本身就是解药。'
+  };
+}
+
+function retrySameCard(){
+  const cardId=state.currentCard.id;state.choicePath=[];state.currentPhase=null;
+  state.isPlaying=false;state.awaitingChoice=false;state.currentOptions=null;
+  state.messageQueue=[];state.isShowingMessages=false;
+  document.getElementById('chatMessages').innerHTML='';
+  document.getElementById('systemBanner').style.display='none';
+  document.getElementById('chatInput').value='';
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  if(cardId.startsWith('love_'))selectLoveCard(cardId);else selectCard(cardId);
+}
+
+function endExperience(){
+  state.currentCard=null;state.currentPhase=null;state.choicePath=[];
+  state.isPlaying=false;state.awaitingChoice=false;state.currentOptions=null;
+  state.messageQueue=[];state.isShowingMessages=false;
+  document.getElementById('chatMessages').innerHTML='';
+  document.getElementById('systemBanner').style.display='none';
+  document.getElementById('chatInput').value='';
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  document.body.style.overflow='';
+  showPage('page-home');
+}
+
+function goHome(){
+  state.currentCard=null;state.currentPhase=null;state.choicePath=[];state.isPlaying=false;
+  document.body.style.overflow='';
+  showPage('page-home');
+}
+
+// ===== 恋爱叙事引擎 =====
+let loveState={
+  currentCard:null,currentPhase:null,choicePath:[],
+  messageQueue:[],messageIndex:0,
+  isShowingPrompt:false,currentOptions:null,
+};
+
+function selectLoveCard(cardId){
+  const card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
+  if(!card)return;
+  loveState.currentCard=card;loveState.choicePath=[];loveState.currentPhase=null;
+  loveState.messageQueue=[];loveState.messageIndex=0;
+  loveState.isShowingPrompt=false;loveState.currentOptions=null;
+  document.getElementById('lsStoryTitle').textContent=card.title;
+  document.getElementById('lsCharAvatar').textContent=card.emoji;
+  document.getElementById('lsCharAvatar').style.background='#6b7280';
+  document.getElementById('lsCharName').textContent='';
+  document.getElementById('lsDialogText').textContent='';
+  document.getElementById('lsChoices').style.display='none';
+  document.getElementById('lsTapHint').style.display='none';
+  showPage('page-love-story');
+  startLovePhase(card.startPhase);
+}
+
+function startLovePhase(phaseId){
+  const card=loveState.currentCard;
+  const phase=card.phases[phaseId];
+  if(!phase)return console.error('Phase not found:',phaseId);
+  loveState.currentPhase=phaseId;
+  if(phase.isEnd){loveFinishGame();return}
+  loveState.messageQueue=phase.messages||[];loveState.messageIndex=0;
+  loveState.isShowingPrompt=false;loveState.currentOptions=null;
+  document.getElementById('lsChoices').style.display='none';
+  lovePlayNextMessage();
+}
+
+function lovePlayNextMessage(){
+  if(loveState.messageIndex<loveState.messageQueue.length){
+    loveShowMessage(loveState.messageQueue[loveState.messageIndex]);
+    loveState.messageIndex++;
+  }else{
+    const phase=loveState.currentCard.phases[loveState.currentPhase];
+    if(phase&&phase.prompt&&phase.options)loveShowPrompt(phase.prompt,phase.options);
+  }
+}
+
+function loveShowMessage(msg){
+  const s=getCharStyle(msg.sender,loveState.currentCard);
+  const a=document.getElementById('lsCharAvatar');
+  a.textContent=s.emoji;a.style.background=s.color;
+  document.getElementById('lsCharName').textContent=msg.sender||'';
+  document.getElementById('lsDialogText').textContent=msg.text;
+  document.getElementById('lsChoices').style.display='none';
+  document.getElementById('lsTapHint').style.display='block';
+  loveState.isShowingPrompt=false;
+}
+
+function loveShowPrompt(prompt,options){
+  document.getElementById('lsDialogText').textContent=prompt;
+  document.getElementById('lsTapHint').style.display='none';
+  document.getElementById('lsChoices').style.display='flex';
+  document.getElementById('lsChoice1').textContent=options[0]?options[0].text:'';
+  document.getElementById('lsChoice2').textContent=options[1]?options[1].text:'';
+  loveState.isShowingPrompt=true;loveState.currentOptions=options;
+}
+
+function loveTapAdvance(){
+  if(loveState.isShowingPrompt)return;
+  lovePlayNextMessage();
+}
+
+function loveChoose(choiceId){
+  if(!loveState.isShowingPrompt||!loveState.currentOptions)return;
+  const option=loveState.currentOptions.find(o=>o.id===choiceId);
+  if(!option)return;
+  loveState.choicePath.push(choiceId);
+  loveState.isShowingPrompt=false;loveState.currentOptions=null;
+  document.getElementById('lsChoices').style.display='none';
+  document.getElementById('lsTapHint').style.display='block';
+  startLovePhase(option.next);
+}
+
+function endLoveStory(){
+  loveState.currentCard=null;loveState.currentPhase=null;loveState.choicePath=[];
+  loveState.messageQueue=[];loveState.messageIndex=0;
+  loveState.isShowingPrompt=false;loveState.currentOptions=null;
+  document.body.style.overflow='';
+  showPage('page-home');
+}
+
+function loveFinishGame(){
+  state.currentCard=loveState.currentCard;
+  state.choicePath=[...loveState.choicePath];
+  state.isPlaying=false;
+  showOverlay('🔮','体验结束，正在生成你的人格处方...',2500,()=>{
+    showPage('page-result');renderResult();
+  });
+}
+
+function getCharStyle(senderName,card){
+  const color=(card.avatarColors&&card.avatarColors[senderName])?card.avatarColors[senderName]:'#6b7280';
+  const emoji=senderName?senderName.charAt(0):'?';
+  return{color,emoji};
+}
+
+function escapeHtml(text){const div=document.createElement('div');div.textContent=text;return div.innerHTML}
+
+// ===== 启动 =====
+document.body.style.overflow='';
+renderHome();
+showPage('page-home');
+</script>
+</body>
+</html>

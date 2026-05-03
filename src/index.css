@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* 手写字体 - 用于处方笺 */
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  src: url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+}
+
+body {
+  margin: 0;
+  background: #1a1a2e;
+  color: #e0d6c2;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 处方笺手写风格 */
+.font-prescription {
+  font-family: 'ZCOOL KuaiLe', 'KaiTi', 'STKaiti', serif;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #4a4a6a;
+  border-radius: 2px;
+}

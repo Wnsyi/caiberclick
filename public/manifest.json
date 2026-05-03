@@ -1,0 +1,17 @@
+{
+  "name": "赛博华佗·精神理疗院",
+  "short_name": "赛博华佗",
+  "description": "用发疯文学治愈你的精神内耗 - MBTI赛博问诊",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
