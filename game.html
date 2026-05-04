@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<base href="/mental-hospital/">
 <title>人生体验卡 · 一日奇幻之旅</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,7 +195,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 }
 .comp3-tri{
   position:absolute;inset:0;z-index:10;pointer-events:none;
-  background:rgba(255,245,225,0.42);mix-blend-mode:overlay;
+  background:rgba(255,245,225,0.42);/* blend removed for debugging */
   transition:opacity 0.4s;
 }
 .comp3-card{
@@ -204,7 +203,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   overflow:hidden;display:flex;flex-direction:column;
   cursor:pointer;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
   box-shadow:0 2px 16px rgba(60,40,20,0.06);
-  position:relative;z-index:1;
+  position:relative;z-index:11;
 }
 .comp3-card:hover{box-shadow:0 16px 48px rgba(60,40,20,0.14);border-color:var(--orange)}
 .comp3-card-upper{
@@ -1900,7 +1899,7 @@ function handleLoveChatSend(){
     loveChatMode=null;
     setTimeout(()=>{
       showPage('page-love-story');
-      document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+      document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
       startLovePhase('crush_3c');
     },600);
     return;
@@ -2309,22 +2308,22 @@ function loveShowMessage(msg){
   }
   // 特定对话触发背景切换
   if(msg.text==='你真的来了。说实话，我昨天写完纸条就后悔了。'){
-    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
   }
   // 恋爱卡2：进入咖啡馆后切换背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('二位要点什么')){
-    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
   }
   // 恋爱卡2：转身离开后好友来电时切换背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('我刚才好像看到')){
-    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard2Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2Background2.jpeg)';
   }
   // 恋爱卡2：掉头跑回十字路口时切回初始背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('气喘吁吁地出现')){
-    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard2.jpg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2.jpg)';
   }
 }
 
