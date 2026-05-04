@@ -3,28 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<base href="/mental-hospital/">
 <title>人生体验卡 · 一日奇幻之旅</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="lib/cloudbase-sdk.js"></script>
 <style>
 /* ============================================================
    RESET & VARIABLES
    ============================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --orange:#FF6B35;--orange-dark:#E55A2B;--yellow:#FFD000;--gold:#F59E0B;
-  --green:#00A86B;--pink:#FF2D78;--purple:#7C3AED;--blue:#3B82F6;
-  --teal:#0D9488;--dark:#1A1A2E;--darker:#0F0F23;--cream:#FFF8E7;
-  --white:#FFF;--gray:#94A3B8;--gray-light:#E2E8F0;
+  --orange:#E5902F;--orange-dark:#C5761E;--yellow:#F5A623;--gold:#E5902F;
+  --green:#00A86B;--pink:#E07060;--purple:#7C3AED;--blue:#5B8CDE;
+  --teal:#0D9488;--dark:#F5EFE0;--darker:#FDF8EE;--cream:#FFF8E7;
+  --white:#FFF;--gray:#8B7D68;--gray-light:#E0D8CB;
   --font-display:'Bebas Neue','Impact',sans-serif;
   --font-body:'Noto Sans SC',system-ui,-apple-system,sans-serif;
-  --shadow-card:0 8px 32px rgba(0,0,0,0.18);
-  --shadow-lg:0 20px 60px rgba(0,0,0,0.3);
+  --shadow-card:0 4px 16px rgba(60,40,20,0.08);
+  --shadow-lg:0 12px 40px rgba(60,40,20,0.12);
   --radius:18px;--radius-sm:10px;
 }
 html{scroll-behavior:smooth}
-body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 .page{display:none}
 .page.active{display:block}
 
@@ -34,17 +36,17 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .sticky-nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 32px;
-  background:rgba(15,15,35,0.85);backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:14px 32px;
+  background:rgba(253,248,238,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(60,40,20,0.08);
   transition:background 0.3s;
 }
-.sticky-nav.scrolled{background:rgba(15,15,35,0.97)}
+.sticky-nav.scrolled{background:rgba(253,248,238,0.98)}
 .nav-left{font-size:11px;color:var(--gray);letter-spacing:1px;white-space:nowrap}
 .nav-center{display:flex;gap:28px;align-items:center}
 .nav-center a{
   font-family:var(--font-display);font-size:14px;letter-spacing:2px;
-  color:var(--white);text-decoration:none;cursor:pointer;transition:color 0.2s;
+  color:#3D3020;text-decoration:none;cursor:pointer;transition:color 0.2s;
 }
 .nav-center a:hover{color:var(--orange)}
 .nav-right .nav-btn{
@@ -61,100 +63,290 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
   position:relative;width:100%;height:100vh;min-height:600px;overflow:hidden;background:var(--dark);
 }
 .comp1-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.comp1-image-sub{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#F0B860 0%,#F5C898 40%,#F8D8B8 70%,#FDF8EE 100%)}
+.comp1-lights{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+.beam{position:absolute;top:0;height:100%;filter:blur(22px);mix-blend-mode:screen;transition:opacity 0.3s}
+.beam::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.5) 0%,transparent 20%,transparent 80%,rgba(255,255,255,0.5) 100%)}
+.beam-center{left:50%;width:605px;transform:translateX(-50%);clip-path:polygon(50% 0%,0% 100%,100% 100%)}
+.beam-left{left:0;width:605px;clip-path:polygon(28% 0%,18% 100%,100% 100%)}
+.beam-right{right:0;width:605px;clip-path:polygon(72% 0%,0% 100%,82% 100%)}
+.beam-blue{background:radial-gradient(ellipse at 50% 0%,rgba(140,110,240,0.45) 0%,rgba(110,80,220,0.2) 30%,rgba(80,50,200,0.06) 60%,transparent 90%)}
+.beam-red{background:radial-gradient(ellipse at 50% 0%,rgba(250,140,90,0.45) 0%,rgba(230,100,50,0.2) 30%,rgba(200,70,30,0.06) 60%,transparent 90%)}
+.beam-green{background:radial-gradient(ellipse at 50% 0%,rgba(110,220,150,0.45) 0%,rgba(80,190,110,0.2) 30%,rgba(50,160,70,0.06) 60%,transparent 90%)}
+.comp1-slideshow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;max-width:60%;max-height:50%;object-fit:contain;transition:opacity 0.5s;pointer-events:none}
+.comp1-slideshow-left{position:absolute;top:50%;left:8%;transform:translateY(-50%);z-index:5;max-width:22%;max-height:38%;object-fit:contain;transition:opacity 0.5s;pointer-events:none}
+.comp1-slideshow-right{position:absolute;top:50%;right:8%;transform:translateY(-50%);z-index:5;max-width:22%;max-height:38%;object-fit:contain;transition:opacity 0.5s;pointer-events:none}
 .comp1-overlay{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:80px 24px 120px;text-align:center;z-index:2;
-  background:linear-gradient(180deg,rgba(15,15,35,0.3) 0%,rgba(15,15,35,0.6) 50%,rgba(15,15,35,0.88) 100%);
+  padding:80px 24px 120px;text-align:center;z-index:3;
+  background:linear-gradient(180deg,rgba(253,248,238,0.2) 0%,rgba(253,248,238,0.5) 50%,rgba(253,248,238,0.85) 100%);
 }
-.comp1-title{font-family:var(--font-body);font-size:clamp(40px,8vw,72px);font-weight:900;line-height:1.15;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 15%,#fff 40%,#fff 60%,rgba(255,255,255,0.15) 85%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.comp1-title{font-family:var(--font-body);font-size:clamp(40px,8vw,72px);font-weight:900;line-height:1.15;background:linear-gradient(90deg,transparent 0%,rgba(61,48,32,0.15) 15%,#3D3020 40%,#3D3020 60%,rgba(61,48,32,0.15) 85%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .comp1-btn{
   position:absolute;bottom:48px;left:48px;z-index:5;
   font-family:var(--font-display);font-size:16px;letter-spacing:3px;
   background:var(--orange);color:#fff;border:none;
   padding:14px 36px;border-radius:30px;cursor:pointer;
-  transition:all 0.3s;box-shadow:0 8px 32px rgba(255,107,53,0.35);
+  transition:all 0.3s;box-shadow:0 8px 32px rgba(229,144,47,0.3);
 }
-.comp1-btn:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(255,107,53,0.5)}
+.comp1-btn:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(229,144,47,0.45)}
 .comp1-btn:active{transform:scale(0.96)}
+.comp1-confetti{position:absolute;inset:0;z-index:6;pointer-events:none;transition:opacity 0.8s}
+.comp1-confetti.hidden{opacity:0}
 
 /* ============================================================
    COMPONENT 2 — CARDS CAROUSEL
    ============================================================ */
-.comp2{background:var(--darker)}
-.comp2-upper{width:100%;height:60vh;min-height:400px;overflow:hidden;background:var(--dark)}
-.comp2-upper img{width:100%;height:100%;object-fit:cover;display:block}
-.comp2-lower{padding:48px 32px 64px;max-width:1200px;margin:0 auto}
-.section-header{text-align:center;margin-bottom:32px}
+.comp2{background:linear-gradient(180deg,#FDF8EE 0%,#F8D8B8 35%,#F5C090 50%,#F8D8B8 65%,#FDF8EE 100%)}
+.comp2-upper{position:relative;width:100%;height:60vh;min-height:400px;overflow:hidden;background:linear-gradient(180deg,#FDF8EE 0%,#FDF8EE 20%,#FBE8D4 50%,#F5C898 72%,#EEB060 100%)}
+.comp2-upper-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;
+  font-family:var(--font-display);font-size:clamp(32px,5vw,56px);letter-spacing:4px;
+  color:rgba(61,48,32,0.35);pointer-events:none;
+}
+.comp2-lower{padding:48px 0 64px;background:linear-gradient(180deg,#EEB060 0%,#F5C898 35%,#FBE8D4 65%,#FDF8EE 100%)}
+.section-header{text-align:center;margin-bottom:32px;padding:0 32px}
 .section-tag{font-family:var(--font-display);font-size:12px;letter-spacing:3px;color:var(--orange)}
-.section-header h2{font-family:var(--font-body);font-size:32px;font-weight:900;color:#fff;margin:8px 0}
+.section-header h2{font-family:var(--font-body);font-size:32px;font-weight:900;color:#3D3020;margin:8px 0}
 .section-header .divider{display:block;width:48px;height:3px;background:var(--orange);margin:12px auto 0;border-radius:2px}
 
 /* ============================================================
    COMPONENT 3 — UPPER PLACEHOLDER + LOWER DUAL CARDS
    ============================================================ */
 .comp3{background:var(--darker)}
-.comp3-upper{width:100%;height:50vh;min-height:350px;overflow:hidden;background:var(--dark)}
+.comp3-upper{width:100%;height:50vh;min-height:350px;overflow:hidden;background:var(--dark);position:relative}
+.comp3-ripple-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%}
+.comp3-splatter{position:absolute;inset:0;pointer-events:none;z-index:1}
+.comp3-splatter .splat{position:absolute;display:block;mix-blend-mode:soft-light}
+/* 手掌印 / 颜料甩溅 */
+.comp3-splatter .s1{
+  width:140px;height:160px;top:15%;left:8%;
+  background:radial-gradient(ellipse at 40% 30%,rgba(235,140,130,0.55),rgba(235,140,130,0.12));
+  border-radius:42% 58% 48% 52% / 58% 45% 55% 42%;
+  transform:rotate(-15deg);
+}
+.comp3-splatter .s2{
+  width:115px;height:125px;top:8%;left:30%;
+  background:radial-gradient(ellipse at 35% 40%,rgba(240,190,110,0.50),rgba(240,190,110,0.10));
+  border-radius:48% 52% 45% 55% / 44% 56% 38% 62%;
+  transform:rotate(10deg);
+}
+.comp3-splatter .s3{
+  width:160px;height:180px;top:22%;right:14%;
+  background:radial-gradient(ellipse at 50% 35%,rgba(140,175,235,0.48),rgba(140,175,235,0.10));
+  border-radius:55% 45% 42% 58% / 48% 62% 44% 52%;
+  transform:rotate(28deg);
+}
+.comp3-splatter .s4{
+  width:95px;height:110px;top:5%;right:6%;
+  background:radial-gradient(ellipse at 45% 25%,rgba(130,195,150,0.50),rgba(130,195,150,0.10));
+  border-radius:38% 62% 52% 48% / 56% 42% 60% 40%;
+  transform:rotate(-18deg);
+}
+.comp3-splatter .s5{
+  width:125px;height:145px;bottom:12%;left:18%;
+  background:radial-gradient(ellipse at 40% 30%,rgba(240,190,110,0.45),rgba(240,190,110,0.08));
+  border-radius:50% 50% 42% 58% / 48% 46% 54% 42%;
+  transform:rotate(15deg);
+}
+.comp3-splatter .s6{
+  width:105px;height:100px;bottom:18%;right:22%;
+  background:radial-gradient(ellipse at 50% 40%,rgba(235,140,130,0.48),rgba(235,140,130,0.08));
+  border-radius:52% 48% 48% 52% / 42% 58% 52% 48%;
+  transform:rotate(-8deg);
+}
+.comp3-splatter .s7{
+  width:80px;height:85px;top:42%;left:4%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(140,175,235,0.52),rgba(140,175,235,0.10));
+  border-radius:44% 56% 50% 50% / 52% 48% 50% 50%;
+  transform:rotate(35deg);
+}
+.comp3-splatter .s8{
+  width:115px;height:130px;top:46%;right:8%;
+  background:radial-gradient(ellipse at 40% 35%,rgba(240,190,110,0.42),rgba(130,195,150,0.15));
+  border-radius:50% 50% 56% 44% / 44% 56% 38% 60%;
+  transform:rotate(-22deg);
+}
+/* 小颜料点 */
+.comp3-splatter::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle 12px at 16% 20%,rgba(235,140,130,0.42),transparent),
+    radial-gradient(circle 7px at 22% 24%,rgba(235,140,130,0.25),transparent),
+    radial-gradient(circle 14px at 32% 12%,rgba(240,190,110,0.38),transparent),
+    radial-gradient(circle 6px at 35% 16%,rgba(240,190,110,0.22),transparent),
+    radial-gradient(circle 15px at 74% 28%,rgba(140,175,235,0.36),transparent),
+    radial-gradient(circle 8px at 76% 32%,rgba(140,175,235,0.20),transparent),
+    radial-gradient(circle 12px at 87% 10%,rgba(130,195,150,0.38),transparent),
+    radial-gradient(circle 7px at 90% 14%,rgba(130,195,150,0.20),transparent),
+    radial-gradient(circle 10px at 13% 82%,rgba(240,190,110,0.35),transparent),
+    radial-gradient(circle 6px at 17% 86%,rgba(240,190,110,0.18),transparent),
+    radial-gradient(circle 14px at 80% 78%,rgba(235,140,130,0.32),transparent),
+    radial-gradient(circle 8px at 82% 82%,rgba(235,140,130,0.18),transparent),
+    radial-gradient(circle 11px at 43% 68%,rgba(140,175,235,0.30),transparent),
+    radial-gradient(circle 7px at 46% 72%,rgba(140,175,235,0.16),transparent),
+    radial-gradient(circle 9px at 62% 53%,rgba(130,195,150,0.32),transparent),
+    radial-gradient(circle 5px at 65% 56%,rgba(130,195,150,0.16),transparent);
+}
 .comp3-upper img{width:100%;height:100%;object-fit:cover;display:block}
 .comp3-lower{
   display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;
-  gap:32px;max-width:1100px;margin:0 auto;padding:64px 32px;
+  gap:36px;width:100%;padding:80px 0;
+  position:relative;
+}
+.comp3-tri{
+  position:absolute;inset:0;z-index:10;pointer-events:none;
+  background:rgba(255,245,225,0.42);mix-blend-mode:overlay;
+  transition:opacity 0.4s;
 }
 .comp3-card{
-  background:linear-gradient(160deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);
-  padding:32px 28px;backdrop-filter:blur(8px);
+  background:#fff;border:2px solid rgba(60,40,20,0.1);border-radius:var(--radius);
+  overflow:hidden;display:flex;flex-direction:column;
   cursor:pointer;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  box-shadow:0 2px 16px rgba(60,40,20,0.06);
+  position:relative;z-index:1;
 }
-.comp3-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.3);border-color:var(--orange)}
-.comp3-card-a{grid-row:1;grid-column:1}
-.comp3-card-b{grid-row:2;grid-column:2}
-.comp3-card-icon{font-size:36px;margin-bottom:12px}
-.comp3-card-title{font-family:var(--font-body);font-size:18px;font-weight:900;color:#fff;margin-bottom:8px}
-.comp3-card-text{font-size:13px;color:rgba(226,232,240,0.6);line-height:1.75}
-.comp3-footer{text-align:center;padding:32px 20px 48px;font-size:11px;color:rgba(148,163,184,0.4);line-height:1.8}
+.comp3-card:hover{box-shadow:0 16px 48px rgba(60,40,20,0.14);border-color:var(--orange)}
+.comp3-card-upper{
+  height:200px;flex-shrink:0;overflow:hidden;
+}
+.comp3-card-upper img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.comp3-card-lower{
+  padding:24px 28px 28px;flex:1;
+  display:flex;flex-direction:column;justify-content:center;gap:10px;
+}
+.comp3-card-a{grid-row:1;grid-column:1;margin-left:25%;transform:scaleX(1.1667);transform-origin:left center}
+.comp3-card-a:hover{transform:scaleX(1.1667) translateY(-4px)}
+.comp3-card-b{grid-row:3;grid-column:2;margin-right:25%;transform:scaleX(1.1667);transform-origin:right center}
+.comp3-card-b:hover{transform:scaleX(1.1667) translateY(-4px)}
+.comp3-insert{
+  position:absolute;inset:0;z-index:0;
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  gap:0;
+}
+.comp3-insert-item img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0.45;
+}
+.comp3-insert-item:nth-child(1) img{object-position:right center}
+.comp3-insert-item:nth-child(2) img{object-position:left center}
+.comp3-insert-item:nth-child(3) img{object-position:right center}
+.comp3-insert-item:nth-child(4) img{object-position:left center}
+.comp3-card-title{font-family:var(--font-body);font-size:18px;font-weight:900;color:#3D3020;line-height:1.3}
+.comp3-card-text{font-size:13px;color:rgba(61,48,32,0.55);line-height:1.85}
+.comp3-footer{text-align:center;padding:32px 20px 48px;font-size:11px;color:rgba(139,125,104,0.6);line-height:1.8}
+
+/* ============================================================
+   COMPONENT 4 — PLACEHOLDER (2:3 RATIO)
+   ============================================================ */
+.comp4{display:flex;flex-direction:column;height:auto;min-height:0;background:var(--darker)}
+.comp4-upper{flex:0 0 auto;width:100%;overflow:hidden;background:#A89880}
+.comp4-lower{flex:0 0 auto;width:100%;position:relative}
+.comp4-shape{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(160deg,rgba(245,166,35,0.12),rgba(229,144,47,0.06));
+  clip-path:url(#comp4ShapeClip);
+}
+.comp4-bottom-row{
+  position:absolute;bottom:32px;left:0;right:0;z-index:2;
+  display:flex;justify-content:center;align-items:flex-start;
+  gap:48px;padding:0 32px;
+}
+.comp4-info-col{
+  flex:1;max-width:320px;
+  font-size:12px;color:rgba(61,48,32,0.5);line-height:2;
+  text-align:center;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.comp4-info-col p{margin:0 0 18px}
+.comp4-info-col p:last-child{margin-bottom:0}
+
+/* ===== 电影胶卷特效 ===== */
+.film-strip{
+  width:100%;position:relative;
+  padding:16px 0;
+  background:#C8BDA8;
+}
+/* 胶卷上边齿孔 */
+.film-strip::before,
+.film-strip::after{
+  content:'';position:absolute;left:0;right:0;height:10px;z-index:2;
+  background:repeating-linear-gradient(
+    90deg,
+    transparent 0px,transparent 16px,
+    #9B9B9B 16px,#9B9B9B 24px
+  );
+}
+.film-strip::before{top:0;border-bottom:2px solid rgba(200,160,100,0.3)}
+.film-strip::after{bottom:0;border-top:2px solid rgba(200,160,100,0.3)}
+/* 齿孔间连线 */
+.film-strip-inner{
+  position:relative;z-index:1;
+  border-top:1px solid rgba(200,160,100,0.2);
+  border-bottom:1px solid rgba(200,160,100,0.2);
+  padding:6px 0;
+}
+.film-track{
+  display:flex;gap:0;width:max-content;
+  animation:filmScroll 40s linear infinite;
+}
+.film-track:hover{animation-play-state:paused}
+.film-frame{
+  width:180px;height:120px;flex-shrink:0;
+  border:3px solid rgba(180,160,140,0.35);
+  border-radius:3px;overflow:hidden;
+  margin:0 6px;
+  transition:border-color 0.3s;
+}
+.film-frame:hover{border-color:var(--orange)}
+.film-frame img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+@keyframes filmScroll{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
 
 /* ============================================================
    CAROUSEL
    ============================================================ */
-.carousel-wrapper{position:relative}
+.carousel-wrapper{width:100%;overflow:hidden}
 .carousel-track{
-  display:flex;gap:20px;overflow-x:auto;overflow-y:visible;
-  scroll-snap-type:x mandatory;scroll-behavior:smooth;
-  -webkit-overflow-scrolling:touch;
-  padding:12px 32px 16px;scrollbar-width:none;
+  position:relative;height:500px;
 }
-.carousel-track::-webkit-scrollbar{display:none}
-
 .carousel-slide{
-  flex:0 0 340px;scroll-snap-align:center;
-  border-radius:var(--radius);padding:24px 20px 18px;
-  cursor:pointer;transition:transform 0.35s,box-shadow 0.35s;
-  position:relative;overflow:hidden;
+  position:absolute;top:12px;
+  width:340px;border-radius:0;
+  padding:24px 20px 18px;
+  cursor:pointer;transition:box-shadow 0.35s;
+  overflow:hidden;
   display:flex;flex-direction:column;gap:8px;
   user-select:none;min-height:440px;
 }
-.carousel-slide:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.carousel-slide:hover{box-shadow:var(--shadow-lg)}
 .carousel-slide:active{transform:scale(0.97)}
 
 /* Card color variants */
-.slide-lottery{background:linear-gradient(160deg,#FF6B35 0%,#FF8C42 30%,#E55A2B 100%);color:#fff}
-.slide-hogwarts{background:linear-gradient(160deg,#7C3AED 0%,#6366F1 40%,#4F46E5 100%);color:#fff}
-.slide-invisible{background:linear-gradient(160deg,#1E293B 0%,#334155 50%,#0F172A 100%);color:#E2E8F0}
-.slide-reunion{background:linear-gradient(160deg,#D97706 0%,#F59E0B 40%,#B45309 100%);color:#fff}
-.slide-gaokao{background:linear-gradient(160deg,#059669 0%,#10B981 40%,#047857 100%);color:#fff}
-.slide-timeloop{background:linear-gradient(160deg,#DB2777 0%,#EC4899 40%,#BE185D 100%);color:#fff}
-.slide-love-crush{background:linear-gradient(160deg,#F472B6 0%,#EC4899 40%,#DB2777 100%);color:#fff}
-.slide-love-reunion{background:linear-gradient(160deg,#A78BFA 0%,#8B5CF6 40%,#7C3AED 100%);color:#fff}
+.slide-lottery{background:linear-gradient(160deg,#FFD4B8 0%,#FFCBA4 30%,#F5C09A 100%);color:#3D3020}
+.slide-hogwarts{background:linear-gradient(160deg,#D4C5F9 0%,#C4B5F0 40%,#B8A6E8 100%);color:#3D3020}
+.slide-invisible{background:linear-gradient(160deg,#C5D5F7 0%,#B8CDF5 40%,#A8BDE8 100%);color:#3D3020}
+.slide-reunion{background:linear-gradient(160deg,#FDE7B4 0%,#FCDD9A 40%,#F0D08A 100%);color:#3D3020}
+.slide-gaokao{background:linear-gradient(160deg,#B8E8D0 0%,#A8DEC4 40%,#96D0B4 100%);color:#3D3020}
+.slide-timeloop{background:linear-gradient(160deg,#F9C8DA 0%,#F5B8CF 40%,#ECA8C0 100%);color:#3D3020}
+.slide-love-crush{background:linear-gradient(160deg,#FBC8D8 0%,#F8B8CC 40%,#F0A8BC 100%);color:#3D3020}
+.slide-love-reunion{background:linear-gradient(160deg,#DDD0FA 0%,#D0C4F2 40%,#C4B8EA 100%);color:#3D3020}
 
 .card-badge-top{
   font-family:var(--font-display);font-size:10px;letter-spacing:2px;
-  background:rgba(255,255,255,0.2);color:inherit;backdrop-filter:blur(4px);
-  display:inline-block;padding:2px 10px;border-radius:10px;align-self:flex-start;
+  background:rgba(0,0,0,0.06);color:inherit;backdrop-filter:blur(4px);
+  display:inline-block;padding:2px 10px;border-radius:0;align-self:flex-start;
 }
 .card-emoji-large{font-size:36px;line-height:1}
 .card-title-large{font-family:var(--font-body);font-size:18px;font-weight:900;line-height:1.25;letter-spacing:1px}
 .card-img-area{
-  width:100%;aspect-ratio:16/10;border-radius:var(--radius-sm);
+  width:100%;aspect-ratio:16/10;border-radius:0;
   overflow:hidden;background:rgba(0,0,0,0.15);
   display:flex;align-items:center;justify-content:center;
 }
@@ -164,28 +356,14 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .card-stars .review-count{font-size:11px;opacity:0.85}
 .card-desc-short{font-size:12px;line-height:1.6;opacity:0.9;flex:1}
 
-.card-actions{display:flex;gap:8px;margin-top:auto}
-.card-actions button{flex:1;padding:9px 0;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;letter-spacing:1px}
-.btn-card-primary{background:#fff;color:var(--dark)}
+.card-actions{display:flex;justify-content:center;margin-top:auto}
+.card-actions button{padding:9px 32px;border-radius:0;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;letter-spacing:1px}
+.btn-card-primary{background:#fff;color:#3D3020}
 .btn-card-primary:hover{background:var(--yellow)}
 .btn-card-primary:active{transform:scale(0.95)}
-.btn-card-secondary{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)!important}
-.btn-card-secondary:hover{background:rgba(255,255,255,0.25)}
-.btn-card-secondary:active{transform:scale(0.95)}
-
-.carousel-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,0.15);color:#fff;
-  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all 0.25s;
-}
-.carousel-arrow:hover{background:var(--orange);border-color:var(--orange)}
-.carousel-prev{left:4px}.carousel-next{right:4px}
 .carousel-dots{display:flex;justify-content:center;gap:8px;padding:8px 0 0}
-.carousel-dots .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s}
-.carousel-dots .dot.active{background:var(--orange);transform:scale(1.3);box-shadow:0 0 8px rgba(255,107,53,0.5)}
+.carousel-dots .dot{width:10px;height:10px;border-radius:50%;background:rgba(60,40,20,0.15);cursor:pointer;transition:all 0.3s}
+.carousel-dots .dot.active{background:var(--orange);transform:scale(1.3);box-shadow:0 0 8px rgba(229,144,47,0.4)}
 
 /* ============================================================
    CHAT PAGE
@@ -193,29 +371,37 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 #page-chat{background:var(--darker);max-width:520px;margin:0 auto;width:100%;min-height:100vh;display:none;flex-direction:column}
 #page-chat.active{display:flex}
 .chat-topbar{
-  background:rgba(15,15,35,0.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(255,107,53,0.2);
+  background:rgba(253,248,238,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(229,144,47,0.2);
   padding:12px 16px;text-align:center;position:sticky;top:0;z-index:10;
 }
 .chat-topbar .room-emoji{font-size:20px;display:block}
-.chat-room-name{font-size:14px;font-weight:700;color:#F1F5F9}
+.chat-room-name{font-size:14px;font-weight:700;color:#3D3020}
 .chat-room-count{font-size:11px;color:var(--orange);margin-top:2px}
 
 .system-banner{
-  position:fixed;top:78px;left:50%;transform:translateX(-50%);
-  z-index:20;max-width:500px;width:calc(100% - 20px);
-  padding:12px 14px;
-  background:linear-gradient(135deg,rgba(255,45,120,0.15),rgba(255,107,53,0.12));
-  border:1px solid rgba(255,45,120,0.3);border-radius:var(--radius-sm);
-  backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  position:fixed;top:78px;right:113px;
+  z-index:20;max-width:340px;width:auto;
+  padding:18px 14px 12px;
+  background:rgba(255,255,255,0.35);
+  border:1px solid rgba(224,112,96,0.15);border-radius:var(--radius-sm);
+  backdrop-filter:blur(4px);box-shadow:0 4px 20px rgba(60,40,20,0.08);
+  cursor:grab;user-select:none;transition:box-shadow 0.2s;
+}
+.system-banner.dragging{cursor:grabbing;box-shadow:0 12px 36px rgba(60,40,20,0.18)}
+.system-banner::after{
+  content:'⋮⋮';
+  position:absolute;top:2px;right:8px;
+  font-size:9px;color:rgba(139,125,104,0.35);letter-spacing:1px;
+  pointer-events:none;
 }
 .system-banner .sys-label{
   font-family:var(--font-display);font-size:11px;color:var(--pink);letter-spacing:2px;margin-bottom:6px;
 }
-.system-banner .sys-text{font-size:12px;color:#FCA5A5;line-height:1.7;margin-bottom:6px}
+.system-banner .sys-text{font-size:12px;color:#8B3A3A;line-height:1.7;margin-bottom:6px}
 .system-banner .sys-option{
-  display:block;font-size:13px;color:var(--yellow);margin-top:4px;font-weight:700;
-  padding:4px 10px;border-radius:8px;cursor:default;background:rgba(255,208,0,0.06);
+  display:block;font-size:13px;color:var(--orange);margin-top:4px;font-weight:700;
+  padding:4px 10px;border-radius:8px;cursor:default;background:rgba(229,144,47,0.08);
 }
 
 .chat-messages{
@@ -233,11 +419,11 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .msg-name{font-size:10px;color:var(--gray);margin-bottom:2px;font-weight:600}
 .msg-bubble{
   font-size:13px;line-height:1.65;padding:10px 14px;border-radius:4px 14px 14px 14px;
-  background:rgba(255,255,255,0.06);color:#E2E8F0;word-break:break-word;
+  background:#fff;color:#3D3020;word-break:break-word;box-shadow:0 1px 4px rgba(60,40,20,0.06);
 }
 .msg-row.me .msg-bubble{
-  background:linear-gradient(135deg,rgba(255,107,53,0.25),rgba(245,158,11,0.2));
-  color:#FDE68A;border-radius:14px 4px 14px 14px;
+  background:linear-gradient(135deg,rgba(229,144,47,0.18),rgba(245,166,35,0.14));
+  color:#5C3800;border-radius:14px 4px 14px 14px;
 }
 .msg-row.me{flex-direction:row-reverse}
 .msg-row.me .msg-name{text-align:right}
@@ -252,17 +438,17 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .chat-input-bar{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:520px;padding:8px 10px 12px;
-  background:linear-gradient(0deg,rgba(15,15,35,1) 60%,rgba(15,15,35,0.95) 100%);
-  border-top:1px solid rgba(255,107,53,0.12);
+  background:linear-gradient(0deg,rgba(253,248,238,1) 60%,rgba(253,248,238,0.95) 100%);
+  border-top:1px solid rgba(229,144,47,0.15);
   display:flex;gap:8px;align-items:center;
 }
 .chat-input-bar input{
-  flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-  border-radius:24px;padding:10px 16px;font-size:14px;color:#E2E8F0;
+  flex:1;background:rgba(60,40,20,0.04);border:1px solid rgba(60,40,20,0.12);
+  border-radius:24px;padding:10px 16px;font-size:14px;color:#3D3020;
   outline:none;transition:border 0.2s;min-width:0;
 }
 .chat-input-bar input:focus{border-color:var(--orange)}
-.chat-input-bar input::placeholder{color:rgba(148,163,184,0.4)}
+.chat-input-bar input::placeholder{color:rgba(139,125,104,0.5)}
 .chat-input-bar .btn-primary{
   padding:10px 20px;border-radius:24px;border:none;
   background:linear-gradient(135deg,var(--orange),var(--orange-dark));
@@ -272,8 +458,8 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .chat-input-bar .btn-primary:disabled{opacity:0.4;cursor:not-allowed}
 .chat-input-bar .btn-end{
   padding:10px 14px;border-radius:24px;
-  background:rgba(255,45,120,0.15);border:1px solid rgba(255,45,120,0.3);
-  color:#FCA5A5;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+  background:rgba(224,112,96,0.12);border:1px solid rgba(224,112,96,0.25);
+  color:#B05040;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;
 }
 .chat-input-bar .btn-end:active{transform:scale(0.95)}
 
@@ -281,7 +467,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
    RESULT PAGE
    ============================================================ */
 #page-result{
-  background:linear-gradient(180deg,#0F0F23 0%,#1A1A2E 50%,#0F0F23 100%);
+  background:linear-gradient(180deg,#FDF8EE 0%,#F5EFE0 50%,#FDF8EE 100%);
   min-height:100vh;display:none;flex-direction:column;align-items:center;
 }
 #page-result.active{display:flex}
@@ -304,7 +490,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .prescription-card .pc-badge{
   font-family:var(--font-display);font-size:11px;letter-spacing:3px;color:var(--orange);margin-bottom:12px;
 }
-.prescription-card .pc-persona{font-size:26px;font-weight:900;color:#1A1A2E;line-height:1.2;margin-bottom:4px}
+.prescription-card .pc-persona{font-size:26px;font-weight:900;color:#3D3020;line-height:1.2;margin-bottom:4px}
 .prescription-card .pc-path{font-size:11px;color:var(--orange);margin-bottom:16px;font-weight:600}
 .prescription-card .pc-section{margin-bottom:16px;position:relative;z-index:1}
 .prescription-card .pc-section h3{
@@ -323,82 +509,89 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 .result-buttons button{width:100%;padding:14px;border-radius:28px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
 .result-buttons .btn-retry{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 6px 24px rgba(255,107,53,0.3)}
 .result-buttons .btn-retry:active{transform:scale(0.96)}
-.result-buttons .btn-home{background:rgba(255,255,255,0.06);color:#CBD5E1;border:1px solid rgba(255,255,255,0.12)}
+.result-buttons .btn-home{background:rgba(60,40,20,0.04);color:#3D3020;border:1px solid rgba(60,40,20,0.12)}
 .result-buttons .btn-home:active{transform:scale(0.96)}
 
 /* ============================================================
    LOVE STORY PAGE (VISUAL NOVEL)
    ============================================================ */
 #page-love-story{
-  position:fixed;inset:0;z-index:50;background:linear-gradient(180deg,#0F0F23 0%,#1A1A2E 40%,#0F0F23 100%);
+  position:fixed;inset:0;z-index:50;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
   display:none;flex-direction:column;overflow:hidden;
 }
 #page-love-story.active{display:flex}
 .ls-topbar{
   display:flex;align-items:center;gap:16px;padding:12px 20px;
-  background:rgba(15,15,35,0.9);backdrop-filter:blur(8px);z-index:5;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+  background:rgba(253,248,238,0.92);backdrop-filter:blur(12px);z-index:5;
+  border-bottom:1px solid rgba(60,40,20,0.08);
 }
 .ls-back-btn{
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
-  color:#CBD5E1;padding:6px 14px;border-radius:16px;font-size:12px;
+  background:rgba(60,40,20,0.04);border:1px solid rgba(60,40,20,0.12);
+  color:#3D3020;padding:6px 14px;border-radius:16px;font-size:12px;
   cursor:pointer;transition:all 0.2s;
 }
 .ls-back-btn:hover{background:rgba(255,45,120,0.2);border-color:var(--pink);color:var(--pink)}
-.ls-story-title{font-size:13px;color:rgba(226,232,240,0.6);font-weight:600}
+.ls-story-title{font-size:13px;color:rgba(139,125,104,0.7);font-weight:600}
 
 .ls-stage{
-  flex:1;display:flex;align-items:center;justify-content:flex-start;
-  padding:20px 24px 0;position:relative;cursor:pointer;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:20px 24px 40px;position:relative;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
+.ls-bottom-row{
+  position:relative;display:flex;align-items:flex-end;justify-content:center;gap:0;
+  width:100%;max-width:580px;
+}
 .ls-char-area{
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  flex-shrink:0;width:160px;align-self:center;margin-bottom:80px;
-  transition:all 0.35s;
+  position:absolute;right:100%;bottom:0;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  flex-shrink:0;transition:all 0.35s;
 }
 .ls-char-avatar{
-  width:120px;height:120px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:48px;color:#fff;
-  box-shadow:0 8px 40px rgba(0,0,0,0.35);
-  transition:background 0.35s;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.ls-char-avatar img{
+  max-width:200px;max-height:45vh;object-fit:contain;display:block;
+}
+.ls-char-avatar img.char-large{
+  max-width:400px;max-height:90vh;
 }
 .ls-char-name{
-  font-size:14px;font-weight:700;color:#E2E8F0;letter-spacing:1px;
+  font-size:14px;font-weight:900;color:#1A1A1A;letter-spacing:1px;
+  text-align:center;white-space:nowrap;
 }
 
 .ls-dialog-area{
-  position:absolute;bottom:60px;right:32px;left:200px;
+  width:100%;
   display:flex;flex-direction:column;align-items:center;gap:12px;
-  max-width:580px;margin:0 auto;
 }
 .ls-dialog-bubble{
-  width:100%;background:rgba(15,15,35,0.92);backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.08);border-radius:16px;
+  width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);
+  border:1px solid rgba(60,40,20,0.08);border-radius:16px;
   padding:20px 24px;position:relative;
 }
 .ls-dialog-bubble::before{
-  content:'';position:absolute;left:-14px;bottom:20px;
+  content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
   width:0;height:0;
-  border-top:10px solid transparent;
-  border-bottom:10px solid transparent;
-  border-right:14px solid rgba(15,15,35,0.92);
+  border-left:10px solid transparent;
+  border-right:10px solid transparent;
+  border-bottom:14px solid rgba(255,255,255,0.92);
 }
-.ls-dialog-text{font-size:15px;color:#E2E8F0;line-height:1.8;margin:0}
+.ls-dialog-text{font-size:15px;color:#3D3020;line-height:1.8;margin:0}
 
 .ls-choices{display:flex;gap:12px;width:100%}
 .ls-choice-btn{
-  flex:1;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);
-  background:rgba(255,255,255,0.05);color:#E2E8F0;font-size:14px;font-weight:600;
+  flex:1;padding:14px 16px;border-radius:14px;border:1px solid rgba(229,144,47,0.25);
+  background:rgba(255,255,255,0.7);color:#3D3020;font-size:14px;font-weight:600;
   cursor:pointer;transition:all 0.2s;line-height:1.5;text-align:center;
   backdrop-filter:blur(6px);
 }
-.ls-choice-btn:hover{background:rgba(255,107,53,0.2);border-color:var(--orange);color:#fff}
+.ls-choice-btn:hover{background:rgba(229,144,47,0.12);border-color:var(--orange);color:var(--orange-dark)}
 .ls-choice-btn:active{transform:scale(0.96)}
 
 .ls-tap-hint{
-  font-size:11px;color:rgba(148,163,184,0.5);letter-spacing:2px;
+  font-size:11px;color:#1A1A1A;letter-spacing:2px;
   animation:lsTapPulse 2s infinite;
 }
 @keyframes lsTapPulse{0%,100%{opacity:0.3;transform:translateY(0)}50%{opacity:0.8;transform:translateY(4px)}}
@@ -407,7 +600,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
    OVERLAY
    ============================================================ */
 .overlay{
-  position:fixed;inset:0;background:rgba(15,15,35,0.96);z-index:200;
+  position:fixed;inset:0;background:rgba(253,248,238,0.96);z-index:200;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity 0.5s;backdrop-filter:blur(12px);
 }
@@ -420,10 +613,12 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
    ============================================================ */
 @media(max-width:900px){
   .carousel-track{padding:12px 20px 16px}
-  .carousel-slide{flex:0 0 300px;min-height:410px}
+  .carousel-slide{width:300px;min-height:410px}
   .nav-center{display:none}
   .comp1-btn{left:32px;bottom:36px}
-  .ls-dialog-area{left:120px;right:20px;bottom:40px}
+  .ls-bottom-row{max-width:520px}
+  .ls-char-avatar img{max-width:160px;max-height:40vh}
+  .ls-char-avatar img.char-large{max-width:320px;max-height:80vh}
 }
 @media(max-width:640px){
   .comp1{min-height:100vh;height:auto}
@@ -434,9 +629,9 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
   .comp2-lower{padding:32px 12px 48px}
   .comp3-upper{height:35vh;min-height:260px}
   .comp3-lower{grid-template-columns:1fr;grid-template-rows:auto;gap:20px;padding:40px 16px}
-  .comp3-card-a,.comp3-card-b{grid-row:auto;grid-column:auto}
-  .carousel-slide{flex:0 0 280px;min-height:380px;padding:18px 14px 14px}
-  .carousel-arrow{display:none}
+  .comp3-card-a,.comp3-card-b{grid-row:auto;grid-column:auto;margin-left:16px;margin-right:16px}
+  .comp4{min-height:400px}
+  .carousel-slide{width:280px;min-height:380px;padding:18px 14px 14px}
   .card-title-large{font-size:16px}
   .card-emoji-large{font-size:28px}
   .sticky-nav{padding:10px 16px}
@@ -446,14 +641,15 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
   .chat-input-bar{gap:5px}
   .chat-input-bar .btn-end{font-size:10px;padding:10px 8px}
   .chat-input-bar .btn-primary{font-size:12px;padding:10px 14px}
-  .ls-char-area{width:100px}
-  .ls-char-avatar{width:80px;height:80px;font-size:32px}
+  .ls-bottom-row{max-width:100%}
   .ls-char-name{font-size:12px}
-  .ls-dialog-area{left:110px;right:12px;bottom:32px;gap:8px}
+  .ls-dialog-area{gap:8px}
+  .ls-char-avatar img{max-width:120px;max-height:35vh}
+  .ls-char-avatar img.char-large{max-width:240px;max-height:70vh}
   .ls-dialog-bubble{padding:14px 16px}
   .ls-dialog-text{font-size:13px;line-height:1.7}
   .ls-choice-btn{font-size:13px;padding:12px 10px}
-  .ls-stage{padding:12px 12px 0}
+  .ls-stage{padding:12px 12px 24px}
 }
 </style>
 </head>
@@ -479,23 +675,35 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
   <section class="comp1" id="comp1">
     <!-- 组件1背景大图：替换此处 src -->
     <img class="comp1-bg"
-         src="https://placehold.co/1600x900/1A1A2E/1A1A2E"
+         src="https://placehold.co/1600x900/E5902F/FDF8EE?text=+"
          alt="Hero Background" loading="eager">
-    <div class="comp1-overlay">
-      <h1 class="comp1-title">体验奇幻之旅</h1>
+    <!-- 图片中组件：全尺寸占位 -->
+    <div class="comp1-image-sub"></div>
+    <!-- 舞台灯光特效：左、中、右三盏灯 -->
+    <div class="comp1-lights" id="comp1Lights">
+      <div class="beam beam-left" id="beamLeft"></div>
+      <div class="beam beam-center" id="beamCenter"></div>
+      <div class="beam beam-right" id="beamRight"></div>
     </div>
+    <!-- 左侧图片轮播 -->
+    <img class="comp1-slideshow-left" id="comp1SlideshowLeft" src="images/lovecard1ta.png" alt="Slideshow Left">
+    <!-- 中央图片轮播 -->
+    <img class="comp1-slideshow" id="comp1Slideshow" src="images/ta.jpeg" alt="Slideshow">
+    <!-- 右侧图片轮播 -->
+    <img class="comp1-slideshow-right" id="comp1SlideshowRight" src="images/azhe.png" alt="Slideshow Right">
+    <div class="comp1-overlay"></div>
     <button class="comp1-btn" onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">
       CHOOSE YOUR EXPERIENCE ▼
     </button>
+    <!-- 彩带飘落特效 -->
+    <canvas class="comp1-confetti" id="confettiCanvas"></canvas>
   </section>
 
   <!-- ===== COMPONENT 2: IMAGE + CAROUSEL ===== -->
   <section class="comp2" id="comp2">
     <!-- 中组件-上：占位图 -->
     <div class="comp2-upper">
-      <!-- 组件2上部图片：替换此处 src -->
-      <img src="https://placehold.co/1600x800/2D1B4E/FFD000?text=YOUR+JOURNEY+AWAITS"
-           alt="Journey Banner" loading="lazy">
+      <div class="comp2-upper-text">YOUR JOURNEY AWAITS</div>
     </div>
     <!-- 中组件-下：体验卡轮播 -->
     <div class="comp2-lower" id="comp2-cards">
@@ -505,9 +713,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
         <span class="divider"></span>
       </div>
       <div class="carousel-wrapper" id="carouselWrapper">
-        <button class="carousel-arrow carousel-prev" onclick="carouselPrev()" aria-label="上一张">‹</button>
         <div class="carousel-track" id="carouselTrack"><!-- JS rendered --></div>
-        <button class="carousel-arrow carousel-next" onclick="carouselNext()" aria-label="下一张">›</button>
         <div class="carousel-dots" id="carouselDots"><!-- JS rendered --></div>
       </div>
     </div>
@@ -516,29 +722,72 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
   <!-- ===== COMPONENT 3: UPPER PLACEHOLDER + LOWER DUAL CARDS ===== -->
   <section class="comp3" id="comp3">
     <!-- 中组件-上：占位图 -->
-    <div class="comp3-upper">
+    <div class="comp3-upper" id="comp3Upper">
       <!-- 组件3上部图片：替换此处 src -->
-      <img src="https://placehold.co/1600x800/0F4A3A/FF6B35?text=JOIN+THE+EXPERIENCE"
-           alt="Community Banner" loading="lazy">
+      <img id="comp3BgImg" src="https://placehold.co/1600x800/E0D8CB/3D3020?text=JOIN+THE+EXPERIENCE"
+           alt="Community Banner" loading="lazy" crossorigin="anonymous">
+      <canvas class="comp3-ripple-canvas" id="rippleCanvas"></canvas>
+      <div class="comp3-splatter">
+        <span class="splat s1"></span><span class="splat s2"></span><span class="splat s3"></span>
+        <span class="splat s4"></span><span class="splat s5"></span><span class="splat s6"></span>
+        <span class="splat s7"></span><span class="splat s8"></span>
+      </div>
     </div>
     <!-- 中组件-下：两个小组件（对角线布局） -->
-    <div class="comp3-lower">
-      <div class="comp3-card comp3-card-a" onclick="selectLoveCard('love_crush')">
-        <div class="comp3-card-icon">💌</div>
-        <div class="comp3-card-title">暗恋咖啡店：说不出口的那句话</div>
-        <div class="comp3-card-text">你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。有些话再不说，可能就再也没有机会了。</div>
+    <div class="comp3-lower" id="comp3Lower">
+      <div class="comp3-tri comp3-tri-a" id="triA"></div>
+      <div class="comp3-tri comp3-tri-b" id="triB"></div>
+      <div class="comp3-card comp3-card-a" id="cardA" onclick="selectLoveCard('love_crush')">
+        <div class="comp3-card-upper"><img src="images/lovecard1Background2.jpeg" alt="" draggable="false"></div>
+        <div class="comp3-card-lower">
+          <div class="comp3-card-title">暗恋咖啡店：说不出口的那句话</div>
+          <div class="comp3-card-text">你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。有些话再不说，可能就再也没有机会了。</div>
+        </div>
       </div>
-      <div class="comp3-card comp3-card-b" onclick="selectLoveCard('love_reunion')">
-        <div class="comp3-card-icon">💔</div>
-        <div class="comp3-card-title">重逢的十字路口：再见时该说什么</div>
-        <div class="comp3-card-text">分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"三条路在你们面前展开，你会怎么走？</div>
+      <!-- 插组件：2×2 图片网格 -->
+      <div class="comp3-insert">
+        <div class="comp3-insert-item"><img src="images/leftUp.jpg" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/rightUp.jpg" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/leftLow.jpg" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/rightLow.jpg" alt="" draggable="false"></div>
       </div>
-    </div>
-    <div class="comp3-footer">
-      © 2026 人生体验卡 · 一日奇幻之旅<br>
-      人生没有重来，但体验卡可以再抽一张。
+      <div class="comp3-card comp3-card-b" id="cardB" onclick="selectLoveCard('love_reunion')">
+        <div class="comp3-card-upper"><img src="images/lovecard2.jpg" alt="" draggable="false"></div>
+        <div class="comp3-card-lower">
+          <div class="comp3-card-title">重逢的十字路口：再见时该说什么</div>
+          <div class="comp3-card-text">分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"三条路在你们面前展开，你会怎么走？</div>
+        </div>
+      </div>
     </div>
   </section>
+
+  <!-- ===== COMPONENT 4: FILM STRIP + PLACEHOLDER ===== -->
+  <section class="comp4" id="comp4">
+    <div class="comp4-upper">
+      <div class="film-strip">
+        <div class="film-strip-inner">
+          <div class="film-track" id="filmTrack"><!-- JS rendered --></div>
+        </div>
+      </div>
+    </div>
+    <div class="comp4-lower">
+      <svg width="0" height="0" style="position:absolute"><defs><clipPath id="comp4ShapeClip" clipPathUnits="objectBoundingBox"><path d="M 0,0.22 C 0.01,0.38 0.025,0.48 0.05,0.08 C 0.06,0.02 0.08,0.05 0.10,0.18 C 0.11,0.32 0.13,0.44 0.17,0.04 C 0.19,0.10 0.20,0.01 0.24,0.15 C 0.26,0.28 0.29,0.50 0.33,0.06 C 0.35,0.02 0.37,0.14 0.40,0.10 C 0.42,0.35 0.44,0.08 0.48,0.03 C 0.50,0.18 0.52,0.46 0.56,0.07 C 0.58,0.01 0.60,0.12 0.64,0.14 C 0.66,0.32 0.68,0.20 0.72,0.05 C 0.74,0.16 0.77,0.45 0.81,0.08 C 0.83,0.02 0.85,0.13 0.89,0.06 C 0.91,0.28 0.93,0.40 0.96,0.04 C 0.98,0.12 0.99,0.25 1,0.10 L 1,1 L 0,1 Z"/></clipPath></defs></svg>
+      <div class="comp4-shape"></div>
+      <div class="comp4-bottom-row">
+        <div class="comp4-info-col"></div>
+        <div class="comp4-info-col">
+          <p>本网站所有内容均为虚构<br>请仔细甄别</p>
+          <p>本网站设计借鉴<br>https://www.delacalle.mx/</p>
+          <p>本网站所有图片均来自其他网页<br>如有侵权 请联系<br>255818502@qq.com。</p>
+        </div>
+        <div class="comp4-info-col">
+<p>本网站作者<br>桀桀桀<br>陈达不溜皮蛋<br>@^<br>嗡嗡嗡</p>
+          <p>如有问题，请联系我们。<br>邮箱：255818502@qq.com<br>电话：188 8888 8888</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ==================== CHAT PAGE ==================== -->
@@ -573,19 +822,21 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
     <span class="ls-story-title" id="lsStoryTitle">暗恋咖啡店</span>
   </div>
   <div class="ls-stage" id="lsStage" onclick="loveTapAdvance()">
-    <div class="ls-char-area" id="lsCharArea">
-      <div class="ls-char-avatar" id="lsCharAvatar">💌</div>
-      <div class="ls-char-name" id="lsCharName"></div>
-    </div>
-    <div class="ls-dialog-area" id="lsDialogArea">
-      <div class="ls-dialog-bubble">
-        <p class="ls-dialog-text" id="lsDialogText"></p>
+    <div class="ls-bottom-row">
+      <div class="ls-char-area" id="lsCharArea">
+        <div class="ls-char-avatar" id="lsCharAvatar"><img id="lsCharImg" src="" alt="" draggable="false"></div>
+        <div class="ls-char-name" id="lsCharName"></div>
       </div>
-      <div class="ls-choices" id="lsChoices" style="display:none">
-        <button class="ls-choice-btn" id="lsChoice1" onclick="event.stopPropagation();loveChoose(1)"></button>
-        <button class="ls-choice-btn" id="lsChoice2" onclick="event.stopPropagation();loveChoose(2)"></button>
+      <div class="ls-dialog-area" id="lsDialogArea">
+        <div class="ls-dialog-bubble">
+          <p class="ls-dialog-text" id="lsDialogText"></p>
+        </div>
+        <div class="ls-choices" id="lsChoices" style="display:none">
+          <button class="ls-choice-btn" id="lsChoice1" onclick="event.stopPropagation();loveChoose(1)"></button>
+          <button class="ls-choice-btn" id="lsChoice2" onclick="event.stopPropagation();loveChoose(2)"></button>
+        </div>
+        <div class="ls-tap-hint" id="lsTapHint">点击继续 ▼</div>
       </div>
-      <div class="ls-tap-hint" id="lsTapHint">点击继续 ▼</div>
     </div>
   </div>
 </div>
@@ -598,12 +849,61 @@ body{font-family:var(--font-body);background:var(--darker);color:#E2E8F0;min-hei
 
 <script>
 // ============================================================
+// CloudBase 全局计数器
+// ============================================================
+const TCB_ENV = 'game-one-d1gx1gwhbee34fff7';
+let tcbApp = null, tcbDb = null, tcbReady = false;
+
+async function initCloudBase() {
+  try {
+    tcbApp = cloudbase.init({ env: TCB_ENV });
+    const auth = tcbApp.auth();
+    const loginState = await auth.getLoginState();
+    if (!loginState) { await auth.signInAnonymously(); }
+    tcbDb = tcbApp.database();
+    tcbReady = true;
+    console.log('[CloudBase] 计数器就绪');
+  } catch (err) {
+    console.warn('[CloudBase] 初始化失败:', err);
+  }
+}
+
+async function getCardCounts() {
+  if (!tcbReady || !tcbDb) return {};
+  try {
+    const res = await tcbDb.collection('card_counters').get();
+    const counts = {};
+    if (res.data) { res.data.forEach(doc => { counts[doc.cardId] = doc.count || 0; }); }
+    return counts;
+  } catch (err) {
+    console.warn('[CloudBase] 读取计数失败:', err);
+    return {};
+  }
+}
+
+async function incrementCardCount(cardId) {
+  if (!tcbReady || !tcbDb) return;
+  try {
+    const coll = tcbDb.collection('card_counters');
+    const res = await coll.where({ cardId }).get();
+    if (res.data && res.data.length > 0) {
+      const doc = res.data[0];
+      await coll.doc(doc._id).update({ count: (doc.count || 0) + 1 });
+    } else {
+      await coll.add({ cardId, count: 1 });
+    }
+  } catch (err) {
+    console.warn('[CloudBase] 更新计数失败:', err);
+  }
+}
+
+// ============================================================
 // 数据层：6张体验卡 × 完整分支对话 × 人格结果
 // ============================================================
 
 const EXPERIENCE_CARDS = [
   {
-    id:'lottery',emoji:'💰',badge:'MOST POPULAR',stars:5,reviews:'328 人体验过',
+    id:'lottery',emoji:'💰',badge:'MOST POPULAR',stars:5,reviews:'0 人体验过',
     title:'突然中彩票100万一日体验卡',
     desc:'假设你今天突然中了100万，但你必须在24小时内全部花完。朋友、家人、商家蜂拥而至——你会怎么选？',
     slideClass:'slide-lottery',
@@ -670,7 +970,7 @@ const EXPERIENCE_CARDS = [
     }
   },
   {
-    id:'hogwarts',emoji:'🧙',badge:'FAN FAVORITE',stars:5,reviews:'256 人体验过',
+    id:'hogwarts',emoji:'🧙',badge:'FAN FAVORITE',stars:5,reviews:'0 人体验过',
     title:'霍格沃茨一日交换生体验卡',
     desc:'一封猫头鹰信把你送到了霍格沃茨。你只有一天时间，是去禁林冒险，还是在图书馆研究魔法史？分院帽在等你。',
     slideClass:'slide-hogwarts',
@@ -733,7 +1033,7 @@ const EXPERIENCE_CARDS = [
     }
   },
   {
-    id:'invisible',emoji:'👻',badge:'MYSTERY',stars:4.5,reviews:'189 人体验过',
+    id:'invisible',emoji:'👻',badge:'MYSTERY',stars:4.5,reviews:'0 人体验过',
     title:'透明人一日体验卡',
     desc:'一觉醒来，你发现自己变成了透明人。没人看得见你，没人听得到你。这24小时，你会用来做什么？',
     slideClass:'slide-invisible',
@@ -794,7 +1094,7 @@ const EXPERIENCE_CARDS = [
     }
   },
   {
-    id:'reunion',emoji:'🍚',badge:'HEARTWARMING',stars:5,reviews:'412 人体验过',
+    id:'reunion',emoji:'🍚',badge:'HEARTWARMING',stars:5,reviews:'0 人体验过',
     title:'和去世的亲人再吃一顿饭',
     desc:'你获得了一次不可思议的机会：和已经离开的亲人再吃一顿饭。只有一顿饭的时间，你会说什么？你会问什么？',
     slideClass:'slide-reunion',
@@ -854,9 +1154,9 @@ const EXPERIENCE_CARDS = [
     }
   },
   {
-    id:'gaokao',emoji:'📝',badge:'TRENDING',stars:5,reviews:'291 人体验过',
+    id:'gaokao',emoji:'📝',badge:'TRENDING',stars:5,reviews:'0 人体验过',
     title:'重启人生：回到高考那天',
-    desc:'你睁眼发现今天是6月7日——但不是202X年，而是你高考那年的6月7日。你带着现在的记忆回去了。你要怎么改写人生？',
+    desc:'你睁眼发现今年不是2026年，而是你高考那年的6月7日。你带着现在的记忆回去了。你要怎么改写人生？',
     slideClass:'slide-gaokao',
     // <!-- 体验卡5图片链接：替换此处 src -->
     imgSrc:'https://placehold.co/600x400/059669/FFFFFF?text=Gaokao+Experience',
@@ -915,7 +1215,7 @@ const EXPERIENCE_CARDS = [
     }
   },
   {
-    id:'timeloop',emoji:'🔄',badge:'NEW',stars:4.5,reviews:'73 人体验过',
+    id:'timeloop',emoji:'🔄',badge:'NEW',stars:4.5,reviews:'0 人体验过',
     title:'时间循环一日体验卡',
     desc:'你被困在了同一天里。无论你做什么，每天早上醒来都是5月3日。你会用这无限循环的一天来做什么？',
     slideClass:'slide-timeloop',
@@ -977,9 +1277,12 @@ const EXPERIENCE_CARDS = [
       },
       end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
     }
-  },
+  }
+];
+
+const LOVE_CARDS = [
   {
-    id:'love_crush',emoji:'💌',badge:'LOVE STORY',stars:5,reviews:'156 人体验过',
+    id:'love_crush',emoji:'💌',badge:'LOVE STORY',stars:5,reviews:'0 人体验过',
     title:'暗恋咖啡店：说不出口的那句话',
     desc:'你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。',
     slideClass:'slide-love-crush',
@@ -992,58 +1295,76 @@ const EXPERIENCE_CARDS = [
         messages:[
           {sender:'咖啡师小鹿',text:'你的拿铁。对了——靠窗那个人让我把这个给你。'},
           {sender:'咖啡师小鹿',text:'（递过来一张折好的纸条）'},
-          {sender:'咖啡师小鹿',text:'TA每天都坐同一个位置，我今天终于忍不住问了TA。TA说也在等你主动。'},
+          {sender:'咖啡师小鹿',text:'TA每天都坐同一个位置。今天我终于忍不住问TA，结果TA脸都红了。'},
         ],
         prompt:'纸条上写着："如果你也想认识我，明天同一时间，这里见。——窗边的人"',
-        options:[{id:1,text:'心跳加速，决定明天准时赴约',next:'crush_2a'},{id:2,text:'把纸条收好，但装作若无其事继续上班',next:'crush_2b'}]
+        options:[{id:1,text:'心跳加速，决定明天准时赴约',next:'crush_2a'},{id:2,text:'把纸条收好，但心里还在犹豫要不要去',next:'crush_2b'}]
       },
       crush_2a:{
         chatName:'☕ 第二天 · 同一张桌子',
         messages:[
-          {sender:'TA',text:'你真的来了。'},
-          {sender:'TA',text:'说实话，我写那张纸条的时候手都在抖。'},
-          {sender:'TA',text:'我观察你两周了。你每次都坐离我最远的位置，但其实你一直在看我。'},
-          {sender:'闺蜜小乔',text:'（手机震动）怎么样了！！！他帅吗？！！'},
+          {sender:'TA',text:'你真的来了。说实话，我昨天写完纸条就后悔了。'},
+          {sender:'TA',text:'我观察你两周了。你每次都坐离我最远的位置，但你的眼睛一直在往这边瞄。'},
+          {sender:'TA',text:'所以——你到底是想认识我，还是只是喜欢这个窗边的座位？'},
         ],
-        prompt:'TA看着你，等你说点什么。',
-        options:[{id:1,text:'坦率承认："对，我确实每天都在看你。"',next:'crush_3a'},{id:2,text:'笑着说："我只是喜欢这家店的拿铁。"',next:'crush_3a'}]
+        prompt:'TA歪着头看你，嘴角带着笑，但眼神是认真的。',
+        options:[{id:1,text:'坦率承认："对，我就是为了看你才天天来的。"',next:'crush_3a'},{id:2,text:'笑着说："两者都有。拿铁不错，窗边的人也不错。"',next:'crush_3b'}]
       },
       crush_2b:{
-        chatName:'☕ 第三天 · 你照常去买咖啡',
+        chatName:'☕ 第二天 · 你没有出现',
         messages:[
-          {sender:'咖啡师小鹿',text:'TA昨天等了你好久...最后留了这个。'},
-          {sender:'咖啡师小鹿',text:'（递过来第二张纸条，字迹比上一张用力）'},
-          {sender:'咖啡师小鹿',text:'纸条上写："如果你需要时间，我可以等。但不是无限期的。"'},
-          {sender:'闺蜜小乔',text:'（夺过纸条）你疯了吗！！快去！！'},
+          {sender:'咖啡师小鹿',text:'（发消息）靠窗那位今天等了三个小时。'},
+          {sender:'咖啡师小鹿',text:'走之前TA又写了一张纸条。这次字写得很快，像是怕自己反悔。'},
+          {sender:'咖啡师小鹿',text:'纸条：\"我不知道你为什么没来。但明天我还会在。——同一个位置。\"'},
         ],
-        prompt:'纸条上的字迹有些急促。TA的耐心在消耗。',
-        options:[{id:1,text:'立刻冲出咖啡店去找TA',next:'crush_3b'},{id:2,text:'给TA发一条消息，先解释你的犹豫',next:'crush_3b'}]
+        prompt:'纸条的边角被攥得有点皱。你盯着那行字，心里翻来覆去。',
+        options:[{id:1,text:'决定明天一定要去，当面说清楚',next:'crush_3c'},{id:2,text:'先加TA微信，发消息解释一下',next:'crush_3d'}]
       },
       crush_3a:{
-        chatName:'🌇 咖啡店角落 · 黄昏',
+        chatName:'☕ 咖啡店角落 · 两人对坐',
         messages:[
-          {sender:'TA',text:'我下个月要调到另一个城市了。'},
-          {sender:'TA',text:'所以我才决定写那张纸条——我不想留遗憾。'},
-          {sender:'TA',text:'但如果你觉得我们只是咖啡店里的陌生人...我也可以接受。'},
+          {sender:'TA',text:'（笑得很开心）你知道吗，我每天都在想你会不会主动过来。'},
+          {sender:'TA',text:'结果最后居然是我先写了纸条。我妈知道了肯定要说我怂。'},
+          {sender:'TA',text:'不过无所谓——结果最重要。所以，我们现在算认识了吗？'},
         ],
-        prompt:'TA在等你的答案。这可能是一段关系的开始，也可能是结束。',
-        options:[{id:1,text:'"别走——至少先试试。我不想以后每天都在想如果当初"',next:'end'},{id:2,text:'"那就好好享受今天吧。不留遗憾地告别也是浪漫的一种。"',next:'end'}]
+        prompt:'TA把手机推到你面前，屏幕上是一个新联系人的空白页。',
+        options:[{id:1,text:'接过手机，输入自己的号码——"算。"',next:'end'},{id:2,text:'也掏出手机："不如你输你的。这样就扯平了。"',next:'end'}]
       },
       crush_3b:{
-        chatName:'🌧️ 咖啡店门口 · 下雨天',
+        chatName:'☕ 咖啡店角落 · 两人对坐',
         messages:[
-          {sender:'TA',text:'（撑着伞）我就知道你会来。'},
-          {sender:'TA',text:'你这个人很奇怪——明明每天来偷看我，但又不敢上前。'},
-          {sender:'TA',text:'你到底在害怕什么？'},
+          {sender:'TA',text:'（被你逗笑）拿铁不错？你知道这家店的拿铁评分才3.5吗。'},
+          {sender:'TA',text:'你要是真喜欢拿铁，应该去隔壁街那家。所以——嗯，我当你在夸我。'},
+          {sender:'TA',text:'不过你得补偿我。这张纸条差点被我的咖啡打湿，我紧张得要死。'},
         ],
-        prompt:'雨声很大。TA的问题更直接。',
-        options:[{id:1,text:'"我怕被拒绝。也怕开始了以后不知道怎么继续。"',next:'end'},{id:2,text:'"我没害怕。我只是需要一个完美的开场白。"',next:'end'}]
+        prompt:'TA假装生气地敲了敲桌子，但耳朵尖是红的。',
+        options:[{id:1,text:'"补偿你一杯新的。这次我请。"',next:'end'},{id:2,text:'"我明天再请你。这样你就有理由继续坐窗边了。"',next:'end'}]
+      },
+      crush_3c:{
+        chatName:'☕ 第三天 · 窗边座位',
+        messages:[
+          {sender:'TA',text:'（看到你走进来，愣了一下）你来了。'},
+          {sender:'TA',text:'我差点以为你真的不会来了。说实话，昨晚我把纸条揉掉又捡起来三次。'},
+          {sender:'TA',text:'还好你来了。不然我就要想办法把自己从窗边挪走了。'},
+        ],
+        prompt:'TA面前的咖啡已经凉了，显然等了很久。',
+        options:[{id:1,text:'坐下，认真道歉——"对不起。但我想认识你，这是认真的。"',next:'end'},{id:2,text:'站着没坐——"我想好好解释。但不是在这里。晚上有空吗？"',next:'end'}]
+      },
+      crush_3d:{
+        chatName:'TA',
+        messages:[
+          {sender:'TA',text:'（通过了你的好友申请）'},
+          {sender:'TA',text:'还以为你打算彻底消失呢。收到好友申请的时候我差点把手机摔了。'},
+          {sender:'TA',text:'所以——为什么今天没来？这不是质问，我就是想知道。'},
+        ],
+        prompt:'对话框上方的"正在输入..."亮了又灭，灭了又亮。',
+        options:[{id:1,text:'诚实打字："我怂了。但我想了一整天，觉得不来会后悔。"',next:'end'},{id:2,text:'直接约时间："明天我会去的。同一个位置，这次换我等你。"',next:'end'}]
       },
       end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
     }
   },
   {
-    id:'love_reunion',emoji:'💔',badge:'LOVE STORY',stars:5,reviews:'203 人体验过',
+    id:'love_reunion',emoji:'💔',badge:'LOVE STORY',stars:5,reviews:'0 人体验过',
     title:'重逢的十字路口：再见时该说什么',
     desc:'分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"',
     slideClass:'slide-love-reunion',
@@ -1066,40 +1387,61 @@ const EXPERIENCE_CARDS = [
         messages:[
           {sender:'咖啡店老板',text:'二位要点什么？...诶，你们以前是不是常来？'},
           {sender:'TA',text:'（低头笑）还是老样子？我记得你喝美式，不加糖。'},
-          {sender:'TA',text:'三年了。你有没有什么想问我的？'},
+          {sender:'TA',text:'三年了。你没什么变化。'},
         ],
-        prompt:'TA把问题抛给了你。你想问什么？',
-        options:[{id:1,text:'"当初为什么要分手？"',next:'reun_3a'},{id:2,text:'"你现在过得好吗？"',next:'reun_3a'}]
+        prompt:'TA的拿铁冒着热气。窗外十字路口的红灯刚好又亮了。',
+        options:[{id:1,text:'"当初为什么要分手？我一直想问这个问题。"',next:'reun_3a'},{id:2,text:'"你现在过得好吗？工作、生活——一切都好吗？"',next:'reun_3b'}]
       },
       reun_2b:{
-        chatName:'🚶 十字路口 · 你转身离开',
+        chatName:'🚶 你转身离开 · 走了两个街区',
         messages:[
           {sender:'好友阿哲',text:'（电话）我刚才好像看到你和TA在一起？？什么情况？？'},
-          {sender:'好友阿哲',text:'你还好吗？要不要我去找你？'},
-          {sender:'好友阿哲',text:'你说走就走了？没说什么？'},
+          {sender:'好友阿哲',text:'你还好吗？三年了，你确定就这样走了？'},
+          {sender:'好友阿哲',text:'虽然我不是你——但我觉得有些话不说，再过三年还是会后悔。'},
         ],
-        prompt:'你走了两个街区。心跳还是很快。',
-        options:[{id:1,text:'掉头回去——有些话不说不甘心',next:'reun_3b'},{id:2,text:'给TA发一条消息："刚才走太快了。下次有空聊。"',next:'reun_3b'}]
+        prompt:'你靠在路边的栏杆上。阿哲的话像一根针扎在胸口。',
+        options:[{id:1,text:'掉头回去——阿哲说得对，有些话不说不甘心',next:'reun_3c'},{id:2,text:'给TA发一条消息："刚才走太快了。有些话想跟你说。"',next:'reun_3d'}]
       },
       reun_3a:{
-        chatName:'🕯️ 咖啡馆 · 灯光暗下来',
+        chatName:'🕯️ 咖啡馆 · 灯光渐暗',
         messages:[
-          {sender:'TA',text:'你想知道为什么分手...'},
-          {sender:'TA',text:'那时候我刚被公司裁员，觉得自己一无所有。我不想拖累你。'},
-          {sender:'TA',text:'但我没勇气告诉你真相。我选择让你觉得是感情淡了。这是我这辈子最后悔的决定。'},
+          {sender:'TA',text:'（沉默了很久）你想知道为什么分手...'},
+          {sender:'TA',text:'那时候我刚被公司裁员。三十岁失业，我觉得自己一无所有。'},
+          {sender:'TA',text:'我不想拖累你。但我没勇气告诉你真相。我选择让你觉得是感情淡了。'},
+          {sender:'TA',text:'这是我这辈子最后悔的决定。三年了，我每天都在想——如果当时说出来会怎样。'},
         ],
-        prompt:'TA的眼睛红了。你发现自己三年来的疑问，答案竟然是这样。',
-        options:[{id:1,text:'"你应该告诉我的。我可以陪你一起扛。"',next:'end'},{id:2,text:'"谢谢你告诉我。过去的就让它过去吧。"',next:'end'}]
+        prompt:'TA的眼睛红了。你面前的咖啡已经凉透了。',
+        options:[{id:1,text:'"你应该告诉我的。我可以陪你一起扛。"',next:'end'},{id:2,text:'"谢谢你告诉我真相。过去的就让它过去吧。"',next:'end'}]
       },
       reun_3b:{
-        chatName:'🌙 河边步道 · 你走回来了',
+        chatName:'☕ 咖啡馆 · 聊开了',
         messages:[
-          {sender:'TA',text:'（看到你出现）你回来了？'},
-          {sender:'TA',text:'我以为你走了就不会回头。'},
-          {sender:'TA',text:'这三年...我学会了一件事：感情里最可怕的不是吵架，是沉默。'},
+          {sender:'TA',text:'过得还行。换了份工作，养了一只猫，叫"等等"。'},
+          {sender:'TA',text:'你呢？我记得你以前说过想开一家自己的店——现在做了吗？'},
+          {sender:'TA',text:'其实后来我去过好几次你以前说想开的那种咖啡店。每次都想，如果你来会点哪一杯。'},
         ],
-        prompt:'河面反射着路灯的光。TA离你很近。',
-        options:[{id:1,text:'"我也是。所以这次我不想沉默了——我还喜欢你。"',next:'end'},{id:2,text:'"我们都不再是三年前的人了。保持联系吧，不用急着定义什么。"',next:'end'}]
+        prompt:'TA还记得你说过的每一个梦想。你突然觉得，有些东西即使分开了也没有消失。',
+        options:[{id:1,text:'"看到你现在挺好的，我放心了。以后——保重。"',next:'end'},{id:2,text:'"其实我也变了很多。不如我们重新认识一下？"',next:'end'}]
+      },
+      reun_3c:{
+        chatName:'🚦 十字路口 · 你跑回来了',
+        messages:[
+          {sender:'TA',text:'（看到你气喘吁吁地出现，愣住了）你...回来了？'},
+          {sender:'TA',text:'我以为你说"赶时间"是借口。我以为你再也不想见到我了。'},
+          {sender:'TA',text:'你跑得满头都是汗。'},
+        ],
+        prompt:'TA递过来一张纸巾。十字路口的红灯刚好又亮了，你们又站在了安全岛上。',
+        options:[{id:1,text:'"我还喜欢你。三年来从没变过。"',next:'end'},{id:2,text:'"我不想留遗憾。至少我们可以做回朋友。"',next:'end'}]
+      },
+      reun_3d:{
+        chatName:'💬 深夜 · 手机屏幕亮起',
+        messages:[
+          {sender:'TA',text:'（秒回）我还以为你把我拉黑了。'},
+          {sender:'TA',text:'其实刚才你走后，我在那个路口愣了好几分钟。咖啡店老板出来问我是不是在等人。'},
+          {sender:'TA',text:'所以——你想跟我说什么？'},
+        ],
+        prompt:'对话框上方的"正在输入..."亮了又灭，灭了又亮。你有很多话想说，但不知道该打哪一句。',
+        options:[{id:1,text:'"刚才走太快了。明天有空吗？我请你喝咖啡——不是以前那家。"',next:'end'},{id:2,text:'"三年没见了，刚才太仓促。保持联系，下次慢慢聊。"',next:'end'}]
       },
       end:{chatName:'',messages:[],prompt:'',options:[],isEnd:true}
     }
@@ -1203,14 +1545,14 @@ buildResults('love_crush',{
 
 // --- 重逢十字路口卡 ---
 buildResults('love_reunion',{
-  '1-1-1':{persona:'「勇敢的追问者」',dia:'你选择了坐下来、直面过去、在真相面前表达了"我本可以陪你"的心情。你在感情里是一个不怕面对真相的人——你宁可痛苦也不要模糊。你的追问不是纠缠，而是你在为自己的感情寻找一个句号。',med:'「释放过去」解脱片',usage:'你已经问到了答案。现在请允许自己向前走——不管有没有TA。',advice:'你敢于问了最难的问题。不是所有人都有面对真相的勇气。你得到了答案——无论它是什么，这都比永远在猜好。'},
-  '1-1-2':{persona:'「释怀的智者」',dia:'你坐在了TA对面、问了TA过得怎么样、在听到真相后选择了放下。你在感情里有一种超越年龄的成熟——你知道有些答案很重要，但更重要的是得到答案后继续走自己的路。',med:'「你已经成长了」肯定剂',usage:'放下不是忘记。放下是——你终于可以带着这段经历继续往前走了。',advice:'你在十字路口遇到了过去，和它坐下来喝了一杯咖啡，然后平静地道了别。这是最高级的重逢。'},
-  '1-2-1':{persona:'「回头的勇者」',dia:'你本来已经走了，但是折返了——然后在TA面前把自己的心意说了出来。你在感情里不怕丢脸——或者说，你觉得和丢脸相比，沉默的代价更大。你的回头不是软弱，而是你知道什么才重要。',med:'「不怕丢脸」护心丸',usage:'面子是最不值钱的东西。你已经证明了。继续保持。',advice:'你走了一段路，然后决定回头。这个转身的重量——比一百次不假思索的向前都要重。回头不是倒退，是你在重新选择。'},
-  '1-2-2':{persona:'「成熟的重逢者」',dia:'你走了但发了消息，最后选择用保持联系来重新定义你们的关系。你在感情里是一个成年人——你不急着复合，也不急着告别。你相信有些关系需要被重新定义，而不是简单地回到过去或彻底断开。',med:'「边界感」平衡尺',usage:'保持联系但不急于定义——这是最健康的重逢方式。你已经做到了。',advice:'很多人重逢不是回到过去就是形同陌路。你找到了第三条路——重新认识彼此。你们都不是三年前的人了，所以重新认识的才是真实的对方。'},
-  '2-1-1':{persona:'「迟到的坦诚者」',dia:'你在十字路口说了"我赶时间"，但后来后悔了——然后你选择用行动弥补。你在感情里的模式是"先回避后面对"。你的本能是逃避，但你有一个更强大的能力：克服本能。',med:'「缩短反射弧」练习卡',usage:'下一次，试着把掉头回去的间隔缩短到五分钟以内。',advice:'你差点就错过了。但你最终没有。谁说迟到的坦诚就不算坦诚了？你到了——这才是最重要的。'},
-  '2-1-2':{persona:'「温和的试探者」',dia:'你选择擦肩而过、发了消息、最后用不紧不慢的方式重新连接。你在感情里是一个懂得留白的人——你不喜欢太激烈的重逢，你更喜欢慢慢地、有距离地、一步一步靠近。',med:'「保持温柔」暖手宝',usage:'你的方式是温和的，但你的心意是坚定的。这两者不矛盾。',advice:'你用一条消息打开了一扇门——不急促、不迫切、不尴尬。最舒服的重逢往往就是这样开始的。'},
-  '2-2-1':{persona:'「坚定的回归者」',dia:'你经历了最初的回避、后来折返、最后坚定地表达了自己。你在感情里是一个"一旦想清楚了就不会再犹豫"的人。你前摇很长，但一旦启动就不会停下来。',med:'「你已经想清楚了」坚定丸',usage:'犹豫之后的坚定是最可靠的。相信你现在的判断。',advice:'你走了一大段路才回到TA面前，但你说的话比任何时候都真。因为这不是冲动——是你在两个街区之外反复思量后的决定。'},
-  '2-2-2':{persona:'「平和的老朋友」',dia:'你选择了远离、发消息试探、最后选择了"保持联系不急着定义"。你在感情里是一个不喜欢戏剧化的人——你相信真正的感情不需要大起大落，而需要细水长流的重新认识。',med:'「你的方式很好」点头片',usage:'不是所有人都需要激烈的重逢。你的平和对某些人来说就是最好的重逢方式。',advice:'你用一条消息保持了联系。不热烈、不冷淡、刚刚好。有些人不需要大团圆结局——保持联系本身就是最好的结局。'},
+  '1-1-1':{persona:'「直面过去的勇敢者」',dia:'你选择了坐下来，然后直接问了最难的问题。你不是不怕答案伤人——你是觉得不知道答案更伤人。你的勇气不在于不害怕，而在于害怕之后还是问了。你在感情里是一个"宁可痛苦也不要模糊"的人。',med:'「继续保持真实」勇气片',usage:'你不需要改变什么。敢于面对真相是你的天赋——珍惜它，但偶尔也让自己休息一下。',advice:'你问了那个困扰你三年的问题。不是所有人都有这种勇气。你得到了答案——不管它是什么，这都比一辈子在心里猜好。'},
+  '1-1-2':{persona:'「释怀的成年人」',dia:'你问了分手的原因，然后选择了放下。你明白了一个道理：有些答案的意义不在于改变什么，而在于让你能心安理得地转身。你在感情里有一种超越年龄的成熟——你可以面对真相，然后带着它继续走自己的路。',med:'「你已经成长了」肯定剂',usage:'放下不是忘记，是终于可以带着这段经历继续往前走了。你已经做到了。',advice:'你在十字路口遇到了过去，和它坐下来喝了一杯咖啡，然后平静地道了别。这是最高级的重逢——不问归期，只问你好。'},
+  '1-2-1':{persona:'「温和的告别者」',dia:'你没有追问过去，而是关心TA的现在。看到TA过得不错之后，你选择了放手。你在感情里是一个温柔的人——你的关心不是为了占有，而只是单纯地想知道对方还好不好。你的告别不是冷漠，而是你爱过的人值得一个好好的再见。',med:'「你的温柔很珍贵」暖心贴',usage:'你用一种最优雅的方式完成了告别。不需要撕心裂肺，只需要一句"保重"。',advice:'你说"保重"的时候，不是在推开TA——是在给彼此一个完整的句号。不是所有的重逢都要有结果，有些重逢只是为了让你确认：TA很好，你也是。'},
+  '1-2-2':{persona:'「新的开始者」',dia:'你没有沉溺在过去，而是看向了未来。你发现TA还记得你所有的梦想，于是你决定——与其怀念旧的关系，不如建立新的认识。你在感情里是一个相信"人是会变的"的人，而你的选择证明了你觉得这种变化值得去了解。',med:'「重新开始」勇气贴',usage:'旧的人，新的关系。这不是回到过去，而是从零开始认识一个你已经认识的人。这需要比开始一段新关系更多的勇气。',advice:'你说"重新认识一下"的时候，你其实是在说：我相信人是可以成长的。给彼此一个重新开始的机会，不是回到三年前，而是从今天开始——两个新的人。'},
+  '2-1-1':{persona:'「迟到的告白者」',dia:'你一开始选择了逃避——但你没有逃到底。你在两个街区之后折返了，然后把憋了三年的真心话说了出来。你在感情里的模式是"先回避后面对"。你的本能是躲开，但你有一个更强大的能力：克服本能。',med:'「缩短反射弧」练习卡',usage:'下一次，试着把掉头回去的间隔从三年缩短到三分钟。你已经证明了自己有这个勇气。',advice:'你差点就错过了。但你最终没有。谁说迟到的告白就不算告白？你跑了两个街区，喘着气把话说了——这比三年前什么都不说的你，已经勇敢了一百倍。'},
+  '2-1-2':{persona:'「理性的回归者」',dia:'你跑回来了，但不是为了复合——而是为了不留遗憾。你在感情里有一种罕见的分寸感：你知道不是所有的重逢都该复合，但所有的重逢都值得一个好好的交代。你选择做回朋友，不是不够爱，而是你更珍惜这个人本身。',med:'「你的分寸很珍贵」平衡丸',usage:'不是所有人都需要大团圆结局。有些关系做回朋友反而更长久——你理解了这个道理。',advice:'你说"至少可以做回朋友"的时候，不是在将就——是在用成年人的方式保护一段对你来说很重要的关系。爱情会结束，但人不一定非要变成陌生人。'},
+  '2-2-1':{persona:'「以退为进者」',dia:'你没有冲动地跑回去，也没有彻底消失。你选择了一条中间的路——先离开，再用一条消息轻轻敲开一扇门。你在感情里是一个懂得留白的人。你不喜欢太激烈的重逢，你更喜欢慢慢地、有距离地、一步一步重新靠近。',med:'「保持你的节奏」慢炖锅',usage:'你的方式是温和的，但你的心意是坚定的。不需要和别人比谁更勇敢——你的节奏就是最好的节奏。',advice:'你走了一段路，然后用一条消息打开了新的可能。不热烈、不迫切、不尴尬。最好的重逢往往就是这样开始的——先留一点空间，再慢慢填满。'},
+  '2-2-2':{persona:'「平和的重连者」',dia:'你选择了最轻的方式——没有戏剧化的回头，没有冲动的告白，只有一条简单的消息和一份"保持联系"的心意。你在感情里是一个不喜欢戏剧化的人。你相信真正的感情不需要大起大落，而需要细水长流的重新认识。',med:'「你的方式很好」点头片',usage:'不是所有人都需要激烈的重逢。你的平和对某些人来说就是最好的重逢方式。保持联系——这三个字比"我还爱你"更需要耐心和信心。',advice:'你说"保持联系"的时候，你不是在退缩——你是在用最不急躁的方式说：你还在我心里，我们可以慢慢来。有些人不急着定义关系——保持联系本身就是最好的关系。'},
 });
 
 // ============================================================
@@ -1248,81 +1590,135 @@ window.addEventListener('scroll',()=>{
   if(nav)nav.classList.toggle('scrolled',window.scrollY>60);
 });
 
-// ===== Carousel =====
-let carouselIndex=0;
-const CARDS=EXPERIENCE_CARDS;
-
-function makeCardHTML(card,i){
-  // <!-- 体验卡图片链接：替换 .card-img-area 中的 src -->
+// ===== 体验卡轮播（自动平滑滚动） =====
+function makeCarouselSlideHTML(card){
   return `
-    <div class="carousel-slide ${card.slideClass}" onclick="selectCard('${card.id}')" data-index="${i}">
-      <span class="card-badge-top">${card.badge}</span>
-      <div class="card-emoji-large">${card.emoji}</div>
-      <div class="card-title-large">${card.title}</div>
-      <div class="card-img-area"><img src="${card.imgSrc}" alt="${card.title}" loading="lazy"></div>
-      <div class="card-stars">
-        <span class="stars-yellow">${'★'.repeat(Math.floor(card.stars))}${card.stars%1?'☆':''}</span>
-        <span class="review-count">${card.reviews}</span>
-      </div>
-      <div class="card-desc-short">${card.desc}</div>
-      <div class="card-actions">
-        <button class="btn-card-primary" onclick="event.stopPropagation();selectCard('${card.id}')">⚡ 立即体验</button>
-        <button class="btn-card-secondary" onclick="event.stopPropagation();selectCard('${card.id}')">ℹ 了解更多</button>
-      </div>
+    <span class="card-badge-top">${card.badge}</span>
+    <div class="card-emoji-large">${card.emoji}</div>
+    <div class="card-title-large">${card.title}</div>
+    <div class="card-img-area"><img src="${card.imgSrc}" alt="${card.title}" loading="lazy"></div>
+    <div class="card-stars">
+      <span class="stars-yellow">${'★'.repeat(Math.floor(card.stars))}${card.stars%1?'☆':''}</span>
+      <span class="review-count">${card.reviews}</span>
+    </div>
+    <div class="card-desc-short">${card.desc}</div>
+    <div class="card-actions">
+      <button class="btn-card-primary" onclick="event.stopPropagation();selectCard('${card.id}')">⚡ 立即体验</button>
     </div>`;
 }
 
 function renderCarousel(){
   const track=document.getElementById('carouselTrack');
-  const dots=document.getElementById('carouselDots');
-  track.innerHTML=CARDS.map((c,i)=>makeCardHTML(c,i)).join('');
-  dots.innerHTML=CARDS.map((_,i)=>`<span class="dot${i===0?' active':''}" onclick="carouselGoTo(${i})"></span>`).join('');
-  carouselIndex=0;
-}
-
-function updateCarouselDots(){
-  document.querySelectorAll('#carouselDots .dot').forEach((d,i)=>d.classList.toggle('active',i===carouselIndex));
-}
-
-function scrollCarouselTo(index){
-  const track=document.getElementById('carouselTrack');
-  const slides=track.children;
-  if(!slides.length)return;
-  const target=slides[Math.min(index,slides.length-1)];
-  track.scrollTo({left:target.offsetLeft-track.offsetLeft-(track.clientWidth-target.clientWidth)/2,behavior:'smooth'});
-}
-
-function carouselNext(){carouselIndex=Math.min(carouselIndex+1,CARDS.length-1);scrollCarouselTo(carouselIndex);updateCarouselDots()}
-function carouselPrev(){carouselIndex=Math.max(carouselIndex-1,0);scrollCarouselTo(carouselIndex);updateCarouselDots()}
-function carouselGoTo(index){carouselIndex=index;scrollCarouselTo(index);updateCarouselDots()}
-
-// Track scroll to sync dots
-document.addEventListener('DOMContentLoaded',()=>{
-  const track=document.getElementById('carouselTrack');
   if(!track)return;
-  track.addEventListener('scroll',()=>{
-    const slides=track.children;
-    if(!slides.length)return;
-    const tc=track.scrollLeft+track.clientWidth/2;
-    let closest=0,closestDist=Infinity;
-    for(let i=0;i<slides.length;i++){
-      const sc=slides[i].offsetLeft+slides[i].clientWidth/2;
-      const dist=Math.abs(tc-sc);
-      if(dist<closestDist){closestDist=dist;closest=i}
+  // 只渲染一组卡片，不复制
+  track.innerHTML=EXPERIENCE_CARDS.map((card,i)=>
+    `<div class="carousel-slide ${card.slideClass}" onclick="selectCard('${card.id}')" data-index="${i}">
+      ${makeCarouselSlideHTML(card)}
+    </div>`
+  ).join('');
+  const dots=document.getElementById('carouselDots');
+  if(dots){
+    dots.innerHTML=EXPERIENCE_CARDS.map((_,i)=>
+      `<span class="dot${i===0?' active':''}"></span>`
+    ).join('');
+  }
+  startCarouselScroll();
+}
+
+// ===== iOS 滚轮式无限循环 =====
+let carouselPos=0,carouselRaf=null,carouselPaused=false;
+const CAROUSEL_SPEED=0.06; // px/ms
+
+function startCarouselScroll(){
+  const track=document.getElementById('carouselTrack');
+  const wrapper=document.getElementById('carouselWrapper');
+  if(!track||!wrapper)return;
+  if(carouselRaf)cancelAnimationFrame(carouselRaf);
+  if(wrapper&&!wrapper._hoverBound){
+    wrapper._hoverBound=true;
+    wrapper.addEventListener('mouseenter',()=>{carouselPaused=true});
+    wrapper.addEventListener('mouseleave',()=>{carouselPaused=false});
+  }
+  let lastTime=0;
+  const slides=track.querySelectorAll('.carousel-slide');
+  const n=EXPERIENCE_CARDS.length;
+  function step(now){
+    if(!lastTime)lastTime=now;
+    const dt=Math.min(now-lastTime,120);
+    lastTime=now;
+    if(!carouselPaused&&slides.length>0){
+      carouselPos+=CAROUSEL_SPEED*dt;
+      const slideW=slides[0].offsetWidth;
+      const gap=20;
+      const cardW=slideW+gap;
+      const tw=n*cardW;
+      const vw=wrapper.offsetWidth;
+      // 每张卡片独立计算位置，滚出左边界自动补到右边
+      slides.forEach((slide,i)=>{
+        let x=i*cardW-carouselPos;
+        while(x<-cardW)x+=tw;   // 完全滚出左边 → 补到最右
+        while(x>vw+cardW)x-=tw; // 跑太右 → 收回（极端情况）
+        slide.style.left=x+'px';
+      });
+      // 同步圆点
+      const effectivePos=((carouselPos%tw)+tw)%tw;
+      const activeIdx=Math.floor((effectivePos+cardW/2)/cardW)%n;
+      document.querySelectorAll('#carouselDots .dot').forEach((d,i)=>{
+        d.classList.toggle('active',i===activeIdx);
+      });
     }
-    if(closest!==carouselIndex){carouselIndex=closest;updateCarouselDots()}
-  });
-});
+    carouselRaf=requestAnimationFrame(step);
+  }
+  carouselRaf=requestAnimationFrame(step);
+}
 
 // ===== 首页渲染 =====
+async function syncCardCounts(){
+  const counts = await getCardCounts();
+  [...EXPERIENCE_CARDS, ...LOVE_CARDS].forEach(card => {
+    const count = counts[card.id] || 0;
+    card.reviews = count + ' 人体验过';
+  });
+  renderCarousel();
+}
+
 function renderHome(){
   renderCarousel();
+  renderFilmStrip();
+  initCloudBase().then(syncCardCounts);
+}
+
+// ===== 电影胶卷 =====
+const FILM_IMAGES = [
+  'images/leftUp.jpg','images/rightUp.jpg','images/leftLow.jpg','images/rightLow.jpg',
+  'images/lovecard1.jpg','images/lovecard2.jpg','images/lovecard1Background2.jpeg',
+  'images/lovecard2Background2.jpeg',
+];
+
+function renderFilmStrip(){
+  const track=document.getElementById('filmTrack');
+  if(!track)return;
+  const frames=FILM_IMAGES.map(src=>
+    `<div class="film-frame"><img src="${src}" alt="" draggable="false" loading="lazy"></div>`
+  ).join('');
+  // 复制一份实现无缝循环
+  track.innerHTML=frames+frames;
+  const upper=document.querySelector('.comp4-upper');
+  const lower=document.querySelector('.comp4-lower');
+  if(upper&&lower){
+    lower.style.height=(upper.offsetHeight*3.6)+'px';
+    const shape=lower.querySelector('.comp4-shape');
+    if(shape) shape.style.top=(upper.offsetHeight*0.25)+'px';
+  }
 }
 
 // ===== 选择体验卡 =====
 function selectCard(cardId){
   const card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
   if(!card)return;
+  incrementCardCount(cardId);
+  const cur=parseInt(card.reviews)||0;
+  card.reviews=(cur+1)+' 人体验过';
   state.currentCard=card;state.choicePath=[];state.currentPhase=card.startPhase;
   state.isPlaying=true;state.awaitingChoice=false;state.messageQueue=[];state.isShowingMessages=false;
   document.getElementById('chatMessages').innerHTML='';
@@ -1369,7 +1765,7 @@ function playMessages(messages,onComplete){
   document.getElementById('chatSendBtn').disabled=true;
   const typingDiv=document.createElement('div');
   typingDiv.className='typing-indicator';
-  typingDiv.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#94A3B8">对方正在输入...</span>';
+  typingDiv.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#8B7D68">对方正在输入...</span>';
   container.appendChild(typingDiv);scrollToBottom();
   let index=0;
   function showNext(){
@@ -1379,7 +1775,7 @@ function playMessages(messages,onComplete){
     index++;
     if(index<messages.length){
       const nt=document.createElement('div');nt.className='typing-indicator';
-      nt.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#94A3B8">对方正在输入...</span>';
+      nt.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div><span style="font-size:11px;color:#8B7D68">对方正在输入...</span>';
       container.appendChild(nt);scrollToBottom();
     }
     setTimeout(showNext,400+Math.random()*700);
@@ -1409,10 +1805,48 @@ function createUserChoiceBubble(optionText){
 function updateSystemBanner(prompt,options){
   const banner=document.getElementById('systemBanner');
   if(!prompt){banner.style.display='none';return}
+  // 重置拖拽位置
+  banner.style.left='';banner.style.top='';banner.style.transform='';banner.style.right='';
   banner.style.display='block';
   let html=`<div class="sys-label">⚡ 系统提示</div><div class="sys-text">${escapeHtml(prompt)}</div>`;
   if(options&&options.length>0)options.forEach(opt=>{html+=`<span class="sys-option">${opt.id}. ${escapeHtml(opt.text)}</span>`});
   banner.innerHTML=html;
+}
+
+// ===== 系统提示卡片拖拽 =====
+let bannerDrag=null;
+
+function initBannerDrag(){
+  const banner=document.getElementById('systemBanner');
+  if(!banner)return;
+
+  function onStart(cx,cy){
+    const rect=banner.getBoundingClientRect();
+    bannerDrag={startX:cx,startY:cy,startLeft:rect.left,startTop:rect.top};
+    banner.style.transform='none';
+    banner.style.right='';
+    banner.style.left=bannerDrag.startLeft+'px';
+    banner.style.top=bannerDrag.startTop+'px';
+    banner.classList.add('dragging');
+  }
+  function onMove(cx,cy){
+    if(!bannerDrag)return;
+    banner.style.left=(bannerDrag.startLeft+cx-bannerDrag.startX)+'px';
+    banner.style.top=(bannerDrag.startTop+cy-bannerDrag.startY)+'px';
+  }
+  function onEnd(){
+    if(!bannerDrag)return;
+    banner.classList.remove('dragging');
+    bannerDrag=null;
+  }
+
+  banner.addEventListener('mousedown',e=>{onStart(e.clientX,e.clientY);e.preventDefault()});
+  document.addEventListener('mousemove',e=>{onMove(e.clientX,e.clientY)});
+  document.addEventListener('mouseup',onEnd);
+
+  banner.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX,e.touches[0].clientY)}, {passive:false});
+  document.addEventListener('touchmove',e=>{if(bannerDrag){onMove(e.touches[0].clientX,e.touches[0].clientY);e.preventDefault()}}, {passive:false});
+  document.addEventListener('touchend',onEnd);
 }
 
 function updateChatRoomName(name){document.getElementById('chatRoomName').textContent=name||'群聊'}
@@ -1421,6 +1855,7 @@ function scrollToBottom(){const c=document.getElementById('chatMessages');setTim
 
 // ===== 用户发送选择 =====
 function handleSend(){
+  if(loveChatMode){handleLoveChatSend();return}
   if(!state.awaitingChoice||state.isShowingMessages)return;
   const input=document.getElementById('chatInput');
   const choice=parseInt(input.value.trim());
@@ -1436,10 +1871,268 @@ function handleSend(){
   setTimeout(()=>{startPhase(option.next)},800);
 }
 
+function handleLoveChatSend(){
+  if(!state.awaitingChoice||state.isShowingMessages)return;
+  const input=document.getElementById('chatInput');
+  const choice=parseInt(input.value.trim());
+  if(choice!==1&&choice!==2){alert('请输入 1 或 2');return}
+  const option=state.currentOptions.find(o=>o.id===choice);
+  if(!option)return;
+  state.awaitingChoice=false;
+  input.value='';input.disabled=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  const container=document.getElementById('chatMessages');
+  container.appendChild(createUserChoiceBubble(option.text));scrollToBottom();
+  document.getElementById('systemBanner').style.display='none';
+  loveState.choicePath.push(choice);
+
+  // 聊天模式结束 → 直接生成结果
+  if(option.next==='end'){
+    state.currentCard=loveState.currentCard;
+    state.choicePath=[...loveState.choicePath];
+    loveChatMode=null;
+    finishGame();
+    return;
+  }
+
+  // 返回恋爱卡模式（恋爱卡1专用：crush_3c）
+  if(loveState.currentCard.id==='love_crush' && option.next==='crush_3c'){
+    loveChatMode=null;
+    setTimeout(()=>{
+      showPage('page-love-story');
+      document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+      startLovePhase('crush_3c');
+    },600);
+    return;
+  }
+
+  // 留在微信聊天模式，切换下一阶段
+  state.currentCard=loveState.currentCard;
+  state.choicePath=[...loveState.choicePath];
+  loveChatMode=null;
+  setTimeout(()=>{
+    document.getElementById('chatMessages').innerHTML='';
+    startPhase(option.next);
+  },600);
+}
+
+// ===== COMP1 舞台灯光 7 场循环 =====
+const LIGHT_SEQUENCE=[
+  {d:2000,c:'blue',       l:null,  r:null},   // 1: 中
+  {d:2000,c:null,         l:'red', r:'green'}, // 2: 左红+右绿
+  {d:1000,c:'blue',       l:'green',r:'red'},  // 3: 中蓝+左绿+右红
+  {d:1000,c:'blue',       l:'green',r:null},   // 4: 中蓝+左绿
+  {d:1000,c:'blue',       l:null,  r:'red'},   // 5: 中蓝+右红
+  {d:1000,c:null,         l:'green',r:null},   // 6: 左绿
+  {d:1000,c:null,         l:null,  r:'red'},   // 7: 右红
+];
+let lightField=0,lightTimer=null;
+
+function setBeam(el,color){
+  if(!el)return;
+  var pos='';
+  if(el.classList.contains('beam-left'))pos='beam-left';
+  else if(el.classList.contains('beam-center'))pos='beam-center';
+  else if(el.classList.contains('beam-right'))pos='beam-right';
+  el.className='beam '+pos;
+  el.style.opacity='0';
+  if(color){
+    el.classList.add('beam-'+color);
+    el.style.opacity='1';
+  }
+}
+
+function runLightField(i){
+  const f=LIGHT_SEQUENCE[i];
+  setBeam(document.getElementById('beamCenter'),f.c);
+  setBeam(document.getElementById('beamLeft'),f.l);
+  setBeam(document.getElementById('beamRight'),f.r);
+  lightField=(i+1)%LIGHT_SEQUENCE.length;
+  lightTimer=setTimeout(()=>runLightField(lightField),f.d);
+}
+
+function initLightShow(){
+  runLightField(0);
+}
+
+// ===== COMP1 中央图片轮播 =====
+const SLIDESHOW_IMAGES=[
+  'images/ta.jpeg',
+  'images/ta.0.jpg',
+  'images/ta.1.jpg',
+  'images/ta.2.jpg',
+  'images/ta.3.jpg',
+  'images/ta.4.jpg'
+];
+let slideIdx=0;
+
+function initSlideshow(){
+  const img=document.getElementById('comp1Slideshow');
+  if(!img)return;
+  setInterval(()=>{
+    slideIdx=(slideIdx+1)%SLIDESHOW_IMAGES.length;
+    img.style.opacity='0';
+    setTimeout(()=>{
+      img.src=SLIDESHOW_IMAGES[slideIdx];
+      img.style.opacity='1';
+    },500);
+  },500);
+}
+
+// ===== COMP1 左侧图片轮播 =====
+const SLIDESHOW_LEFT_IMAGES=[
+  'images/lovecard1ta.png',
+  'images/cta.0.jpg',
+  'images/cta.1.jpg',
+  'images/cta.2.jpg',
+  'images/cta.3.jpg',
+  'images/cta.4.jpg'
+];
+let slideLeftIdx=0;
+
+function initSlideshowLeft(){
+  const img=document.getElementById('comp1SlideshowLeft');
+  if(!img)return;
+  setInterval(()=>{
+    slideLeftIdx=(slideLeftIdx+1)%SLIDESHOW_LEFT_IMAGES.length;
+    img.style.opacity='0';
+    setTimeout(()=>{
+      img.src=SLIDESHOW_LEFT_IMAGES[slideLeftIdx];
+      img.style.opacity='1';
+    },500);
+  },500);
+}
+
+// ===== COMP1 右侧图片轮播 =====
+const SLIDESHOW_RIGHT_IMAGES=[
+  'images/azhe.png',
+  'images/azhe.0.jpg',
+  'images/azhe.1.jpg',
+  'images/azhe.2.jpg',
+  'images/azhe.3.jpg',
+  'images/azhe.4.jpg'
+];
+let slideRightIdx=0;
+
+function initSlideshowRight(){
+  const img=document.getElementById('comp1SlideshowRight');
+  if(!img)return;
+  setInterval(()=>{
+    slideRightIdx=(slideRightIdx+1)%SLIDESHOW_RIGHT_IMAGES.length;
+    img.style.opacity='0';
+    setTimeout(()=>{
+      img.src=SLIDESHOW_RIGHT_IMAGES[slideRightIdx];
+      img.style.opacity='1';
+    },500);
+  },500);
+}
+
+// ===== COMP1 彩带飘落特效 =====
+const CONFETTI_COLORS=[
+  '#E5902F','#F5A623','#E07060','#7C3AED','#5B8CDE',
+  '#0D9488','#00A86B','#FF6B9D','#FFD93D','#C084FC'
+];
+let confettiParticles=[];
+let confettiRunning=false;
+let confettiRafId=null;
+
+function spawnConfetti(canvas){
+  const w=canvas.width;
+  for(let i=0;i<3;i++){
+    confettiParticles.push({
+      x:Math.random()*w*1.2-w*0.1,
+      y:-20-Math.random()*100,
+      w:6+Math.random()*10,
+      h:3+Math.random()*6,
+      color:CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      vx:(Math.random()-0.5)*1.5,
+      vy:1.5+Math.random()*3,
+      rot:Math.random()*Math.PI*2,
+      rotSpd:(Math.random()-0.5)*0.08,
+      op:0.7+Math.random()*0.3
+    });
+  }
+}
+
+function updateConfetti(canvas){
+  const w=canvas.width;
+  const h=canvas.height;
+  confettiParticles=confettiParticles.filter(p=>p.y<h+20&&p.op>0);
+  for(const p of confettiParticles){
+    p.x+=p.vx+Math.sin(p.y*0.02)*0.5;
+    p.y+=p.vy;
+    p.rot+=p.rotSpd;
+    if(p.y>h*0.7)p.op-=0.003;
+  }
+}
+
+function drawConfetti(canvas){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const p of confettiParticles){
+    ctx.save();
+    ctx.globalAlpha=p.op;
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+  }
+}
+
+function confettiLoop(canvas){
+  if(!confettiRunning)return;
+  if(confettiParticles.length<60)spawnConfetti(canvas);
+  updateConfetti(canvas);
+  drawConfetti(canvas);
+  confettiRafId=requestAnimationFrame(()=>confettiLoop(canvas));
+}
+
+function initConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  if(!canvas)return;
+  const section=canvas.parentElement;
+  const resize=()=>{
+    canvas.width=section.offsetWidth;
+    canvas.height=section.offsetHeight;
+  };
+  resize();
+  window.addEventListener('resize',resize);
+
+  confettiRunning=true;
+  confettiLoop(canvas);
+
+  // IntersectionObserver: 当 comp2-cards 出现时隐藏彩带
+  const target=document.getElementById('comp2-cards');
+  if(!target)return;
+  const observer=new IntersectionObserver(entries=>{
+    for(const e of entries){
+      if(e.isIntersecting){
+        canvas.classList.add('hidden');
+        confettiRunning=false;
+        if(confettiRafId)cancelAnimationFrame(confettiRafId);
+      }else{
+        canvas.classList.remove('hidden');
+        if(!confettiRunning){
+          confettiRunning=true;
+          confettiLoop(canvas);
+        }
+      }
+    }
+  },{threshold:0});
+  observer.observe(target);
+}
+
 // Enter key
 document.addEventListener('DOMContentLoaded',()=>{
   const input=document.getElementById('chatInput');
   if(input)input.addEventListener('keydown',function(e){if(e.key==='Enter')handleSend()});
+  initBannerDrag();
+  initLightShow();
+  initSlideshow();
+  initSlideshowLeft();
+  initSlideshowRight();
+  initConfetti();
 });
 
 // ===== 游戏结束 =====
@@ -1478,7 +2171,7 @@ function renderResult(){
       <button class="btn-retry" onclick="retrySameCard()">🔄 再测一次当前体验</button>
       <button class="btn-home" onclick="goHome()">🎴 重新挑选体验卡</button>
     </div>
-    <p style="font-size:10px;color:rgba(148,163,184,0.4);text-align:center;padding:0 20px 30px;line-height:1.8">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
+    <p style="font-size:10px;color:rgba(139,125,104,0.5);text-align:center;padding:0 20px 30px;line-height:1.8">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
 }
 
 function getFallbackResult(){
@@ -1527,20 +2220,25 @@ let loveState={
   messageQueue:[],messageIndex:0,
   isShowingPrompt:false,currentOptions:null,
 };
+let loveChatMode=null; // 恋爱卡→聊天模式跨界状态
 
 function selectLoveCard(cardId){
-  const card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
+  const card=LOVE_CARDS.find(c=>c.id===cardId);
   if(!card)return;
   loveState.currentCard=card;loveState.choicePath=[];loveState.currentPhase=null;
   loveState.messageQueue=[];loveState.messageIndex=0;
   loveState.isShowingPrompt=false;loveState.currentOptions=null;
   document.getElementById('lsStoryTitle').textContent=card.title;
-  document.getElementById('lsCharAvatar').textContent=card.emoji;
-  document.getElementById('lsCharAvatar').style.background='#6b7280';
   document.getElementById('lsCharName').textContent='';
   document.getElementById('lsDialogText').textContent='';
   document.getElementById('lsChoices').style.display='none';
   document.getElementById('lsTapHint').style.display='none';
+  const bgImg = cardId === 'love_crush' ? 'images/lovecard1.jpg' : 'images/lovecard2.jpg';
+  document.getElementById('page-love-story').style.backgroundImage = 'url(' + bgImg + ')';
+  const charImg = cardId === 'love_crush' ? 'images/server.png' : 'images/ta.jpeg';
+  const imgEl = document.getElementById('lsCharImg');
+  imgEl.src = charImg;
+  imgEl.classList.toggle('char-large', true);
   showPage('page-love-story');
   startLovePhase(card.startPhase);
 }
@@ -1551,6 +2249,16 @@ function startLovePhase(phaseId){
   if(!phase)return console.error('Phase not found:',phaseId);
   loveState.currentPhase=phaseId;
   if(phase.isEnd){loveFinishGame();return}
+  // 恋爱卡1 crush_2b：整段切换到微信聊天模式（先播消息再出提示）
+  if(card.id==='love_crush' && phaseId==='crush_2b'){
+    enterLoveChatMode(card, phase, '咖啡店小鹿');
+    return;
+  }
+  // 恋爱卡2 reun_3d：切换到微信聊天模式（私聊TA）
+  if(card.id==='love_reunion' && phaseId==='reun_3d'){
+    enterLoveChatMode(card, phase, 'TA');
+    return;
+  }
   loveState.messageQueue=phase.messages||[];loveState.messageIndex=0;
   loveState.isShowingPrompt=false;loveState.currentOptions=null;
   document.getElementById('lsChoices').style.display='none';
@@ -1568,14 +2276,56 @@ function lovePlayNextMessage(){
 }
 
 function loveShowMessage(msg){
-  const s=getCharStyle(msg.sender,loveState.currentCard);
-  const a=document.getElementById('lsCharAvatar');
-  a.textContent=s.emoji;a.style.background=s.color;
   document.getElementById('lsCharName').textContent=msg.sender||'';
   document.getElementById('lsDialogText').textContent=msg.text;
   document.getElementById('lsChoices').style.display='none';
   document.getElementById('lsTapHint').style.display='block';
   loveState.isShowingPrompt=false;
+  // 恋爱卡1：根据说话人切换人物图
+  if(loveState.currentCard&&loveState.currentCard.id==='love_crush'){
+    const imgEl=document.getElementById('lsCharImg');
+    if(msg.sender==='TA'){
+      imgEl.src='images/lovecard1ta.png';
+      imgEl.classList.add('char-large');
+    }else{
+      imgEl.src='images/server.png';
+      imgEl.classList.add('char-large');
+    }
+  }
+  // 恋爱卡2：根据说话人切换人物图
+  if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'){
+    const imgEl=document.getElementById('lsCharImg');
+    const nameEl=document.getElementById('lsCharName');
+    if(msg.sender==='咖啡店老板'){
+      imgEl.src='images/server.png';
+      nameEl.style.color='';
+    }else if(msg.sender==='好友阿哲'){
+      imgEl.src='images/azhe.png';
+      nameEl.style.color='#eab308';
+    }else if(msg.sender==='TA'){
+      imgEl.src='images/ta.jpeg';
+      nameEl.style.color='';
+    }
+  }
+  // 特定对话触发背景切换
+  if(msg.text==='你真的来了。说实话，我昨天写完纸条就后悔了。'){
+    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+  }
+  // 恋爱卡2：进入咖啡馆后切换背景
+  if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
+     msg.text.includes('二位要点什么')){
+    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard1Background2.jpeg)';
+  }
+  // 恋爱卡2：转身离开后好友来电时切换背景
+  if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
+     msg.text.includes('我刚才好像看到')){
+    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard2Background2.jpeg)';
+  }
+  // 恋爱卡2：掉头跑回十字路口时切回初始背景
+  if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
+     msg.text.includes('气喘吁吁地出现')){
+    document.getElementById('page-love-story').style.backgroundImage='url(/images/lovecard2.jpg)';
+  }
 }
 
 function loveShowPrompt(prompt,options){
@@ -1603,6 +2353,24 @@ function loveChoose(choiceId){
   startLovePhase(option.next);
 }
 
+function enterLoveChatMode(card, phase, roomName){
+  loveChatMode={card:card};
+  showPage('page-chat');
+  updateChatRoomName(roomName || '咖啡店小鹿');
+  updateChatRoomCount('');
+  state.currentCard=card; // 暂存，供 createMessageBubble 取头像色
+  document.getElementById('chatMessages').innerHTML='';
+  // 先播放该阶段所有消息，播完再出系统提示
+  playMessages(phase.messages, ()=>{
+    updateSystemBanner(phase.prompt, phase.options);
+    scrollToBottom();
+    state.awaitingChoice=true;state.currentOptions=phase.options;
+    document.getElementById('chatInput').disabled=false;
+    document.getElementById('chatSendBtn').disabled=false;
+    document.getElementById('chatInput').focus();
+  });
+}
+
 function endLoveStory(){
   loveState.currentCard=null;loveState.currentPhase=null;loveState.choicePath=[];
   loveState.messageQueue=[];loveState.messageIndex=0;
@@ -1620,18 +2388,234 @@ function loveFinishGame(){
   });
 }
 
-function getCharStyle(senderName,card){
-  const color=(card.avatarColors&&card.avatarColors[senderName])?card.avatarColors[senderName]:'#6b7280';
-  const emoji=senderName?senderName.charAt(0):'?';
-  return{color,emoji};
-}
 
 function escapeHtml(text){const div=document.createElement('div');div.textContent=text;return div.innerHTML}
+
+// ===== 三角形动画（comp3） =====
+let triAnimId=null;
+function startTriAnimation(){
+  const triA=document.getElementById('triA');
+  const triB=document.getElementById('triB');
+  const cardA=document.getElementById('cardA');
+  const cardB=document.getElementById('cardB');
+  if(!triA||!triB||!cardA||!cardB)return;
+  const lower=document.getElementById('comp3Lower');
+  const duration=10000;
+  function easeInOut(t){return t<0.5?2*t*t:-1+(4-2*t)*t}
+  function getPhase(progress){
+    // 0-25%: tl+br 向中间扩大
+    if(progress<0.25)return{cornerA:'tl',cornerB:'br',scale:0.05+easeInOut(progress/0.25)*0.95};
+    // 25-50%: tl+br 向两边缩小
+    if(progress<0.50)return{cornerA:'tl',cornerB:'br',scale:1-easeInOut((progress-0.25)/0.25)*0.95};
+    // 50-75%: tr+bl 向中间扩大
+    if(progress<0.75)return{cornerA:'tr',cornerB:'bl',scale:0.05+easeInOut((progress-0.50)/0.25)*0.95};
+    // 75-100%: tr+bl 向两边缩小
+    return{cornerA:'tr',cornerB:'bl',scale:1-easeInOut((progress-0.75)/0.25)*0.95};
+  }
+  function clipFor(corner,scale){
+    const m=50*(1-scale); // margin from corner when scaled
+    if(corner==='tr')return `polygon(${m}% ${m}%, 100% 0, 100% 100%)`;
+    if(corner==='bl')return `polygon(0 0, 0 100%, ${100-m}% ${100-m}%)`;
+    if(corner==='tl')return `polygon(0 0, ${100-m}% 0, 0 ${100-m}%)`;
+    if(corner==='br')return `polygon(${m}% 100%, 100% ${m}%, 100% 100%)`;
+  }
+  function originFor(corner){
+    if(corner==='tr')return'100% 0';
+    if(corner==='bl')return'0 100%';
+    if(corner==='tl')return'0 0';
+    if(corner==='br')return'100% 100%';
+  }
+  function updateTri(el,corner,scale){
+    el.style.clipPath=clipFor(corner,scale);
+    el.style.transformOrigin=originFor(corner);
+    el.style.transform=`scale(${scale})`;
+  }
+  function checkOverlap(cornerA,scaleA,cornerB,scaleB){
+    // 近似：三角面积 = scale决定覆盖范围，scale>0.4视为可接触卡片
+    const rA=lower.getBoundingClientRect();
+    const cA=cardA.getBoundingClientRect();
+    const cB=cardB.getBoundingClientRect();
+    // 卡A在左上，卡B在右下
+    const cALeft=(cA.left-rA.left)/rA.width;
+    const cARight=(cA.right-rA.left)/rA.width;
+    const cATop=(cA.top-rA.top)/rA.height;
+    const cABottom=(cA.bottom-rA.top)/rA.height;
+    const cBLeft=(cB.left-rA.left)/rA.width;
+    const cBRight=(cB.right-rA.left)/rA.width;
+    const cBTop=(cB.top-rA.top)/rA.height;
+    const cBBottom=(cB.bottom-rA.top)/rA.height;
+    // 三角A接触卡A(左上)当cornerA=tl且三角覆盖左上区域
+    let touchA=false,touchB=false;
+    if(cornerA==='tl'&&scaleA>0.4) touchA=true;
+    if(cornerA==='tr'&&scaleA>0.4) touchB=true;
+    if(cornerB==='bl'&&scaleB>0.4) touchA=true;
+    if(cornerB==='br'&&scaleB>0.4) touchB=true;
+    cardA.style.transition='opacity 0.4s';
+    cardB.style.transition='opacity 0.4s';
+    cardA.style.opacity=touchA?'0.12':'1';
+    cardB.style.opacity=touchB?'0.12':'1';
+  }
+  function frame(now){
+    const elapsed=(now-triAnimStart)%duration;
+    const progress=elapsed/duration;
+    const s=getPhase(progress);
+    updateTri(triA,s.cornerA,s.scale);
+    updateTri(triB,s.cornerB,s.scale);
+    checkOverlap(s.cornerA,s.scale,s.cornerB,s.scale);
+    triAnimId=requestAnimationFrame(frame);
+  }
+  let triAnimStart=performance.now();
+  triAnimId=requestAnimationFrame(frame);
+}
+
+// ===== 启动 =====
+document.body.style.overflow='';
+// ===== 水面涟漪扭曲特效（Canvas displacement） =====
+function initRippleEffect(){
+  const container=document.getElementById('comp3Upper');
+  const canvas=document.getElementById('rippleCanvas');
+  const img=document.getElementById('comp3BgImg');
+  if(!container||!canvas||!img)return;
+
+  const ctx=canvas.getContext('2d');
+  let ripples=[];
+  let srcImage=null;
+  let offscreen=document.createElement('canvas');
+  let offCtx=offscreen.getContext('2d');
+  let w=0,h=0,cx=0,cy=0;
+  let lastSpawn=0;
+  const MAX_RIPPLES=4;
+  const SPAWN_INTERVAL=1800;
+  const DISP_STEP=3; // 每N像素采样，平衡性能
+
+  function resize(){
+    const rect=container.getBoundingClientRect();
+    const dpr=Math.min(window.devicePixelRatio||1,2); // 限制像素比保性能
+    w=Math.floor(rect.width*dpr);
+    h=Math.floor(rect.height*dpr);
+    canvas.width=w;canvas.height=h;
+    offscreen.width=w;offscreen.height=h;
+    cx=w/2;cy=h/2;
+    // 重新绘制源图到离屏canvas
+    if(srcImage){
+      offCtx.clearRect(0,0,w,h);
+      offCtx.drawImage(srcImage,0,0,w,h);
+    }
+    ripples=[]; // 重置涟漪
+  }
+
+  function loadSource(){
+    try{
+      // 用Image重新加载，确保无跨域问题
+      const srcImg=new Image();
+      srcImg.crossOrigin='anonymous';
+      srcImg.onload=function(){
+        srcImage=srcImg;
+        resize();
+      };
+      srcImg.onerror=function(){
+        // 回退：用canvas绘制现有img
+        srcImage=img;
+        resize();
+      };
+      srcImg.src=img.src;
+    }catch(e){
+      srcImage=img;
+      resize();
+    }
+  }
+
+  function spawnRipple(){
+    if(ripples.length>=MAX_RIPPLES)return;
+    ripples.push({
+      radius:0,
+      maxRadius:Math.max(w,h)*0.72,
+      amplitude:5+Math.random()*10,
+      speed:0.8+Math.random()*1.2,
+      thickness:18+Math.random()*20,
+    });
+  }
+
+  function getDisplacement(px,py){
+    let dx=0,dy=0;
+    for(let i=ripples.length-1;i>=0;i--){
+      const r=ripples[i];
+      const dist=Math.sqrt((px-cx)*(px-cx)+(py-cy)*(py-cy));
+      const ringDist=dist-r.radius;
+      const halfThick=r.thickness/2;
+      if(Math.abs(ringDist)<halfThick){
+        const falloff=1-Math.abs(ringDist)/halfThick;
+        // 正弦波纹，falloff做高斯衰减
+        const wave=Math.sin(ringDist*0.35)*falloff*falloff*r.amplitude;
+        const nd=(dist<0.01)?0:(px-cx)/dist;
+        const ny=(dist<0.01)?0:(py-cy)/dist;
+        dx+=nd*wave;
+        dy+=ny*wave;
+      }
+    }
+    return{dx,dy};
+  }
+
+  function render(timestamp){
+    // 更新涟漪
+    if(!ripples.length||timestamp-lastSpawn>SPAWN_INTERVAL){
+      spawnRipple();
+      lastSpawn=timestamp;
+    }
+    for(let i=ripples.length-1;i>=0;i--){
+      ripples[i].radius+=ripples[i].speed;
+      if(ripples[i].radius>ripples[i].maxRadius)ripples.splice(i,1);
+    }
+
+    if(!srcImage||!w||!h){requestAnimationFrame(render);return}
+
+    // 确保离屏canvas有源图
+    offCtx.clearRect(0,0,w,h);
+    offCtx.drawImage(srcImage,0,0,w,h);
+    const srcData=offCtx.getImageData(0,0,w,h);
+    const dstData=ctx.createImageData(w,h);
+
+    const srcPixels=srcData.data;
+    const dstPixels=dstData.data;
+
+    for(let py=0;py<h;py+=DISP_STEP){
+      for(let px=0;px<w;px+=DISP_STEP){
+        const{dx,dy}=getDisplacement(px,py);
+        const sx=Math.round(px+dx);
+        const sy=Math.round(py+dy);
+
+        // 对当前采样块的所有像素写入相同偏移
+        for(let oy=0;oy<DISP_STEP&&py+oy<h;oy++){
+          for(let ox=0;ox<DISP_STEP&&px+ox<w;ox++){
+            const di=((py+oy)*w+px+ox)*4;
+            const siX=Math.max(0,Math.min(w-1,px+ox+Math.round(dx)));
+            const siY=Math.max(0,Math.min(h-1,py+oy+Math.round(dy)));
+            const si=(siY*w+siX)*4;
+            dstPixels[di]=srcPixels[si];
+            dstPixels[di+1]=srcPixels[si+1];
+            dstPixels[di+2]=srcPixels[si+2];
+            dstPixels[di+3]=255;
+          }
+        }
+      }
+    }
+
+    ctx.putImageData(dstData,0,0);
+    requestAnimationFrame(render);
+  }
+
+  // 启动
+  if(img.complete){loadSource()}else{img.addEventListener('load',loadSource,{once:true})}
+  window.addEventListener('resize',()=>{if(srcImage)resize()});
+  requestAnimationFrame(render);
+}
 
 // ===== 启动 =====
 document.body.style.overflow='';
 renderHome();
 showPage('page-home');
+startTriAnimation();
+initRippleEffect();
 </script>
 </body>
 </html>
