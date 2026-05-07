@@ -6,7 +6,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>人生体验卡 · 一日奇幻之旅</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E5902F">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>开药吗</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -86,9 +89,9 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .beam-center{left:50%;width:605px;transform:translateX(-50%);clip-path:polygon(50% 0%,0% 100%,100% 100%)}
 .beam-left{left:0;width:605px;clip-path:polygon(28% 0%,18% 100%,100% 100%)}
 .beam-right{right:0;width:605px;clip-path:polygon(72% 0%,0% 100%,82% 100%)}
-.beam-blue{background:radial-gradient(ellipse at 50% 0%,rgba(140,110,240,0.45) 0%,rgba(110,80,220,0.2) 30%,rgba(80,50,200,0.06) 60%,transparent 90%)}
-.beam-red{background:radial-gradient(ellipse at 50% 0%,rgba(250,140,90,0.45) 0%,rgba(230,100,50,0.2) 30%,rgba(200,70,30,0.06) 60%,transparent 90%)}
 .beam-green{background:radial-gradient(ellipse at 50% 0%,rgba(110,220,150,0.45) 0%,rgba(80,190,110,0.2) 30%,rgba(50,160,70,0.06) 60%,transparent 90%)}
+.beam-purple{background:radial-gradient(ellipse at 50% 0%,rgba(160,100,240,0.5) 0%,rgba(130,60,220,0.22) 30%,rgba(100,30,200,0.07) 60%,transparent 90%)}
+.beam-orange{background:radial-gradient(ellipse at 50% 0%,rgba(255,165,70,0.48) 0%,rgba(240,130,30,0.2) 30%,rgba(210,100,15,0.06) 60%,transparent 90%)}
 .comp1-slideshow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;max-width:82%;max-height:66%;object-fit:contain;pointer-events:none}
 .comp1-slideshow-left{position:absolute;top:50%;left:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
 .comp1-slideshow-right{position:absolute;top:50%;right:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
@@ -961,10 +964,10 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* 结果页左侧人格图形 */
 .result-left-graphic{
   position:fixed;left:calc(20px + 1cm);top:50%;transform:translateY(-50%);
-  width:min(400px,52vw);aspect-ratio:1;
-  z-index:0;pointer-events:none;opacity:0.15;
+  width:min(400px,52vw);min-width:120px;min-height:120px;
+  z-index:5;pointer-events:none;
 }
-.result-left-graphic svg{width:100%;height:100%;display:block}
+.result-left-graphic svg{width:100%;height:auto;display:block}
 
 .prescription-card{
   background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
@@ -1296,9 +1299,6 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
     <img class="comp1-slideshow-right" id="comp1SlideshowRight" src="images/azhe.png?v=1778169434319" alt="Slideshow Right">
     <div class="comp1-overlay"></div>
     <div class="comp1-btns">
-      <button class="comp1-btn" onclick="window.open('downloads/CaiberClick.exe','_blank')">
-        🪟 Windows 下载
-      </button>
       <button class="comp1-btn" onclick="window.open('downloads/app-debug.apk','_blank')">
         🤖 Android 下载
       </button>
@@ -2114,7 +2114,7 @@ const LOVE_CARDS = [
           {sender:'TA',text:'不过无所谓——结果最重要。所以，我们现在算认识了吗？'},
         ],
         prompt:'TA把手机推到你面前，屏幕上是一个新联系人的空白页。',
-        options:[{id:1,text:'接过手机，输入自己的号码——"算。"',next:'end'},{id:2,text:'也掏出手机："不如你输你的。这样就扯平了。"',next:'end'}]
+        options:[{id:1,text:'接过手机，输入自己的号码——"1**"',next:'end'},{id:2,text:'也掏出手机："不如你输你的。这样就扯平了。"',next:'end'}]
       },
       crush_3b:{
         chatName:'☕ 咖啡店角落 · 两人对坐',
@@ -2911,15 +2911,20 @@ function handleLoveChatSend(){
   },600);
 }
 
-// ===== COMP1 舞台灯光 7 场循环 =====
+// ===== COMP1 舞台灯光 11 场循环 =====
+// 每场颜色从左到右: l=左, c=中, r=右; null=无灯光
 const LIGHT_SEQUENCE=[
-  {d:2000,c:'blue',       l:null,  r:null},   // 1: 中
-  {d:2000,c:null,         l:'red', r:'green'}, // 2: 左红+右绿
-  {d:1000,c:'blue',       l:'green',r:'red'},  // 3: 中蓝+左绿+右红
-  {d:1000,c:'blue',       l:'green',r:null},   // 4: 中蓝+左绿
-  {d:1000,c:'blue',       l:null,  r:'red'},   // 5: 中蓝+右红
-  {d:1000,c:null,         l:'green',r:null},   // 6: 左绿
-  {d:1000,c:null,         l:null,  r:'red'},   // 7: 右红
+  {d:1800,c:'purple', l:'green',  r:'orange'},  // 1: 绿 紫 橙
+  {d:1800,c:'orange', l:null,     r:'green'},   // 2: 无 橙 绿
+  {d:1800,c:'orange', l:'green',  r:'purple'},  // 3: 绿 橙 紫
+  {d:1800,c:'green',  l:'purple', r:null},      // 4: 紫 绿 无
+  {d:1800,c:'orange', l:'purple', r:'green'},   // 5: 紫 橙 绿
+  {d:1800,c:'purple', l:null,     r:null},      // 6: 无 紫 无
+  {d:1800,c:'green',  l:'purple', r:'orange'},  // 7: 紫 绿 橙
+  {d:1800,c:'green',  l:null,     r:'orange'},  // 8: 无 绿 橙
+  {d:1800,c:'green',  l:'orange', r:'purple'},  // 9: 橙 绿 紫
+  {d:1800,c:'purple', l:'green',  r:null},      // 10: 绿 紫 无
+  {d:1800,c:'purple', l:'orange', r:'green'},   // 11: 橙 紫 绿
 ];
 let lightField=0,lightTimer=null;
 
@@ -3186,7 +3191,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   initLightShow();
   initSlideshow();
   initConfetti();
+  preloadCharacterImages();
 });
+
+function preloadCharacterImages(){
+  Object.values(PERSONALITY_CHARACTERS).forEach(function(src){
+    var img = new Image();
+    img.src = src;
+  });
+}
 
 // ===== 游戏结束 =====
 function finishGame(){
@@ -3460,7 +3473,7 @@ function loveFinishGame(){
   state.choicePath=[...loveState.choicePath];
   state.isPlaying=false;
   showResultLoading();
-  showOverlay('🔮','体验结束，正在生成你的、处方...',2500,()=>{
+  showOverlay('🔮','体验结束，正在生成你的处方...',2500,()=>{
     showPage('page-result');renderResult();
   });
 }
@@ -3724,6 +3737,8 @@ function showPersonalityDetail(pid){
 function closePersonalityDetail(e){
   if(e && e.target !== document.getElementById('personalityDetailOverlay')) return;
   document.getElementById('personalityDetailOverlay').classList.remove('show');
+  document.getElementById('pdGraphic').innerHTML = '';
+  document.getElementById('pdCharacter').innerHTML = '';
   document.body.style.overflow = '';
 }
 
@@ -3732,11 +3747,11 @@ function getPersonalityGraphicSVG(pid){
   const svgs = {
     1:`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF6B4A"/><stop offset="100%" stop-color="#E0442B"/></linearGradient></defs>
-      <circle cx="60" cy="60" r="52" fill="none" stroke="url(#g1)" stroke-width="2.5" opacity="0.3"/>
+      <circle cx="60" cy="60" r="52" fill="none" stroke="url(#g1)" stroke-width="2.5"/>
       <polygon points="42,30 82,60 42,90" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linejoin="round"/>
       <line x1="60" y1="60" x2="82" y2="60" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
-      <line x1="48" y1="45" x2="82" y2="60" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      <line x1="48" y1="75" x2="82" y2="60" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+      <line x1="48" y1="45" x2="82" y2="60" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="48" y1="75" x2="82" y2="60" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"/>
     </svg>`,
     2:`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5B8CDE"/><stop offset="100%" stop-color="#3A6FC4"/></linearGradient></defs>
@@ -4177,5 +4192,14 @@ initRippleEffect();
   </div>
 </div>
 
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    console.log('SW registered:', reg.scope);
+  }).catch(function(err){
+    console.log('SW registration failed:', err);
+  });
+}
+</script>
 </body>
 </html>
