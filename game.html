@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>人生体验卡 · 一日奇幻之旅</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,12 +45,26 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 }
 .sticky-nav.scrolled{background:rgba(253,248,238,0.98)}
 .nav-left{font-size:11px;color:var(--gray);letter-spacing:1px;white-space:nowrap}
+.nav-logo-img{height:28px;width:auto;display:block}
 .nav-center{display:flex;gap:28px;align-items:center}
 .nav-center a{
   font-family:var(--font-display);font-size:14px;letter-spacing:2px;
   color:#3D3020;text-decoration:none;cursor:pointer;transition:color 0.2s;
 }
 .nav-center a:hover{color:var(--orange)}
+.nav-dropdown{position:relative;display:inline-block}
+.nav-dropdown-card{
+  display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  padding-top:8px;z-index:110;
+}
+.nav-dropdown:hover .nav-dropdown-card{display:block}
+.nav-dropdown-card p{
+  background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 50%,#FBE8D4 100%);
+  border-radius:12px;box-shadow:0 12px 40px rgba(40,20,10,0.18);
+  padding:20px 24px;width:300px;white-space:normal;
+  font-family:var(--font-body);font-size:13px;color:#5D4E3A;line-height:2;
+  letter-spacing:0.5px;margin:0;
+}
 .nav-right .nav-btn{
   font-family:var(--font-display);font-size:13px;letter-spacing:2px;
   background:var(--orange);color:#fff;border:none;padding:8px 18px;
@@ -81,12 +98,16 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   background:linear-gradient(180deg,rgba(253,248,238,0.2) 0%,rgba(253,248,238,0.5) 50%,rgba(253,248,238,0.85) 100%);
 }
 .comp1-title{font-family:var(--font-body);font-size:clamp(40px,8vw,72px);font-weight:900;line-height:1.15;background:linear-gradient(90deg,transparent 0%,rgba(61,48,32,0.15) 15%,#3D3020 40%,#3D3020 60%,rgba(61,48,32,0.15) 85%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.comp1-btn{
+.comp1-btns{
   position:absolute;bottom:48px;left:48px;z-index:5;
-  font-family:var(--font-display);font-size:16px;letter-spacing:3px;
+  display:flex;gap:16px;
+}
+.comp1-btn{
+  font-family:var(--font-display);font-size:14px;letter-spacing:2px;
   background:var(--orange);color:#fff;border:none;
-  padding:14px 36px;border-radius:30px;cursor:pointer;
+  padding:14px 28px;border-radius:30px;cursor:pointer;
   transition:all 0.3s;box-shadow:0 8px 32px rgba(229,144,47,0.3);
+  white-space:nowrap;
 }
 .comp1-btn:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(229,144,47,0.45)}
 .comp1-btn:active{transform:scale(0.96)}
@@ -113,7 +134,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
    GACHA MACHINE — 魔术师扭蛋机
    ============================================================ */
 .gacha-container{display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;gap:24px;padding:20px 24px;position:relative}
-.gacha-machine-wrapper{display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:12px}
+.gacha-machine-wrapper{display:flex;flex-direction:column;align-items:center;flex:0 0 200px;gap:12px}
 .gacha-machine{
   position:relative;width:200px;display:flex;flex-direction:column;align-items:center;
   filter:drop-shadow(0 12px 32px rgba(60,30,10,0.25));
@@ -334,13 +355,14 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* 保留旧类兼容 */
 .gacha-body-front{display:none}
 .gacha-coin-slot{display:none}
-.gacha-btn-row{margin-top:133px}
+.gacha-btn-row{margin-top:133px;display:flex;gap:6px;justify-content:center}
 .gacha-start-btn{
-  width:88px;height:44px;border-radius:0;border:none;cursor:pointer;
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#FF7777 0%,#EE5555 50%,#CC5555 100%);
   box-shadow:0 6px 18px rgba(220,100,100,0.35),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -4px 8px rgba(0,0,0,0.25);
   transition:all 0.12s;position:relative;
   outline:none;
+  display:flex;align-items:center;justify-content:center;
 }
 .gacha-start-btn:hover{
   box-shadow:0 8px 24px rgba(220,100,100,0.5),inset 0 3px 8px rgba(255,255,255,0.3),inset 0 -4px 8px rgba(0,0,0,0.25);
@@ -355,14 +377,15 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:not-allowed;transform:none;
 }
 .gacha-start-btn .gacha-btn-inner{
-  font-family:var(--font-display);font-size:12px;letter-spacing:2px;color:#fff;
+  font-family:var(--font-display);font-size:10px;letter-spacing:1px;color:#fff;
   text-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 .gacha-reset-btn{
-  width:88px;height:44px;border-radius:0;border:none;cursor:pointer;
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#FFC060 0%,#F0A030 50%,#C88030 100%);
   box-shadow:0 6px 16px rgba(220,160,60,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
   transition:all 0.12s;position:relative;outline:none;
+  display:flex;align-items:center;justify-content:center;
 }
 .gacha-reset-btn:hover{
   box-shadow:0 8px 24px rgba(220,160,60,0.45),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -3px 6px rgba(0,0,0,0.22);
@@ -373,13 +396,14 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   box-shadow:0 2px 8px rgba(220,160,60,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
 }
 .gacha-reset-btn .gacha-btn-inner{
-  font-size:12px;letter-spacing:3px;
+  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 .gacha-all-btn{
-  width:88px;height:44px;border-radius:0;border:none;cursor:pointer;
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#90B8F0 0%,#70A0E0 50%,#5080C0 100%);
   box-shadow:0 6px 16px rgba(80,130,200,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
   transition:all 0.12s;position:relative;outline:none;
+  display:flex;align-items:center;justify-content:center;
 }
 .gacha-all-btn:hover{
   box-shadow:0 8px 24px rgba(80,130,200,0.45),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -3px 6px rgba(0,0,0,0.22);
@@ -390,7 +414,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   box-shadow:0 2px 8px rgba(80,130,200,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
 }
 .gacha-all-btn .gacha-btn-inner{
-  font-size:12px;letter-spacing:3px;
+  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 /* 掉落的扭蛋（初始隐藏） */
 .gacha-dispensed-capsule{
@@ -465,9 +489,13 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 }
 .gacha-card-slot.empty .card-back-graphic svg{
   width:100%;height:100%;display:block;
+  pointer-events:none;
 }
 .gacha-card-slot.collected{
-  background:#fff;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    #fff;
   border:2px solid rgba(60,40,20,0.15);
   box-shadow:0 2px 12px rgba(60,40,20,0.08);
   animation:cardReveal 0.5s ease-out;
@@ -477,6 +505,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 
 /* 浮动动画包裹层 */
 .gacha-card-float{
+
   animation:cardFloat 3s ease-in-out infinite;
 }
 .gacha-card-float:hover{
@@ -524,7 +553,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* ============================================================
    COMPONENT 3 — UPPER PLACEHOLDER + LOWER DUAL CARDS
    ============================================================ */
-.comp3{background:var(--darker)}
+.comp3{background:var(--darker);overflow:hidden}
 .comp3-upper{width:100%;height:50vh;min-height:350px;overflow:hidden;background:var(--dark);position:relative}
 .comp3-ripple-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%}
 .comp3-splatter{position:absolute;inset:0;pointer-events:none;z-index:1}
@@ -603,7 +632,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .comp3-lower{
   display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;
   gap:36px;width:100%;padding:80px 0;
-  position:relative;
+  position:relative;overflow:hidden;
 }
 .comp3-tri{
   position:absolute;inset:0;z-index:10;pointer-events:none;
@@ -611,7 +640,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   transition:opacity 0.4s;
 }
 .comp3-card{
-  background:#fff;border:2px solid rgba(60,40,20,0.1);border-radius:var(--radius);
+  background:#fff;border:2px solid rgba(60,40,20,0.1);border-radius:0;
   overflow:hidden;display:flex;flex-direction:column;
   cursor:pointer;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
   box-shadow:0 2px 16px rgba(60,40,20,0.06);
@@ -636,6 +665,9 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   position:absolute;inset:0;z-index:0;
   display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
   gap:0;
+}
+.comp3-insert-item{
+  overflow:hidden;width:100%;height:100%;
 }
 .comp3-insert-item img{
   width:100%;height:100%;object-fit:cover;display:block;
@@ -707,13 +739,14 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .film-frame{
   width:180px;height:120px;flex-shrink:0;
   border:3px solid rgba(180,160,140,0.35);
-  border-radius:3px;overflow:hidden;
+  border-radius:0;overflow:hidden;
   margin:0 6px;
   transition:border-color 0.3s;
+  background:rgba(0,0,0,0.06);
 }
 .film-frame:hover{border-color:var(--orange)}
 .film-frame img{
-  width:100%;height:100%;object-fit:cover;display:block;
+  width:100%;height:100%;object-fit:contain;display:block;
 }
 @keyframes filmScroll{
   from{transform:translateX(0)}
@@ -723,9 +756,9 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* ============================================================
    CAROUSEL
    ============================================================ */
-.carousel-wrapper{width:100%;overflow:hidden}
+.carousel-wrapper{width:100%;overflow:hidden;position:relative}
 .carousel-track{
-  position:relative;height:500px;
+  position:relative;height:550px;
 }
 .carousel-slide{
   position:absolute;top:12px;
@@ -734,7 +767,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   cursor:pointer;transition:box-shadow 0.35s;
   overflow:hidden;
   display:flex;flex-direction:column;gap:8px;
-  user-select:none;min-height:440px;
+  user-select:none;height:490px;
 }
 .carousel-slide:hover{box-shadow:var(--shadow-lg)}
 .carousel-slide:active{transform:scale(0.97)}
@@ -755,7 +788,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   display:inline-block;padding:2px 10px;border-radius:0;align-self:flex-start;
 }
 .card-emoji-large{font-size:36px;line-height:1}
-.card-title-large{font-family:var(--font-body);font-size:18px;font-weight:900;line-height:1.25;letter-spacing:1px}
+.card-title-large{font-family:var(--font-body);font-size:18px;font-weight:900;line-height:1.25;letter-spacing:1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card-img-area{
   width:100%;aspect-ratio:16/10;border-radius:0;
   overflow:hidden;background:rgba(0,0,0,0.15);
@@ -765,7 +798,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .card-stars{display:flex;align-items:center;gap:6px;font-size:13px}
 .card-stars .stars-yellow{color:var(--yellow);letter-spacing:1px}
 .card-stars .review-count{font-size:11px;opacity:0.85}
-.card-desc-short{font-size:12px;line-height:1.6;opacity:0.9;flex:1}
+.card-desc-short{font-size:12px;line-height:1.6;opacity:0.9;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 
 .card-actions{display:flex;justify-content:center;margin-top:auto}
 .card-actions button{padding:9px 32px;border-radius:0;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;letter-spacing:1px}
@@ -776,15 +809,44 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .carousel-dots .dot{width:10px;height:10px;border-radius:50%;background:rgba(60,40,20,0.15);cursor:pointer;transition:all 0.3s}
 .carousel-dots .dot.active{background:var(--orange);transform:scale(1.3);box-shadow:0 0 8px rgba(229,144,47,0.4)}
 
+/* 轮播箭头按钮 */
+.carousel-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  border:2px solid rgba(60,40,20,0.15);
+  background:rgba(255,255,255,0.85);
+  color:rgba(60,40,20,0.7);
+  font-size:18px;cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.25s;backdrop-filter:blur(4px);
+}
+.carousel-arrow:hover{
+  background:#fff;color:var(--orange);
+  border-color:var(--orange);box-shadow:0 4px 16px rgba(229,144,47,0.2);
+}
+.carousel-arrow:active{transform:translateY(-50%) scale(0.92)}
+.carousel-arrow-left{left:12px}
+.carousel-arrow-right{right:12px}
+
 /* ============================================================
    CHAT PAGE
    ============================================================ */
-#page-chat{background:var(--darker);max-width:520px;margin:0 auto;width:100%;min-height:100vh;display:none;flex-direction:column}
+#page-chat{background:var(--darker);max-width:520px;margin:0 auto;width:100%;height:100vh;display:none;flex-direction:column;overflow:hidden;position:relative}
 #page-chat.active{display:flex}
 .chat-topbar{
   background:rgba(253,248,238,0.95);backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(229,144,47,0.2);
   padding:12px 16px;text-align:center;position:sticky;top:0;z-index:10;
+}
+/* 聊天背景装饰 Logo — 3行×4列 铺满整个屏幕 */
+.chat-bg-logos{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);
+  place-items:center;
+}
+.chat-bg-logo{
+  width:75%;height:75%;object-fit:contain;
+  opacity:0.1;filter:grayscale(0.5);
 }
 .chat-topbar .room-emoji{font-size:20px;display:block}
 .chat-room-name{font-size:14px;font-weight:700;color:#3D3020}
@@ -817,7 +879,8 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 
 .chat-messages{
   flex:1;overflow-y:auto;padding:6px 10px 110px;
-  display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth;
+  display:flex;flex-direction:column;gap:4px;
+  min-height:0;
 }
 
 .msg-row{display:flex;align-items:flex-start;gap:8px;animation:msgIn 0.35s ease-out}
@@ -880,12 +943,28 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 #page-result{
   background:linear-gradient(180deg,#FDF8EE 0%,#F5EFE0 50%,#FDF8EE 100%);
   min-height:100vh;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 #page-result.active{display:flex}
 .result-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .result-loading .loading-pill{font-size:64px;animation:bounce 1s infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
 .result-loading .loading-text{font-size:14px;color:var(--orange);margin-top:16px;letter-spacing:1px}
+
+/* 结果页右侧角色图片 */
+.result-right-character{
+  position:fixed;right:calc(20px + 1cm);top:50%;transform:translateY(-50%);
+  width:min(280px,36vw);z-index:1;pointer-events:none;
+}
+.result-right-character img{width:100%;height:auto;display:block}
+
+/* 结果页左侧人格图形 */
+.result-left-graphic{
+  position:fixed;left:calc(20px + 1cm);top:50%;transform:translateY(-50%);
+  width:min(400px,52vw);aspect-ratio:1;
+  z-index:0;pointer-events:none;opacity:0.15;
+}
+.result-left-graphic svg{width:100%;height:100%;display:block}
 
 .prescription-card{
   background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
@@ -1007,6 +1086,38 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 }
 @keyframes lsTapPulse{0%,100%{opacity:0.3;transform:translateY(0)}50%{opacity:0.8;transform:translateY(4px)}}
 
+/* 恋爱卡故事浮层卡片 */
+.ls-story-card-overlay{
+  position:absolute;inset:0;z-index:10;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.55);
+}
+.ls-story-card{
+  background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
+  border-radius:12px;box-shadow:0 24px 80px rgba(40,20,10,0.3);
+  padding:32px 28px 22px;width:min(420px,88vw);
+  animation:pdSlideIn 0.4s ease-out;
+}
+.ls-story-card-title{
+  font-family:var(--font-body);font-size:18px;font-weight:900;
+  color:#3D3020;text-align:center;margin-bottom:16px;
+  padding-bottom:12px;border-bottom:2px solid rgba(180,130,50,0.15);
+}
+.ls-story-card-text{
+  font-size:14px;color:#5D4E3A;line-height:2;
+  padding:4px 0 20px;
+}
+.ls-story-card-btn{
+  display:flex;justify-content:flex-end;
+}
+.ls-story-card-btn button{
+  background:var(--orange);color:#fff;border:none;
+  padding:8px 32px;border-radius:8px;font-size:14px;
+  font-family:var(--font-body);font-weight:700;
+  cursor:pointer;transition:background 0.2s;
+}
+.ls-story-card-btn button:hover{background:var(--orange-dark)}
+
 /* ============================================================
    OVERLAY
    ============================================================ */
@@ -1019,63 +1130,6 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .overlay .overlay-icon{font-size:60px;animation:bounce 0.8s infinite}
 .overlay .overlay-text{font-family:var(--font-display);font-size:18px;color:var(--orange);margin-top:16px;text-align:center;letter-spacing:2px}
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media(max-width:900px){
-  .carousel-track{padding:12px 20px 16px}
-  .carousel-slide{width:300px;min-height:410px}
-  .nav-center{display:none}
-  .comp1-btn{left:32px;bottom:36px}
-  .ls-bottom-row{max-width:520px}
-  .ls-char-avatar img{max-width:160px;max-height:40vh}
-  .ls-char-avatar img.char-large{max-width:320px;max-height:80vh}
-}
-@media(max-width:640px){
-  .comp1{min-height:100vh;height:auto}
-  .comp1-btn{left:20px;bottom:24px;font-size:14px;padding:12px 28px;letter-spacing:2px}
-  .comp1-overlay{padding:100px 20px 140px}
-  .comp1-title{font-size:clamp(34px,10vw,48px)}
-  .comp2-upper{height:auto;min-height:auto}
-  .gacha-container{flex-direction:column;gap:20px;padding:16px}
-  .gacha-machine-wrapper{flex-shrink:1}
-  .gacha-machine{width:160px}
-  .hat-top{width:110px;height:80px}
-  .hat-brim{width:170px;height:18px}
-  .magician-face{width:101px;height:91px}
-  .magician-neck{width:36px;height:12px}
-  .magician-cape{width:150px;height:101px;top:167px}
-  .magician-body{width:80px;height:80px;margin-bottom:-76px}
-  .magician-arm{width:18px;height:60px}
-  .gacha-start-btn,.gacha-reset-btn,.gacha-all-btn{width:64px;height:36px}
-  .gacha-start-btn .gacha-btn-inner,.gacha-reset-btn .gacha-btn-inner,.gacha-all-btn .gacha-btn-inner{font-size:10px;letter-spacing:1px}
-  .gacha-collection{max-width:100%}
-  .gacha-card-grid{grid-template-columns:repeat(4,1fr);gap:4px}
-  .comp2-lower{padding:32px 12px 48px}
-  .comp3-upper{height:35vh;min-height:260px}
-  .comp3-lower{grid-template-columns:1fr;grid-template-rows:auto;gap:20px;padding:40px 16px}
-  .comp3-card-a,.comp3-card-b{grid-row:auto;grid-column:auto;margin-left:16px;margin-right:16px}
-  .comp4{min-height:400px}
-  .carousel-slide{width:280px;min-height:380px;padding:18px 14px 14px}
-  .card-title-large{font-size:16px}
-  .card-emoji-large{font-size:28px}
-  .sticky-nav{padding:10px 16px}
-  .nav-left{font-size:10px}
-  .section-header h2{font-size:26px}
-  .section-tag{font-size:11px}
-  .chat-input-bar{gap:5px}
-  .chat-input-bar .btn-end{font-size:10px;padding:10px 8px}
-  .chat-input-bar .btn-primary{font-size:12px;padding:10px 14px}
-  .ls-bottom-row{max-width:100%}
-  .ls-char-name{font-size:12px}
-  .ls-dialog-area{gap:8px}
-  .ls-char-avatar img{max-width:120px;max-height:35vh}
-  .ls-char-avatar img.char-large{max-width:240px;max-height:70vh}
-  .ls-dialog-bubble{padding:14px 16px}
-  .ls-dialog-text{font-size:13px;line-height:1.7}
-  .ls-choice-btn{font-size:13px;padding:12px 10px}
-  .ls-stage{padding:12px 12px 24px}
-}
 
 /* ===== 人格详情弹窗 ===== */
 .pd-overlay{
@@ -1118,12 +1172,12 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .pd-content{width:100%}
 .pd-badge{
   font-family:var(--font-display);font-size:10px;letter-spacing:4px;
-  color:var(--orange);margin-bottom:8px;text-align:right;
+  color:var(--orange);margin-bottom:8px;text-align:center;
 }
 .pd-persona{
   font-family:var(--font-body);font-size:32px;font-weight:900;
   color:#3D3020;line-height:1.2;margin-bottom:20px;
-  text-align:right;border-bottom:2px solid rgba(180,130,50,0.15);padding-bottom:16px;
+  text-align:center;border-bottom:2px solid rgba(180,130,50,0.15);padding-bottom:16px;
 }
 .pd-section{margin-bottom:18px}
 .pd-section h3{
@@ -1149,32 +1203,73 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .pd-disclaimer{
   font-size:10px;color:rgba(139,125,104,0.5);text-align:center;
   padding-top:20px;border-top:1px solid rgba(180,130,50,0.12);
-  line-height:1.8;margin-top:8px;
+  line-height:1.8;margin-top:calc(8px - 5mm);
 }
 
-@media(max-width:640px){
-  .pd-modal{padding:36px 18px 24px}
-  .pd-graphic{top:12px;left:12px;width:min(80px,18vw);height:min(80px,18vw)}
-  .pd-persona{font-size:24px;text-align:left;padding-left:96px}
-  .pd-badge{text-align:left;padding-left:96px}
-  .pd-diagnosis,.pd-advice{font-size:13px}
+.pd-character{
+  position:absolute;top:20px;right:24px;
+  text-align:center;z-index:1;
 }
+.pd-char-label{
+  display:block;font-family:var(--font-display);font-size:11px;
+  letter-spacing:2px;color:var(--orange);margin-bottom:8px;
+}
+.pd-char-img{
+  width:min(140px,18vw);
+  display:block;opacity:0.15;
+}
+
+
+/* ===== 卡牌背面点击提示弹窗 ===== */
+.gh-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(30,20,10,0.72);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s;
+}
+.gh-overlay.show{opacity:1;pointer-events:auto}
+.gh-modal{
+  position:relative;
+  width:min(420px,88vw);
+  background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
+  border-radius:16px;
+  box-shadow:0 24px 80px rgba(40,20,10,0.25);
+  padding:40px 28px 28px;
+  text-align:center;
+  animation:pdSlideIn 0.4s ease-out;
+}
+.gh-modal .gh-icon{font-size:48px;margin-bottom:12px}
+.gh-modal .gh-title{font-family:var(--font-display);font-size:18px;color:var(--orange);letter-spacing:3px;margin-bottom:16px}
+.gh-modal .gh-message{font-family:var(--font-body);font-size:15px;color:#3D3020;line-height:1.8;margin-bottom:20px}
+.gh-modal .gh-btn{display:inline-block;padding:10px 36px;border-radius:24px;border:2px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--font-display);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all 0.25s}
+.gh-modal .gh-btn:hover{background:#fff;color:var(--orange)}
 </style>
 </head>
 <body>
-
 <!-- ==================== STICKY NAVIGATION ==================== -->
 <nav class="sticky-nav" id="stickyNav">
-  <div class="nav-left">🎴 人生体验卡 · 一日奇幻之旅</div>
+  <div class="nav-left"><img src="images/logo.jpg?v=1778169434319" alt="人生体验卡" class="nav-logo-img"></div>
   <div class="nav-center">
-    <a onclick="document.getElementById('comp1').scrollIntoView({behavior:'smooth'})">首页</a>
+    <span class="nav-dropdown">
+      <a onclick="document.getElementById('comp1').scrollIntoView({behavior:'smooth'})">首页</a>
+      <div class="nav-dropdown-card">
+        <p>这是一个结合了二次元的心理诊疗所。我们通过沉静式体验，根据你的选择来判断你的人格。根据每个人格，我们都会开出不一样的处方哦！快来试试吧！对了，每个人格都有一个代表人物哦，点击人格介绍，看看有没有你喜欢的角色吧！</p>
+      </div>
+    </span>
+    <a onclick="document.getElementById('comp2Upper').scrollIntoView({behavior:'smooth'})">人格介绍</a>
     <a onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">体验卡</a>
-    <a onclick="document.getElementById('comp3').scrollIntoView({behavior:'smooth'})">关于</a>
+    <a onclick="document.getElementById('comp3').scrollIntoView({behavior:'smooth'})">恋爱卡</a>
+    <a onclick="document.getElementById('comp4').scrollIntoView({behavior:'smooth'})">关于</a>
   </div>
   <div class="nav-right">
     <button class="nav-btn" onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">开始</button>
   </div>
 </nav>
+
+<div id="app">
+
 
 <!-- ==================== HOME PAGE ==================== -->
 <div id="page-home" class="page active">
@@ -1194,15 +1289,20 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
       <div class="beam beam-right" id="beamRight"></div>
     </div>
     <!-- 左侧图片轮播 -->
-    <img class="comp1-slideshow-left" id="comp1SlideshowLeft" src="images/lovecard1ta.png" alt="Slideshow Left">
+    <img class="comp1-slideshow-left" id="comp1SlideshowLeft" src="images/lovecard1ta.png?v=1778169434319" alt="Slideshow Left">
     <!-- 中央图片轮播 -->
-    <img class="comp1-slideshow" id="comp1Slideshow" src="images/ta.jpeg" alt="Slideshow">
+    <img class="comp1-slideshow" id="comp1Slideshow" src="images/ta.jpeg?v=1778169434319" alt="Slideshow">
     <!-- 右侧图片轮播 -->
-    <img class="comp1-slideshow-right" id="comp1SlideshowRight" src="images/azhe.png" alt="Slideshow Right">
+    <img class="comp1-slideshow-right" id="comp1SlideshowRight" src="images/azhe.png?v=1778169434319" alt="Slideshow Right">
     <div class="comp1-overlay"></div>
-    <button class="comp1-btn" onclick="document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'})">
-      CHOOSE YOUR EXPERIENCE ▼
-    </button>
+    <div class="comp1-btns">
+      <button class="comp1-btn" onclick="window.open('downloads/CaiberClick.exe','_blank')">
+        🪟 Windows 下载
+      </button>
+      <button class="comp1-btn" onclick="window.open('downloads/app-debug.apk','_blank')">
+        🤖 Android 下载
+      </button>
+    </div>
     <!-- 彩带飘落特效 -->
     <canvas class="comp1-confetti" id="confettiCanvas"></canvas>
   </section>
@@ -1319,6 +1419,8 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
       </div>
       <div class="carousel-wrapper" id="carouselWrapper">
         <div class="carousel-track" id="carouselTrack"><!-- JS rendered --></div>
+        <button class="carousel-arrow carousel-arrow-left" onclick="carouselPrev()" aria-label="上一张">◂</button>
+        <button class="carousel-arrow carousel-arrow-right" onclick="carouselNext()" aria-label="下一张">▸</button>
         <div class="carousel-dots" id="carouselDots"><!-- JS rendered --></div>
       </div>
     </div>
@@ -1343,7 +1445,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
       <div class="comp3-tri comp3-tri-a" id="triA"></div>
       <div class="comp3-tri comp3-tri-b" id="triB"></div>
       <div class="comp3-card comp3-card-a" id="cardA" onclick="selectLoveCard('love_crush')">
-        <div class="comp3-card-upper"><img src="images/lovecard1Background2.jpeg" alt="" draggable="false"></div>
+        <div class="comp3-card-upper"><img src="images/lovecard1Background2.jpeg?v=1778169434319" alt="" draggable="false"></div>
         <div class="comp3-card-lower">
           <div class="comp3-card-title">暗恋咖啡店：说不出口的那句话</div>
           <div class="comp3-card-text">你每天都会去公司楼下的咖啡店，只为了看一眼那个靠窗座位的TA。今天，咖啡师递给你一张纸条——是TA写的。有些话再不说，可能就再也没有机会了。</div>
@@ -1351,13 +1453,13 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
       </div>
       <!-- 插组件：2×2 图片网格 -->
       <div class="comp3-insert">
-        <div class="comp3-insert-item"><img src="images/leftUp.jpg" alt="" draggable="false"></div>
-        <div class="comp3-insert-item"><img src="images/rightUp.jpg" alt="" draggable="false"></div>
-        <div class="comp3-insert-item"><img src="images/leftLow.jpg" alt="" draggable="false"></div>
-        <div class="comp3-insert-item"><img src="images/rightLow.jpg" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/leftUp.jpg?v=1778169434319" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/rightUp.jpg?v=1778169434319" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/leftLow.jpg?v=1778169434319" alt="" draggable="false"></div>
+        <div class="comp3-insert-item"><img src="images/rightLow.jpg?v=1778169434319" alt="" draggable="false"></div>
       </div>
       <div class="comp3-card comp3-card-b" id="cardB" onclick="selectLoveCard('love_reunion')">
-        <div class="comp3-card-upper"><img src="images/lovecard2.jpg" alt="" draggable="false"></div>
+        <div class="comp3-card-upper"><img src="images/lovecard2.jpg?v=1778169434319" alt="" draggable="false"></div>
         <div class="comp3-card-lower">
           <div class="comp3-card-title">重逢的十字路口：再见时该说什么</div>
           <div class="comp3-card-text">分手三年后，你在十字路口遇到了TA。绿灯亮了，但你们都站在原地没动。TA先开了口——"好久不见。"三条路在你们面前展开，你会怎么走？</div>
@@ -1379,7 +1481,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
       <svg width="0" height="0" style="position:absolute"><defs><clipPath id="comp4ShapeClip" clipPathUnits="objectBoundingBox"><path d="M 0,0.22 C 0.01,0.38 0.025,0.48 0.05,0.08 C 0.06,0.02 0.08,0.05 0.10,0.18 C 0.11,0.32 0.13,0.44 0.17,0.04 C 0.19,0.10 0.20,0.01 0.24,0.15 C 0.26,0.28 0.29,0.50 0.33,0.06 C 0.35,0.02 0.37,0.14 0.40,0.10 C 0.42,0.35 0.44,0.08 0.48,0.03 C 0.50,0.18 0.52,0.46 0.56,0.07 C 0.58,0.01 0.60,0.12 0.64,0.14 C 0.66,0.32 0.68,0.20 0.72,0.05 C 0.74,0.16 0.77,0.45 0.81,0.08 C 0.83,0.02 0.85,0.13 0.89,0.06 C 0.91,0.28 0.93,0.40 0.96,0.04 C 0.98,0.12 0.99,0.25 1,0.10 L 1,1 L 0,1 Z"/></clipPath></defs></svg>
       <div class="comp4-shape"></div>
       <div class="comp4-bottom-row">
-        <div class="comp4-info-col"></div>
+        <div class="comp4-info-col"><img src="images/logo.jpg?v=1778169434319" alt="" style="width:100%;max-width:160px;display:block;margin:0 auto;opacity:0.8;"></div>
         <div class="comp4-info-col">
           <p>本网站所有内容均为虚构<br>请仔细甄别</p>
           <p>本网站设计借鉴<br>https://www.delacalle.mx/</p>
@@ -1397,6 +1499,11 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 
 <!-- ==================== CHAT PAGE ==================== -->
 <div id="page-chat" class="page">
+  <div class="chat-bg-logos" aria-hidden="true">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+  </div>
   <div class="chat-topbar">
     <span class="room-emoji">💬</span>
     <div class="chat-room-name" id="chatRoomName">群聊</div>
@@ -1414,70 +1521,15 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 <!-- ==================== RESULT PAGE ==================== -->
 <div id="page-result" class="page">
   <div id="resultLoading" class="result-loading">
+    <div class="chat-bg-logos" aria-hidden="true">
+      <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+      <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+      <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+    </div>
     <div class="loading-pill">💊</div>
     <div class="loading-text">正在调配你的专属人格处方...</div>
   </div>
   <div id="resultContent" style="display:none;width:100%;flex-direction:column;align-items:center"></div>
-</div>
-
-<!-- ==================== PERSONALITY DETAIL MODAL ==================== -->
-<div id="personalityDetailOverlay" class="pd-overlay" onclick="closePersonalityDetail(event)">
-  <div class="pd-modal" onclick="event.stopPropagation()">
-    <button class="pd-close" onclick="closePersonalityDetail()">✕</button>
-    <div class="pd-graphic" id="pdGraphic"><!-- SVG rendered by JS --></div>
-    <div class="pd-content">
-      <div class="pd-badge">PERSONALITY ARCHETYPE</div>
-      <div class="pd-persona" id="pdPersona"></div>
-      <div class="pd-section">
-        <h3>【诊断结果】</h3>
-        <div class="pd-diagnosis" id="pdDia"></div>
-      </div>
-      <div class="pd-section">
-        <h3>【处方】Rp.</h3>
-        <div class="pd-med-box">
-          <div class="pd-med-name" id="pdMed"></div>
-          <div class="pd-med-usage" id="pdUsage"></div>
-        </div>
-      </div>
-      <div class="pd-section">
-        <h3>【医嘱】</h3>
-        <div class="pd-advice" id="pdAdvice"></div>
-      </div>
-      <p class="pd-disclaimer">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== LOVE STORY PAGE ==================== -->
-<div id="page-love-story" class="page">
-  <div class="ls-topbar">
-    <button class="ls-back-btn" onclick="endLoveStory()">✕ 退出</button>
-    <span class="ls-story-title" id="lsStoryTitle">暗恋咖啡店</span>
-  </div>
-  <div class="ls-stage" id="lsStage" onclick="loveTapAdvance()">
-    <div class="ls-bottom-row">
-      <div class="ls-char-area" id="lsCharArea">
-        <div class="ls-char-avatar" id="lsCharAvatar"><img id="lsCharImg" src="" alt="" draggable="false"></div>
-        <div class="ls-char-name" id="lsCharName"></div>
-      </div>
-      <div class="ls-dialog-area" id="lsDialogArea">
-        <div class="ls-dialog-bubble">
-          <p class="ls-dialog-text" id="lsDialogText"></p>
-        </div>
-        <div class="ls-choices" id="lsChoices" style="display:none">
-          <button class="ls-choice-btn" id="lsChoice1" onclick="event.stopPropagation();loveChoose(1)"></button>
-          <button class="ls-choice-btn" id="lsChoice2" onclick="event.stopPropagation();loveChoose(2)"></button>
-        </div>
-        <div class="ls-tap-hint" id="lsTapHint">点击继续 ▼</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== TRANSITION OVERLAY ==================== -->
-<div class="overlay" id="overlay">
-  <div class="overlay-icon" id="overlayIcon">🔮</div>
-  <div class="overlay-text" id="overlayText"></div>
 </div>
 
 <script>
@@ -1502,31 +1554,39 @@ async function initCloudBase() {
 }
 
 async function getCardCounts() {
-  if (!tcbReady || !tcbDb) return {};
+  if (!tcbReady || !tcbDb) { console.warn('[CloudBase] tcb未就绪，无法读取计数'); return {}; }
   try {
-    const res = await tcbDb.collection('card_counters').get();
+    // 聚合统计所有事件记录，按 cardId 分组计数
+    const res = await tcbDb.collection('card_counters').limit(1000).get();
     const counts = {};
-    if (res.data) { res.data.forEach(doc => { counts[doc.cardId] = doc.count || 0; }); }
+    if (res.data) {
+      res.data.forEach(doc => {
+        const cid = doc.cardId;
+        if (cid) counts[cid] = (counts[cid] || 0) + 1;
+      });
+    }
+    console.log('[CloudBase] 读取计数成功:', JSON.stringify(counts));
     return counts;
   } catch (err) {
-    console.warn('[CloudBase] 读取计数失败:', err);
+    console.warn('[CloudBase] 读取计数失败:', err.message || err);
     return {};
   }
 }
 
 async function incrementCardCount(cardId) {
-  if (!tcbReady || !tcbDb) return;
+  if (!tcbReady || !tcbDb) {
+    console.warn('[CloudBase] 未就绪，计数未同步到云端');
+    return;
+  }
   try {
-    const coll = tcbDb.collection('card_counters');
-    const res = await coll.where({ cardId }).get();
-    if (res.data && res.data.length > 0) {
-      const doc = res.data[0];
-      await coll.doc(doc._id).update({ count: (doc.count || 0) + 1 });
-    } else {
-      await coll.add({ cardId, count: 1 });
-    }
+    // 事件记录模式：每次点击新增一条记录，不受"仅可修改本人数据"限制
+    await tcbDb.collection('card_counters').add({
+      cardId: cardId,
+      timestamp: Date.now()
+    });
+    console.log('[CloudBase] 计数 +1:', cardId);
   } catch (err) {
-    console.warn('[CloudBase] 更新计数失败:', err);
+    console.warn('[CloudBase] 更新计数失败:', err.message || err);
   }
 }
 
@@ -2309,6 +2369,25 @@ const PERSONALITIES = [
   },
 ];
 
+const PERSONALITY_CHARACTERS = {
+  1: 'images/lufei.jpg?v=1778169434319',
+  2: 'images/ayin.jpg?v=1778169434319',
+  3: 'images/warm.jpg?v=1778169434319',
+  4: 'images/independent.jpg?v=1778169434319',
+  5: 'images/introspection.jpg?v=1778169434319',
+  6: 'images/genuine.jpg?v=1778169434319',
+  7: 'images/practical.jpg?v=1778169434319',
+  8: 'images/freedom.jpg?v=1778169434319',
+  9: 'images/empathy.jpg?v=1778169434319',
+  10: 'images/romantic.jpg?v=1778169434319',
+  11: 'images/generous.jpg?v=1778169434319',
+  12: 'images/cautious.jpg?v=1778169434319',
+  13: 'images/firm.jpg?v=1778169434319',
+  14: 'images/rational.jpg?v=1778169434319',
+  15: 'images/generousGive.jpg?v=1778169434319',
+  16: 'images/quiet.jpg?v=1778169434319',
+};
+
 function buildResults(cardId,resultsData){
   let card=EXPERIENCE_CARDS.find(c=>c.id===cardId);
   if(!card)card=LOVE_CARDS.find(c=>c.id===cardId);
@@ -2430,7 +2509,33 @@ function showPage(pageId){
   const nav=document.getElementById('stickyNav');
   const isHome=pageId==='page-home';
   if(nav)nav.style.display=isHome?'flex':'none';
-  document.body.style.overflow=isHome?'':'hidden';
+  document.body.style.overflow = (pageId === 'page-love-story') ? 'hidden' : '';
+  // 返回首页时刷新体验卡计数器显示（用本地数据，避免云端异步写入未完成被覆盖）
+  if(isHome) refreshAllCarouselReviews();
+}
+
+// ===== 刷新轮播卡片的"XX人体验过"显示 =====
+function updateCarouselReviewDOM(cardId, text){
+  const slides=document.querySelectorAll('#carouselTrack .carousel-slide');
+  EXPERIENCE_CARDS.forEach((card,i)=>{
+    if(card.id===cardId){
+      const slide=slides[i];
+      if(slide){
+        const el=slide.querySelector('.review-count');
+        if(el) el.textContent=text;
+      }
+    }
+  });
+}
+function refreshAllCarouselReviews(){
+  const slides=document.querySelectorAll('#carouselTrack .carousel-slide');
+  EXPERIENCE_CARDS.forEach((card,i)=>{
+    const slide=slides[i];
+    if(slide){
+      const el=slide.querySelector('.review-count');
+      if(el) el.textContent=card.reviews;
+    }
+  });
 }
 
 function showOverlay(icon,text,duration,callback){
@@ -2529,28 +2634,59 @@ function startCarouselScroll(){
   carouselRaf=requestAnimationFrame(step);
 }
 
+function carouselSnap(delta){
+  const track=document.getElementById('carouselTrack');
+  const wrapper=document.getElementById('carouselWrapper');
+  if(!track||!wrapper)return;
+  const slides=track.querySelectorAll('.carousel-slide');
+  if(!slides.length)return;
+  const slideW=slides[0].offsetWidth;
+  const gap=20;
+  const cardW=slideW+gap;
+  const n=EXPERIENCE_CARDS.length;
+  const tw=n*cardW;
+  const vw=wrapper.offsetWidth;
+  carouselPos+=delta*cardW;
+  // 立即刷新所有卡片位置
+  slides.forEach((slide,i)=>{
+    let x=i*cardW-carouselPos;
+    while(x<-cardW)x+=tw;
+    while(x>vw+cardW)x-=tw;
+    slide.style.left=x+'px';
+  });
+  // 同步圆点
+  const effectivePos=((carouselPos%tw)+tw)%tw;
+  const activeIdx=Math.floor((effectivePos+cardW/2)/cardW)%n;
+  document.querySelectorAll('#carouselDots .dot').forEach((d,i)=>{
+    d.classList.toggle('active',i===activeIdx);
+  });
+}
+function carouselNext(){ carouselSnap(1); }
+function carouselPrev(){ carouselSnap(-1); }
+
 // ===== 首页渲染 =====
 async function syncCardCounts(){
   const counts = await getCardCounts();
-  [...EXPERIENCE_CARDS, ...LOVE_CARDS].forEach(card => {
+  const allCards = [...EXPERIENCE_CARDS, ...LOVE_CARDS];
+  allCards.forEach(card => {
     const count = counts[card.id] || 0;
     card.reviews = count + ' 人体验过';
   });
-  renderCarousel();
+  refreshAllCarouselReviews();
 }
 
 function renderHome(){
   renderCarousel();
   renderFilmStrip();
-  initCloudBase().then(syncCardCounts);
+  initCloudBase().then(() => {
+    syncCardCounts();
+    // CloudBase 就绪后，后续每次回首页都刷新
+    window._tcbReady = true;
+  });
 }
 
 // ===== 电影胶卷 =====
-const FILM_IMAGES = [
-  'images/leftUp.jpg','images/rightUp.jpg','images/leftLow.jpg','images/rightLow.jpg',
-  'images/lovecard1.jpg','images/lovecard2.jpg','images/lovecard1Background2.jpeg',
-  'images/lovecard2Background2.jpeg',
-];
+const FILM_IMAGES = Object.values(PERSONALITY_CHARACTERS);
 
 function renderFilmStrip(){
   const track=document.getElementById('filmTrack');
@@ -2576,6 +2712,8 @@ function selectCard(cardId){
   incrementCardCount(cardId);
   const cur=parseInt(card.reviews)||0;
   card.reviews=(cur+1)+' 人体验过';
+  // 立即刷新对应卡片的DOM显示
+  updateCarouselReviewDOM(cardId, card.reviews);
   state.currentCard=card;state.choicePath=[];state.currentPhase=card.startPhase;
   state.isPlaying=true;state.awaitingChoice=false;state.messageQueue=[];state.isShowingMessages=false;
   document.getElementById('chatMessages').innerHTML='';
@@ -2646,7 +2784,7 @@ function createMessageBubble(msg){
   const row=document.createElement('div');
   row.className='msg-row'+(isMe?' me':'');
   let avatarColor='#6b7280';
-  if(!isMe&&card.avatarColors&&card.avatarColors[msg.sender])avatarColor=card.avatarColors[msg.sender];
+  if(!isMe&&card&&card.avatarColors&&card.avatarColors[msg.sender])avatarColor=card.avatarColors[msg.sender];
   if(isMe)avatarColor='#f59e0b';
   const initials=isMe?'我':(msg.sender||'?').charAt(0);
   row.innerHTML=`<div class="msg-avatar" style="background:${avatarColor}">${initials}</div><div class="msg-body"><div class="msg-name">${isMe?'你':(msg.sender||'')}</div><div class="msg-bubble">${escapeHtml(msg.text)}</div></div>`;
@@ -2708,7 +2846,7 @@ function initBannerDrag(){
 
 function updateChatRoomName(name){document.getElementById('chatRoomName').textContent=name||'群聊'}
 function updateChatRoomCount(count){document.getElementById('chatRoomCount').textContent=count||''}
-function scrollToBottom(){const c=document.getElementById('chatMessages');setTimeout(()=>{c.scrollTop=c.scrollHeight},50)}
+function scrollToBottom(){const c=document.getElementById('chatMessages');if(!c)return;requestAnimationFrame(()=>{requestAnimationFrame(()=>{c.scrollTop=c.scrollHeight})})}
 
 // ===== 用户发送选择 =====
 function handleSend(){
@@ -2757,7 +2895,7 @@ function handleLoveChatSend(){
     loveChatMode=null;
     setTimeout(()=>{
       showPage('page-love-story');
-      document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
+      document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg?v=1778169434319)';
       startLovePhase('crush_3c');
     },600);
     return;
@@ -2814,9 +2952,9 @@ function initLightShow(){
 
 // ===== COMP1 团播轮播（三人三角队列，平滑轮转） =====
 const GROUP_PERSONS = [
-  { images: ['images/ta.jpeg','images/ta.0.jpg','images/ta.1.jpg','images/ta.2.jpg','images/ta.3.jpg','images/ta.4.jpg'] },
-  { images: ['images/lovecard1ta.png','images/cta.0.jpg','images/cta.1.jpg','images/cta.2.jpg','images/cta.3.jpg','images/cta.4.jpg'] },
-  { images: ['images/azhe.png','images/azhe.0.jpg','images/azhe.1.jpg','images/azhe.2.jpg','images/azhe.3.jpg','images/azhe.4.jpg'] }
+  { images: ['images/ta.jpeg?v=1778169434319','images/ta.0.jpg?v=1778169434319','images/ta.1.jpg?v=1778169434319','images/ta.2.jpg?v=1778169434319','images/ta.3.jpg?v=1778169434319','images/ta.4.jpg?v=1778169434319'] },
+  { images: ['images/lovecard1ta.png?v=1778169434319','images/cta.0.jpg?v=1778169434319','images/cta.1.jpg?v=1778169434319','images/cta.2.jpg?v=1778169434319','images/cta.3.jpg?v=1778169434319','images/cta.4.jpg?v=1778169434319'] },
+  { images: ['images/azhe.png?v=1778169434319','images/azhe.0.jpg?v=1778169434319','images/azhe.1.jpg?v=1778169434319','images/azhe.2.jpg?v=1778169434319','images/azhe.3.jpg?v=1778169434319','images/azhe.4.jpg?v=1778169434319'] }
 ];
 
 // 位置参数 — 所有定位纯用 transform（GPU compositor-only，不触 layout）
@@ -3069,10 +3207,17 @@ function renderResult(){
   document.getElementById('resultLoading').style.display='none';
   const container=document.getElementById('resultContent');container.style.display='flex';
   const card=state.currentCard;
+  if(!card){container.innerHTML='<p style="text-align:center;padding:40px">数据丢失，请重新选择体验卡</p>';return;}
   const pathKey=state.choicePath.join('-');
   const raw=(card.results&&card.results[pathKey])?card.results[pathKey]:null;
   const result=(raw&&raw.personalityId)?PERSONALITIES[raw.personalityId-1]:(raw||getFallbackResult());
-  container.innerHTML=`
+  // 左侧人格图形
+  const pid=raw&&raw.personalityId;
+  const leftGraphic=pid?`<div class="result-left-graphic">${getPersonalityGraphicSVG(pid)}</div>`:'';
+  // 右侧角色图片
+  const charImg=PERSONALITY_CHARACTERS[pid];
+  const rightCharacter=charImg?`<div class="result-right-character"><img src="${charImg}" alt=""></div>`:'';
+  container.innerHTML=leftGraphic+rightCharacter+`
     <div class="prescription-card">
       <div class="pc-watermark"></div>
       <div class="pc-badge">PERSONALITY DIAGNOSIS</div>
@@ -3081,13 +3226,12 @@ function renderResult(){
       <div class="pc-section"><h3>【诊断结果】</h3><div class="pc-diagnosis">${escapeHtml(result.dia)}</div></div>
       <div class="pc-section"><h3>【处方】Rp.</h3><div class="pc-med-box"><div class="pc-med-name">${escapeHtml(result.med)}</div><div class="pc-med-usage"><strong>用法用量：</strong>${escapeHtml(result.usage)}</div></div></div>
       <div class="pc-section"><h3>【医嘱】</h3><div class="pc-advice">${escapeHtml(result.advice)}</div></div>
-      <div class="pc-doctor"><div><div style="font-size:10px;color:rgba(180,130,50,0.7)">主治医师</div><div class="pc-doctor-name">赛博华佗</div></div><div class="pc-stamp">处方<br>专用</div></div>
     </div>
     <div class="result-buttons">
       <button class="btn-retry" onclick="retrySameCard()">🔄 再测一次当前体验</button>
       <button class="btn-home" onclick="goHome()">🎴 重新挑选体验卡</button>
     </div>
-    <p style="font-size:10px;color:rgba(139,125,104,0.5);text-align:center;padding:0 20px 30px;line-height:1.8">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
+    <p style="font-size:10px;color:rgba(139,125,104,0.5);text-align:center;padding:0 20px 11px;line-height:1.8;margin-top:-5mm">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
 }
 
 function getFallbackResult(){
@@ -3125,9 +3269,16 @@ function endExperience(){
 }
 
 function goHome(){
+  const cardId=state.currentCard&&state.currentCard.id;
   state.currentCard=null;state.currentPhase=null;state.choicePath=[];state.isPlaying=false;
   document.body.style.overflow='';
-  showPage('page-home');
+  if(cardId&&cardId.startsWith('love_')){
+    showPage('page-home');
+    setTimeout(()=>{document.getElementById('comp3').scrollIntoView({behavior:'smooth'});},100);
+  }else{
+    showPage('page-home');
+    setTimeout(()=>{document.getElementById('comp2-cards').scrollIntoView({behavior:'smooth'});},100);
+  }
 }
 
 // ===== 恋爱叙事引擎 =====
@@ -3137,6 +3288,10 @@ let loveState={
   isShowingPrompt:false,currentOptions:null,
 };
 let loveChatMode=null; // 恋爱卡→聊天模式跨界状态
+
+function closeLoveStoryCard(){
+  document.getElementById('lsStoryCard').style.display='none';
+}
 
 function selectLoveCard(cardId){
   const card=LOVE_CARDS.find(c=>c.id===cardId);
@@ -3149,13 +3304,17 @@ function selectLoveCard(cardId){
   document.getElementById('lsDialogText').textContent='';
   document.getElementById('lsChoices').style.display='none';
   document.getElementById('lsTapHint').style.display='none';
-  const bgImg = cardId === 'love_crush' ? 'images/lovecard1.jpg' : 'images/lovecard2.jpg';
+  const bgImg = cardId === 'love_crush' ? 'images/lovecard1.jpg?v=1778169434319' : 'images/lovecard2.jpg?v=1778169434319';
   document.getElementById('page-love-story').style.backgroundImage = 'url(' + bgImg + ')';
-  const charImg = cardId === 'love_crush' ? 'images/server.png' : 'images/ta.jpeg';
+  const charImg = cardId === 'love_crush' ? 'images/server.png?v=1778169434319' : 'images/ta.jpeg?v=1778169434319';
   const imgEl = document.getElementById('lsCharImg');
   imgEl.src = charImg;
   imgEl.classList.toggle('char-large', true);
   showPage('page-love-story');
+  // 显示故事背景卡片
+  document.getElementById('lsStoryCardTitle').textContent=card.title;
+  document.getElementById('lsStoryCardText').textContent=card.desc;
+  document.getElementById('lsStoryCard').style.display='flex';
   startLovePhase(card.startPhase);
 }
 
@@ -3201,10 +3360,10 @@ function loveShowMessage(msg){
   if(loveState.currentCard&&loveState.currentCard.id==='love_crush'){
     const imgEl=document.getElementById('lsCharImg');
     if(msg.sender==='TA'){
-      imgEl.src='images/lovecard1ta.png';
+      imgEl.src='images/lovecard1ta.png?v=1778169434319';
       imgEl.classList.add('char-large');
     }else{
-      imgEl.src='images/server.png';
+      imgEl.src='images/server.png?v=1778169434319';
       imgEl.classList.add('char-large');
     }
   }
@@ -3213,34 +3372,34 @@ function loveShowMessage(msg){
     const imgEl=document.getElementById('lsCharImg');
     const nameEl=document.getElementById('lsCharName');
     if(msg.sender==='咖啡店老板'){
-      imgEl.src='images/server.png';
+      imgEl.src='images/server.png?v=1778169434319';
       nameEl.style.color='';
     }else if(msg.sender==='好友阿哲'){
-      imgEl.src='images/azhe.png';
+      imgEl.src='images/azhe.png?v=1778169434319';
       nameEl.style.color='#eab308';
     }else if(msg.sender==='TA'){
-      imgEl.src='images/ta.jpeg';
+      imgEl.src='images/ta.jpeg?v=1778169434319';
       nameEl.style.color='';
     }
   }
   // 特定对话触发背景切换
   if(msg.text==='你真的来了。说实话，我昨天写完纸条就后悔了。'){
-    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg?v=1778169434319)';
   }
   // 恋爱卡2：进入咖啡馆后切换背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('二位要点什么')){
-    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard1Background2.jpeg?v=1778169434319)';
   }
   // 恋爱卡2：转身离开后好友来电时切换背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('我刚才好像看到')){
-    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2Background2.jpeg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2Background2.jpeg?v=1778169434319)';
   }
   // 恋爱卡2：掉头跑回十字路口时切回初始背景
   if(loveState.currentCard&&loveState.currentCard.id==='love_reunion'&&
      msg.text.includes('气喘吁吁地出现')){
-    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2.jpg)';
+    document.getElementById('page-love-story').style.backgroundImage='url(images/lovecard2.jpg?v=1778169434319)';
   }
 }
 
@@ -3293,12 +3452,14 @@ function endLoveStory(){
   loveState.isShowingPrompt=false;loveState.currentOptions=null;
   document.body.style.overflow='';
   showPage('page-home');
+  setTimeout(()=>{document.getElementById('comp3').scrollIntoView({behavior:'smooth'});},100);
 }
 
 function loveFinishGame(){
   state.currentCard=loveState.currentCard;
   state.choicePath=[...loveState.choicePath];
   state.isPlaying=false;
+  showResultLoading();
   showOverlay('🔮','体验结束，正在生成你的、处方...',2500,()=>{
     showPage('page-result');renderResult();
   });
@@ -3413,6 +3574,11 @@ function initGacha(){
         </div>
       </div>`
     ).join('');
+    // 事件委托：点击背面卡牌弹出提示
+    grid.onclick = function(e){
+      const slot = e.target.closest('.gacha-card-slot');
+      if(slot && slot.classList.contains('empty')) showGachaHint();
+    };
   }
 
   document.getElementById('gachaRemainCount').textContent = '16';
@@ -3451,7 +3617,7 @@ function pullGacha(){
       slot.classList.add('collected');
       const p = PERSONALITIES[idx];
 	      const svg = getPersonalityGraphicSVG(p.id);
-	      slot.innerHTML = `<div class="card-slot-inner" onclick="showPersonalityDetail(${p.id})" style="cursor:pointer">
+	      slot.innerHTML = `<div class="card-slot-inner" onclick="event.stopPropagation();showPersonalityDetail(${p.id})" style="cursor:pointer">
 	        <div class="card-slot-graphic">${svg}</div>
 	        <span class="card-slot-label">${escapeHtml(p.persona)}</span>
 	      </div>`;
@@ -3515,8 +3681,7 @@ function revealAll(){
     const p = PERSONALITIES[i];
     const svg = getPersonalityGraphicSVG(p.id);
     slot.className = 'gacha-card-slot collected';
-    slot.style = 'background:#fff';
-    slot.innerHTML = `<div class="card-slot-inner" onclick="showPersonalityDetail(${p.id})" style="cursor:pointer">
+    slot.innerHTML = `<div class="card-slot-inner" onclick="event.stopPropagation();showPersonalityDetail(${p.id})" style="cursor:pointer">
       <div class="card-slot-graphic">${svg}</div>
       <span class="card-slot-label">${escapeHtml(p.persona)}</span>
     </div>`;
@@ -3530,6 +3695,16 @@ function revealAll(){
   if (pool) { pool.innerHTML = ''; }
 }
 
+// ===== 卡牌背面点击提示 =====
+function showGachaHint(){
+  document.getElementById('gachaHintOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeGachaHint(){
+  document.getElementById('gachaHintOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 // ===== 人格详情弹窗 =====
 function showPersonalityDetail(pid){
   const p = PERSONALITIES[pid-1];
@@ -3540,6 +3715,9 @@ function showPersonalityDetail(pid){
   document.getElementById('pdUsage').innerHTML = '<strong>用法用量：</strong>'+escapeHtml(p.usage);
   document.getElementById('pdAdvice').textContent = p.advice;
   document.getElementById('pdGraphic').innerHTML = getPersonalityGraphicSVG(pid);
+  const charEl = document.getElementById('pdCharacter');
+  const charImg = PERSONALITY_CHARACTERS[pid];
+  charEl.innerHTML = charImg ? `<span class="pd-char-label">代表人物</span><img class="pd-char-img" src="${charImg}" alt="">` : '';
   document.getElementById('personalityDetailOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -3851,6 +4029,153 @@ initGacha();
 showPage('page-home');
 startTriAnimation();
 initRippleEffect();
+
+// ===== 移动端适配：等比缩放，桌面布局不变 =====
+(function(){
+  var APP = document.getElementById('app');
+  var NAV = document.getElementById('stickyNav');
+  var BASE_W = 960;
+
+  function updateMobileScale() {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var isMobile = vw < BASE_W || vh < 700;
+
+    if (!isMobile) {
+      document.body.style.overflow = '';
+      APP.style.transform = '';
+      APP.style.width = '';
+      if (NAV) {
+        NAV.style.transform = '';
+        NAV.style.width = '';
+        NAV.style.transformOrigin = '';
+      }
+      return;
+    }
+
+    if (vw >= vh) {
+      // 横屏：等比缩放，宽度撑满，高度自动，正常上下滚动
+      var scale = vw / BASE_W;
+      document.body.style.overflowX = 'hidden';
+      document.body.style.overflowY = 'auto';
+      APP.style.transform = 'scale(' + scale + ')';
+      APP.style.transformOrigin = '0 0';
+      APP.style.width = BASE_W + 'px';
+      // Nav 在 #app 外面，需要单独缩放以保持视觉一致
+      if (NAV) {
+        NAV.style.transform = 'scale(' + scale + ')';
+        NAV.style.transformOrigin = '0 0';
+        NAV.style.width = BASE_W + 'px';
+      }
+    } else {
+      // 竖屏：正常显示，用户可手动旋转手机
+      document.body.style.overflow = 'auto';
+      APP.style.transform = '';
+      APP.style.width = '';
+      if (NAV) {
+        NAV.style.transform = '';
+        NAV.style.width = '';
+        NAV.style.transformOrigin = '';
+      }
+    }
+  }
+
+  window.addEventListener('resize', updateMobileScale);
+  window.addEventListener('orientationchange', function() {
+    setTimeout(updateMobileScale, 100);
+  });
+  updateMobileScale();
+
+  // 页面加载时尝试锁定横屏
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(function(){});
+  }
+})();
 </script>
+</div>
+
+<!-- ==================== PERSONALITY DETAIL MODAL ==================== -->
+<div id="personalityDetailOverlay" class="pd-overlay" onclick="closePersonalityDetail(event)">
+  <div class="pd-modal" onclick="event.stopPropagation()">
+    <button class="pd-close" onclick="closePersonalityDetail()">✕</button>
+    <div class="pd-graphic" id="pdGraphic"><!-- SVG rendered by JS --></div>
+    <div class="pd-character" id="pdCharacter"><!-- character image rendered by JS --></div>
+    <div class="pd-content">
+      <div class="pd-badge">PERSONALITY ARCHETYPE</div>
+      <div class="pd-persona" id="pdPersona"></div>
+      <div class="pd-section">
+        <h3>【诊断结果】</h3>
+        <div class="pd-diagnosis" id="pdDia"></div>
+      </div>
+      <div class="pd-section">
+        <h3>【处方】Rp.</h3>
+        <div class="pd-med-box">
+          <div class="pd-med-name" id="pdMed"></div>
+          <div class="pd-med-usage" id="pdUsage"></div>
+        </div>
+      </div>
+      <div class="pd-section">
+        <h3>【医嘱】</h3>
+        <div class="pd-advice" id="pdAdvice"></div>
+      </div>
+      <p class="pd-disclaimer">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== GACHA HINT MODAL ==================== -->
+<!-- ==================== LOVE STORY PAGE ==================== -->
+<div id="page-love-story" class="page">
+  <div class="ls-topbar">
+    <button class="ls-back-btn" onclick="endLoveStory()">✕ 退出</button>
+    <span class="ls-story-title" id="lsStoryTitle">暗恋咖啡店</span>
+  </div>
+  <div class="ls-story-card-overlay" id="lsStoryCard">
+    <div class="ls-story-card">
+      <div class="ls-story-card-title" id="lsStoryCardTitle"></div>
+      <div class="ls-story-card-text" id="lsStoryCardText"></div>
+      <div class="ls-story-card-btn"><button onclick="closeLoveStoryCard()">确定</button></div>
+    </div>
+  </div>
+  <div class="ls-stage" id="lsStage" onclick="loveTapAdvance()">
+    <div class="ls-bottom-row">
+      <div class="ls-char-area" id="lsCharArea">
+        <div class="ls-char-avatar" id="lsCharAvatar"><img id="lsCharImg" src="" alt="" draggable="false"></div>
+        <div class="ls-char-name" id="lsCharName"></div>
+      </div>
+      <div class="ls-dialog-area" id="lsDialogArea">
+        <div class="ls-dialog-bubble">
+          <p class="ls-dialog-text" id="lsDialogText"></p>
+        </div>
+        <div class="ls-choices" id="lsChoices" style="display:none">
+          <button class="ls-choice-btn" id="lsChoice1" onclick="event.stopPropagation();loveChoose(1)"></button>
+          <button class="ls-choice-btn" id="lsChoice2" onclick="event.stopPropagation();loveChoose(2)"></button>
+        </div>
+        <div class="ls-tap-hint" id="lsTapHint">点击继续 ▼</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TRANSITION OVERLAY ==================== -->
+<div class="overlay" id="overlay">
+  <div class="chat-bg-logos" aria-hidden="true">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+    <img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo"><img src="images/logo.jpg?v=1778169434319" class="chat-bg-logo">
+  </div>
+  <div class="overlay-icon" id="overlayIcon">🔮</div>
+  <div class="overlay-text" id="overlayText"></div>
+</div>
+
+<div id="gachaHintOverlay" class="gh-overlay" onclick="closeGachaHint()">
+  <div class="gh-modal" onclick="event.stopPropagation()">
+    <div class="gh-icon">🎰</div>
+    <div class="gh-title">HINT</div>
+    <div class="gh-message">这是一个可以玩扭蛋的地方，左边的魔术师其实是个扭蛋机哦！想要知道卡牌是什么，去找找魔术师问问吧。</div>
+    <button class="gh-btn" onclick="closeGachaHint()">知道啦</button>
+  </div>
+</div>
+
 </body>
 </html>

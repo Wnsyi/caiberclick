@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build outputs
+public/downloads/
+*.tar.gz
+*.exe
+*.apk
