@@ -964,10 +964,10 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* 结果页左侧人格图形 */
 .result-left-graphic{
   position:fixed;left:calc(20px + 1cm);top:50%;transform:translateY(-50%);
-  width:min(400px,52vw);min-width:120px;min-height:120px;
+  width:min(400px,52vw);aspect-ratio:1;min-width:120px;min-height:120px;
   z-index:5;pointer-events:none;
 }
-.result-left-graphic svg{width:100%;height:auto;display:block}
+.result-left-graphic svg{width:100%;height:100%;display:block}
 
 .prescription-card{
   background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
@@ -3743,8 +3743,14 @@ function closePersonalityDetail(e){
 }
 
 // 16种人格的MBTI风格几何象征图形
+var _svgUid = 0;
 function getPersonalityGraphicSVG(pid){
-  const svgs = {
+  _svgUid++;
+  var raw = _SVG_RAW[pid];
+  if (!raw) return '';
+  return raw.replace(/id="g(\d+)"/g, 'id="g$1_u'+_svgUid+'"').replace(/url\(#g(\d+)\)/g, 'url(#g$1_u'+_svgUid+')');
+}
+var _SVG_RAW = {
     1:`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF6B4A"/><stop offset="100%" stop-color="#E0442B"/></linearGradient></defs>
       <circle cx="60" cy="60" r="52" fill="none" stroke="url(#g1)" stroke-width="2.5"/>
@@ -3872,9 +3878,7 @@ function getPersonalityGraphicSVG(pid){
       <circle cx="60" cy="56" r="14" fill="none" stroke="#C49A2A" stroke-width="2"/>
       <path d="M54,56 L58,60 L66,52" fill="none" stroke="#C49A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`
-  };
-  return svgs[pid] || svgs[1];
-}
+};
 
 // 卡牌背面的环形字母图形
 function getCardBackGraphic(){
