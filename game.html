@@ -1590,6 +1590,26 @@ async function incrementCardCount(cardId) {
   }
 }
 
+async function saveConsultation(data){
+  if (!tcbReady || !tcbDb) return;
+  try {
+    await tcbDb.collection('consultations').add({ ...data, timestamp: Date.now() });
+    console.log('[CloudBase] 问诊记录已保存');
+  } catch(err) {
+    console.warn('[CloudBase] 保存问诊失败:', err.message || err);
+  }
+}
+
+async function savePrescription(data){
+  if (!tcbReady || !tcbDb) return;
+  try {
+    await tcbDb.collection('prescriptions').add({ ...data, timestamp: Date.now() });
+    console.log('[CloudBase] 处方数据已保存');
+  } catch(err) {
+    console.warn('[CloudBase] 保存处方失败:', err.message || err);
+  }
+}
+
 // ============================================================
 // 数据层：6张体验卡 × 完整分支对话 × 人格结果
 // ============================================================
@@ -3245,6 +3265,9 @@ function renderResult(){
       <button class="btn-home" onclick="goHome()">🎴 重新挑选体验卡</button>
     </div>
     <p style="font-size:10px;color:rgba(139,125,104,0.5);text-align:center;padding:0 20px 11px;line-height:1.8;margin-top:-5mm">* 本诊断仅供娱乐，不具备临床诊断效度<br>* 人生没有标准答案，你选的每一条路都算数</p>`;
+  // 写入 CloudBase 数据库
+  saveConsultation({ cardId: card.id, cardTitle: card.title, choicePath: state.choicePath, personalityId: pid, persona: result.persona });
+  savePrescription({ cardId: card.id, cardTitle: card.title, personalityId: pid, persona: result.persona, dia: result.dia, med: result.med, usage: result.usage, advice: result.advice });
 }
 
 function getFallbackResult(){
