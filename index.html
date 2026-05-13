@@ -1,11 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>人生体验卡 · 一日奇幻之旅</title>
-<meta http-equiv="refresh" content="0;url=/mental-hospital/game.html">
-<script>location.href='/mental-hospital/game.html'</script>
-</head>
-<body></body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#FDF8EE" />
+    <meta name="description" content="人生体验卡 - 交互式人格探索游戏" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>人生体验卡</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

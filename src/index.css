@@ -1,4 +1,10 @@
-@import "tailwindcss";
+@import "./styles/game-theme.css";
+@import "./styles/game-animations.css";
+@import "./styles/gacha.css";
+@import "./styles/game-carousel.css";
+@import "./styles/game-chat.css";
+@import "./styles/game-love-story.css";
+@import "./styles/game-result.css";
 
 /* 手写字体 - 用于处方笺 */
 @font-face {
@@ -6,12 +12,7 @@
   src: url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
 }
 
-body {
-  margin: 0;
-  background: #1a1a2e;
-  color: #e0d6c2;
-  min-height: 100vh;
-}
+/* body styling is handled by game-theme.css */
 
 #root {
   min-height: 100vh;
@@ -20,16 +21,4 @@ body {
 /* 处方笺手写风格 */
 .font-prescription {
   font-family: 'ZCOOL KuaiLe', 'KaiTi', 'STKaiti', serif;
-}
-
-/* 自定义滚动条 */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #4a4a6a;
-  border-radius: 2px;
 }

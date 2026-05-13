@@ -1,21 +1,36 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
-import { AppProvider } from './contexts/AppContext';
-import HomePage from './pages/HomePage';
-import ConsultationPage from './pages/ConsultationPage';
-import PrescriptionPage from './pages/PrescriptionPage';
+import { BrowserRouter } from 'react-router-dom';
+import { GameProvider, useGameState } from './contexts/GameContext';
+import { GameHomePage } from './pages/GameHomePage';
+import { GameChatPage } from './pages/GameChatPage';
+import { LoveStoryPage } from './pages/LoveStoryPage';
+import { GameResultPage } from './pages/GameResultPage';
+import { StickyNav } from './components/game/StickyNav';
+import { PageSync } from './components/game/PageSync';
+
+function AppRoutes() {
+  const { page } = useGameState();
+
+  switch (page) {
+    case 'page-chat':
+      return <GameChatPage />;
+    case 'page-love-story':
+      return <LoveStoryPage />;
+    case 'page-result':
+      return <GameResultPage />;
+    case 'page-home':
+    default:
+      return <GameHomePage />;
+  }
+}
 
 export default function App() {
   return (
-    <AppProvider>
-      <HashRouter>
-        <div className="min-h-screen bg-[#1a1a2e] text-amber-100">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/consultation" element={<ConsultationPage />} />
-            <Route path="/prescription" element={<PrescriptionPage />} />
-          </Routes>
-        </div>
-      </HashRouter>
-    </AppProvider>
+    <BrowserRouter>
+      <GameProvider>
+        <StickyNav />
+        <AppRoutes />
+        <PageSync />
+      </GameProvider>
+    </BrowserRouter>
   );
 }

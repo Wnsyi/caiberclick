@@ -1,0 +1,377 @@
+/* ============================================================
+   GACHA MACHINE — 魔术师扭蛋机 + CARD COLLECTION
+   ============================================================ */
+.gacha-container{display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;gap:24px;padding:20px 24px;position:relative}
+.gacha-machine-wrapper{display:flex;flex-direction:column;align-items:center;flex:0 0 200px;gap:12px}
+.gacha-machine{
+  position:relative;width:200px;display:flex;flex-direction:column;align-items:center;
+  filter:drop-shadow(0 12px 32px rgba(60,30,10,0.25));
+  margin-top:38px;
+}
+
+/* 魔术帽 */
+.magician-hat{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center}
+.hat-top{
+  width:130px;height:100px;background:linear-gradient(180deg,#F5F5F5 0%,#E0E0E0 60%,#CCCCCC 100%);
+  border-radius:6px 6px 0 0;position:relative;overflow:hidden;
+  border:3px solid #D0D0D0;border-bottom:none;
+  box-shadow:inset 0 4px 0 rgba(255,255,255,0.06);
+}
+.hat-top::after{
+  content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;
+  background:rgba(180,180,180,0.4);
+}
+.hat-brim{
+  width:200px;height:22px;background:linear-gradient(180deg,#F5F5F5 0%,#E0E0E0 100%);
+  border-radius:50%;position:relative;z-index:2;margin-top:-6px;
+  border:3px solid #D0D0D0;
+  box-shadow:0 4px 8px rgba(0,0,0,0.4);
+}
+
+/* 帽中扭蛋 */
+.gacha-capsules-pool{
+  position:absolute;bottom:2px;left:6px;right:6px;height:90px;
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;
+  gap:3px 5px;padding:0 6px;pointer-events:none;
+}
+.gacha-mini-capsule{
+  width:20px;height:26px;border-radius:50% 50% 45% 45%;position:relative;
+  box-shadow:inset 0 -2px 3px rgba(0,0,0,0.25);
+  animation:miniFloat 3s ease-in-out infinite;
+}
+.gacha-mini-capsule:nth-child(odd){animation-delay:0s}
+.gacha-mini-capsule:nth-child(even){animation-delay:1.5s}
+.gacha-mini-capsule::after{
+  content:'';position:absolute;top:30%;left:3px;right:3px;height:1px;
+  background:rgba(0,0,0,0.12);
+}
+
+/* 魔术师的脸 */
+.magician-face{
+  position:relative;z-index:1;width:121px;height:111px;margin-top:-24px;
+  background:radial-gradient(ellipse at 50% 40%,#FFF5E8 0%,#FDE8D0 40%,#F5D4B0 75%,#E8C49A 100%);
+  clip-path:polygon(4% 0%,96% 0%,96% 74%,70% 100%,30% 100%,4% 74%);
+  box-shadow:inset 0 -4px 12px rgba(0,0,0,0.08);
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* 脖子 */
+.magician-neck{
+  width:44px;height:15px;
+  background:linear-gradient(180deg,#FDE8D0 0%,#F5D4B0 50%,#E8C49A 100%);
+  margin-top:-8px;
+  border-radius:4px 4px 8px 8px;
+}
+
+/* 眼睛 */
+.magician-eyes{display:flex;gap:32px;margin-top:30px}
+.magician-eye{
+  width:22px;height:8px;
+  border-bottom:3px solid #8B6914;
+  border-radius:0 0 50% 50%;
+  position:relative;
+}
+
+/* 鼻子 */
+.magician-nose{
+  width:8px;height:8px;
+  border-left:2px solid rgba(180,120,90,0.7);
+  border-bottom:2px solid rgba(180,120,90,0.7);
+  transform:rotate(45deg);
+  margin-top:14px;margin-left:-4px;
+}
+
+/* 胡子 */
+.magician-mustache{
+  width:70px;height:14px;margin-top:4px;
+  background:linear-gradient(90deg,transparent 0%,#8B7355 10%,#A08060 50%,#8B7355 90%,transparent 100%);
+  border-radius:0 0 50% 50%/0 0 100% 100%;
+}
+
+/* 嘴巴 */
+.magician-mouth{
+  width:44px;height:16px;margin-top:14px;
+  position:relative;z-index:5;
+  border-bottom:3px solid #C4956A;
+  border-radius:0 0 50% 50%;
+}
+.magician-mouth .gacha-chute-flap{display:none}
+
+/* 领结 */
+.magician-collar{
+  position:absolute;top:204px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;z-index:5;
+}
+.magician-bow-left,.magician-bow-right{
+  width:28px;height:18px;background:#7EC8E3;
+  border-radius:4px;transform:skewX(-10deg);
+}
+.magician-bow-center{
+  width:12px;height:12px;background:#5BBDD9;
+  border-radius:3px;
+}
+
+/* 显示窗口 */
+.gacha-display-window{
+  position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  width:60px;height:36px;background:rgba(100,180,220,0.25);
+  border:2px solid rgba(130,200,240,0.4);border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:5;
+}
+.gacha-display-count{
+  font-family:var(--font-display);font-size:18px;color:rgba(255,255,255,0.85);
+  text-shadow:0 0 6px rgba(255,255,255,0.3);line-height:1;
+}
+
+/* 扭蛋掉落口 */
+.gacha-dispensed-capsule{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:50px;height:64px;z-index:10;opacity:0;pointer-events:none;
+  transition:opacity 0.2s;
+}
+.gacha-dispensed-capsule.show{opacity:1}
+.gacha-dispensed-capsule.dropping{animation:capsuleDrop 0.5s ease-out}
+.gacha-dispensed-capsule.opening{animation:capsuleOpen 0.6s ease-out forwards}
+.gacha-capsule-top{
+  width:50px;height:32px;border-radius:50% 50% 0 0;
+  background:radial-gradient(ellipse at 40% 30%,rgba(255,255,255,0.4) 0%,var(--capsule-color,#E07060) 70%);
+  box-shadow:inset 0 -2px 4px rgba(0,0,0,0.1);
+}
+.gacha-capsule-top::after{
+  content:'';position:absolute;bottom:0;left:6px;right:6px;height:1px;
+  background:rgba(0,0,0,0.1);
+}
+.gacha-capsule-bottom{
+  width:50px;height:32px;border-radius:0 0 50% 50%;
+  background:radial-gradient(ellipse at 40% 70%,rgba(255,255,255,0.3) 0%,var(--capsule-color,#C05040) 70%);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);margin-top:-1px;
+}
+
+/* 手柄 — 魔术棒 */
+.gacha-handle-wrapper{
+  position:absolute;top:-72px;left:calc(50% + 4px);
+  transform:translateX(-50%) rotate(25deg) scaleY(-1);
+  transform-origin:7px 80px;
+  z-index:10;
+}
+.gacha-handle{
+  width:14px;height:80px;border-radius:7px;
+  background:linear-gradient(90deg,#F5F5F5 0%,#E0E0E0 30%,#F0F0F0 60%,#DDD 100%);
+  cursor:pointer;transition:transform 0.15s;
+  box-shadow:0 4px 8px rgba(0,0,0,0.4);
+  position:relative;
+  transform-origin:center 80px;
+}
+.gacha-handle:hover{transform:scale(1.05)}
+.gacha-handle.spinning{animation:handleSpin 0.6s ease-in-out}
+.gacha-handle-knob{
+  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  width:20px;height:20px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff 0%,#FFD700 40%,#DAA520 100%);
+  box-shadow:0 0 12px rgba(255,215,0,0.6),0 0 24px rgba(255,215,0,0.3);
+}
+
+/* 魔术师披肩 */
+.magician-cape{
+  width:240px;height:132px;
+  background:linear-gradient(180deg,#E8E8E8 0%,#D8D8D8 50%,#E8E8E8 100%);
+  clip-path:url(#capeClip);
+  position:absolute;top:207px;left:50%;transform:translateX(-50%);
+  z-index:-1;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* 魔术师身体 */
+.magician-body{
+  width:100px;height:100px;
+  background:linear-gradient(180deg,#FAFAFA 0%,#F0F0F0 40%,#E8E8E8 100%);
+  border-radius:10px 10px 0 0;
+  margin-top:-4px;
+  margin-bottom:-96px;
+  position:relative;
+  box-shadow:0 4px 16px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+/* 手臂 */
+.magician-arm{
+  position:absolute;top:0;
+  width:22px;height:76px;
+  background:linear-gradient(180deg,#F5F5F5 0%,#E8E8E8 100%);
+  border-radius:30px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+.arm-left{left:0;transform:translateX(-100%)}
+.arm-right{right:0;transform:translateX(100%)}
+
+/* 手肘 */
+.magician-forearm{
+  position:absolute;top:100%;left:0;
+  width:22px;height:60px;
+  background:linear-gradient(180deg,#F5F5F5 0%,#E8E8E8 100%);
+  border-radius:30px;
+  transform-origin:top center;
+  transform:scaleY(-1) rotate(315deg);
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+.forearm-left{transform:rotate(-30deg)}
+
+/* 手掌 */
+.magician-palm{
+  position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  width:24px;height:24px;
+  background:radial-gradient(circle at 40% 35%,#FFF5E8 0%,#FDE8D0 40%,#F5D4B0 75%,#E8C49A 100%);
+  border-radius:50%;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* 保留旧类兼容 */
+.gacha-body-front{display:none}
+.gacha-coin-slot{display:none}
+
+/* 按钮 */
+.gacha-btn-row{margin-top:133px;display:flex;gap:6px;justify-content:center}
+.gacha-start-btn{
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#FF7777 0%,#EE5555 50%,#CC5555 100%);
+  box-shadow:0 6px 18px rgba(220,100,100,0.35),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -4px 8px rgba(0,0,0,0.25);
+  transition:all 0.12s;position:relative;
+  outline:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.gacha-start-btn:hover{
+  box-shadow:0 8px 24px rgba(220,100,100,0.5),inset 0 3px 8px rgba(255,255,255,0.3),inset 0 -4px 8px rgba(0,0,0,0.25);
+  transform:translateY(-2px);
+}
+.gacha-start-btn:active{
+  transform:scale(0.94) translateY(2px);
+  box-shadow:0 2px 8px rgba(220,100,100,0.25),inset 0 4px 12px rgba(0,0,0,0.35);
+}
+.gacha-start-btn:disabled{
+  background:linear-gradient(180deg,#999 0%,#666 50%,#444 100%);
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:not-allowed;transform:none;
+}
+.gacha-start-btn .gacha-btn-inner{
+  font-family:var(--font-display);font-size:10px;letter-spacing:1px;color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,0.5);
+}
+.gacha-reset-btn{
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#FFC060 0%,#F0A030 50%,#C88030 100%);
+  box-shadow:0 6px 16px rgba(220,160,60,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
+  transition:all 0.12s;position:relative;outline:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.gacha-reset-btn:hover{
+  box-shadow:0 8px 24px rgba(220,160,60,0.45),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -3px 6px rgba(0,0,0,0.22);
+  transform:translateY(-2px);
+}
+.gacha-reset-btn:active{
+  transform:scale(0.94) translateY(2px);
+  box-shadow:0 2px 8px rgba(220,160,60,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
+}
+.gacha-reset-btn .gacha-btn-inner{
+  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+}
+.gacha-all-btn{
+  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#90B8F0 0%,#70A0E0 50%,#5080C0 100%);
+  box-shadow:0 6px 16px rgba(80,130,200,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
+  transition:all 0.12s;position:relative;outline:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.gacha-all-btn:hover{
+  box-shadow:0 8px 24px rgba(80,130,200,0.45),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -3px 6px rgba(0,0,0,0.22);
+  transform:translateY(-2px);
+}
+.gacha-all-btn:active{
+  transform:scale(0.94) translateY(2px);
+  box-shadow:0 2px 8px rgba(80,130,200,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
+}
+.gacha-all-btn .gacha-btn-inner{
+  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* 卡片收集板 */
+.gacha-collection{flex:1;min-width:0}
+.gacha-collection-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;padding:0 4px}
+.gacha-collection-title{
+  font-family:var(--font-display);font-size:18px;letter-spacing:3px;color:#3D3020;
+}
+.gacha-collection-sub{
+  font-family:var(--font-display);font-size:14px;letter-spacing:2px;color:var(--gray);
+}
+.gacha-card-grid{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  gap:10px;
+}
+.gacha-card-float{
+  aspect-ratio:3/4;
+  animation:cardFloat 3s ease-in-out infinite;
+}
+.gacha-card-float:hover{animation:none}
+.gacha-card-slot{
+  width:100%;height:100%;border-radius:0;position:relative;cursor:default;
+  transition:all 0.4s;
+}
+.gacha-card-slot.empty{
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    linear-gradient(180deg, #F5EDE0 0%, #EDE0CC 100%);
+  border:2px solid rgba(60,40,20,0.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.3s;
+}
+.gacha-card-slot.empty:hover{
+  transform:scale(1.12);
+  box-shadow:0 8px 32px rgba(60,40,20,0.12);
+  z-index:5;
+}
+.gacha-card-slot.empty .card-back-graphic{
+  width:80%;aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+}
+.gacha-card-slot.empty .card-back-graphic svg{
+  width:100%;height:100%;display:block;
+  pointer-events:none;
+}
+.gacha-card-slot.collected{
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(180,130,50,0.12) 4px, rgba(180,130,50,0.12) 5px),
+    #fff;
+  border:2px solid rgba(60,40,20,0.15);
+  box-shadow:0 2px 12px rgba(60,40,20,0.08);
+  animation:cardReveal 0.5s ease-out;
+  cursor:pointer;
+  transition:opacity 0.35s,box-shadow 0.35s,filter 0.35s,transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.gacha-card-slot.collected:hover{
+  transform:scale(1.15);
+  box-shadow:0 0 40px rgba(255,215,100,0.55),0 4px 16px rgba(229,144,47,0.3);
+  z-index:5;
+}
+.gacha-card-slot .card-slot-inner{
+  width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px;text-align:center;gap:6px;
+}
+.gacha-card-slot .card-slot-graphic{
+  width:70%;aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:1;min-height:0;
+}
+.gacha-card-slot .card-slot-graphic svg{
+  width:100%;height:100%;display:block;
+}
+.gacha-card-slot .card-slot-label{
+  font-family:var(--font-display);font-size:13px;letter-spacing:2px;color:var(--gray);
+  line-height:1.3;flex-shrink:0;font-weight:700;
+}
+
+/* 飞行卡片 */
+.gacha-card-fly{
+  position:fixed;z-index:200;pointer-events:none;
+  animation:cardFlyUp 1s ease-out forwards;
+}

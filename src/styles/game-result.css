@@ -1,0 +1,190 @@
+/* ============================================================
+   RESULT PAGE
+   ============================================================ */
+#page-result{
+  background:linear-gradient(180deg,#FDF8EE 0%,#F5EFE0 50%,#FDF8EE 100%);
+  min-height:100vh;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#page-result.active{display:flex}
+.result-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.result-loading .loading-pill{font-size:64px;animation:bounce 1s infinite}
+.result-loading .loading-text{font-size:14px;color:var(--orange);margin-top:16px;letter-spacing:1px}
+
+/* 结果页右侧角色图片 */
+.result-right-character{
+  position:fixed;right:calc(20px + 1cm);top:50%;transform:translateY(-50%);
+  width:min(280px,36vw);z-index:1;pointer-events:none;
+}
+.result-right-character img{width:100%;height:auto;display:block}
+
+/* 结果页左侧人格图形 */
+.result-left-graphic{
+  position:fixed;left:calc(20px + 1cm);top:50%;transform:translateY(-50%);
+  width:min(400px,52vw);aspect-ratio:1;min-width:120px;min-height:120px;
+  z-index:5;pointer-events:none;
+}
+.result-left-graphic svg{width:100%;height:100%;display:block}
+
+/* 处方笺卡片 */
+.prescription-card{
+  background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
+  border-radius:var(--radius);padding:28px 24px 20px;
+  max-width:420px;width:92%;margin:24px auto;
+  box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(180,130,50,0.2);
+  color:#3D2E0A;position:relative;overflow:hidden;
+}
+.prescription-card .pc-watermark{
+  position:absolute;inset:0;opacity:0.025;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 35px,#000 35px,#000 36px);
+}
+.prescription-card .pc-badge{
+  font-family:var(--font-display);font-size:11px;letter-spacing:3px;color:var(--orange);margin-bottom:12px;
+}
+.prescription-card .pc-persona{font-size:26px;font-weight:900;color:#3D3020;line-height:1.2;margin-bottom:4px}
+.prescription-card .pc-path{font-size:11px;color:var(--orange);margin-bottom:16px;font-weight:600}
+.prescription-card .pc-section{margin-bottom:16px;position:relative;z-index:1}
+.prescription-card .pc-section h3{
+  font-family:var(--font-display);font-size:14px;letter-spacing:2px;color:#B45309;margin-bottom:6px;
+}
+.prescription-card .pc-diagnosis{font-size:13px;color:#3D2E0A;line-height:1.75;background:rgba(251,191,36,0.08);padding:10px 12px;border-radius:10px}
+.prescription-card .pc-med-box{background:rgba(255,255,255,0.6);border:1px solid rgba(180,130,50,0.2);border-radius:10px;padding:12px}
+.prescription-card .pc-med-name{font-size:17px;font-weight:900;color:#B45309}
+.prescription-card .pc-med-usage{font-size:12px;color:#6B5A3A;margin-top:4px;line-height:1.7}
+.prescription-card .pc-advice{font-size:13px;color:#3D2E0A;line-height:1.75;background:rgba(255,45,120,0.04);border:1px solid rgba(255,45,120,0.1);border-radius:10px;padding:10px 12px}
+.prescription-card .pc-doctor{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-top:12px;border-top:1px solid rgba(180,130,50,0.2)}
+.prescription-card .pc-doctor-name{font-size:17px;color:#991B1B;font-weight:900;letter-spacing:2px}
+.prescription-card .pc-stamp{border:2px solid rgba(185,28,28,0.3);border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;color:#991B1B;font-size:9px;font-weight:700;transform:rotate(12deg);line-height:1.2;text-align:center}
+
+/* 结果页按钮 */
+.result-buttons{display:flex;flex-direction:column;gap:10px;padding:0 20px 32px;width:100%;max-width:420px}
+.result-buttons button{width:100%;padding:14px;border-radius:28px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
+.result-buttons .btn-retry{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 6px 24px rgba(255,107,53,0.3)}
+.result-buttons .btn-retry:active{transform:scale(0.96)}
+.result-buttons .btn-home{background:rgba(60,40,20,0.04);color:#3D3020;border:1px solid rgba(60,40,20,0.12)}
+.result-buttons .btn-home:active{transform:scale(0.96)}
+
+/* ============================================================
+   OVERLAYS & MODALS
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;background:rgba(253,248,238,0.96);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.5s;backdrop-filter:blur(12px);
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.overlay .overlay-icon{font-size:60px;animation:bounce 0.8s infinite}
+.overlay .overlay-text{font-family:var(--font-display);font-size:18px;color:var(--orange);margin-top:16px;text-align:center;letter-spacing:2px}
+
+/* 人格详情弹窗 */
+.pd-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(30,20,10,0.72);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s;
+}
+.pd-overlay.show{opacity:1;pointer-events:auto}
+.pd-modal{
+  position:relative;
+  width:min(720px,94vw);max-height:90vh;
+  background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
+  border-radius:16px;
+  box-shadow:0 24px 80px rgba(40,20,10,0.25);
+  overflow-y:auto;overflow-x:hidden;
+  padding:48px 36px 36px;
+  display:flex;flex-direction:column;
+  animation:pdSlideIn 0.4s ease-out;
+}
+.pd-close{
+  position:absolute;top:14px;right:18px;
+  width:40px;height:40px;border-radius:50%;
+  border:2px solid rgba(180,130,50,0.2);
+  background:rgba(255,255,255,0.7);
+  font-size:18px;color:#8B7D68;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.25s;z-index:2;
+}
+.pd-close:hover{background:rgba(255,77,77,0.1);border-color:rgba(255,77,77,0.35);color:#CC3333}
+.pd-graphic{
+  position:absolute;top:20px;left:24px;
+  width:min(120px,15vw);height:min(120px,15vw);
+  flex-shrink:0;
+}
+.pd-graphic svg{width:100%;height:100%;display:block}
+.pd-content{width:100%}
+.pd-badge{
+  font-family:var(--font-display);font-size:10px;letter-spacing:4px;
+  color:var(--orange);margin-bottom:8px;text-align:center;
+}
+.pd-persona{
+  font-family:var(--font-body);font-size:32px;font-weight:900;
+  color:#3D3020;line-height:1.2;margin-bottom:20px;
+  text-align:center;border-bottom:2px solid rgba(180,130,50,0.15);padding-bottom:16px;
+}
+.pd-section{margin-bottom:18px}
+.pd-section h3{
+  font-family:var(--font-display);font-size:12px;letter-spacing:2px;
+  color:var(--orange);margin-bottom:8px;text-transform:uppercase;
+}
+.pd-diagnosis{
+  font-size:14px;color:#3D2E0A;line-height:1.85;
+  background:rgba(251,191,36,0.08);padding:14px 16px;
+  border-radius:10px;border:1px solid rgba(251,191,36,0.12);
+}
+.pd-med-box{
+  background:rgba(255,255,255,0.65);border:1px solid rgba(180,130,50,0.2);
+  border-radius:10px;padding:14px 16px;
+}
+.pd-med-name{font-size:18px;font-weight:900;color:#B45309;margin-bottom:6px}
+.pd-med-usage{font-size:13px;color:#6B5A3A;line-height:1.8}
+.pd-advice{
+  font-size:14px;color:#3D2E0A;line-height:1.85;
+  background:rgba(255,45,120,0.04);border:1px solid rgba(255,45,120,0.1);
+  border-radius:10px;padding:14px 16px;
+}
+.pd-disclaimer{
+  font-size:10px;color:rgba(139,125,104,0.5);text-align:center;
+  padding-top:20px;border-top:1px solid rgba(180,130,50,0.12);
+  line-height:1.8;margin-top:calc(8px - 5mm);
+}
+
+.pd-character{
+  position:absolute;top:20px;right:24px;
+  text-align:center;z-index:1;
+}
+.pd-char-label{
+  display:block;font-family:var(--font-display);font-size:11px;
+  letter-spacing:2px;color:var(--orange);margin-bottom:8px;
+}
+.pd-char-img{
+  width:min(140px,18vw);
+  display:block;opacity:0.15;
+}
+
+/* 卡牌背面点击提示弹窗 */
+.gh-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(30,20,10,0.72);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s;
+}
+.gh-overlay.show{opacity:1;pointer-events:auto}
+.gh-modal{
+  position:relative;
+  width:min(420px,88vw);
+  background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
+  border-radius:16px;
+  box-shadow:0 24px 80px rgba(40,20,10,0.25);
+  padding:40px 28px 28px;
+  text-align:center;
+  animation:pdSlideIn 0.4s ease-out;
+}
+.gh-modal .gh-icon{font-size:48px;margin-bottom:12px}
+.gh-modal .gh-title{font-family:var(--font-display);font-size:18px;color:var(--orange);letter-spacing:3px;margin-bottom:16px}
+.gh-modal .gh-message{font-family:var(--font-body);font-size:15px;color:#3D3020;line-height:1.8;margin-bottom:20px}
+.gh-modal .gh-btn{display:inline-block;padding:10px 36px;border-radius:24px;border:2px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--font-display);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all 0.25s}
+.gh-modal .gh-btn:hover{background:#fff;color:var(--orange)}
