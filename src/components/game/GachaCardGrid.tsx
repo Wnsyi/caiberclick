@@ -1,5 +1,5 @@
 import { getCardBackGraphic, getPersonalityGraphicSVG } from '../../data/personalityMappings';
-import { GACHA_CARD_ICONS } from '../../data/gacha';
+
 import { PERSONALITIES } from '../../data/personalities';
 
 interface Props {

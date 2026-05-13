@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 export function useTriangleAnimation() {
-  const triAnimId = useRef<number>();
+  const triAnimId = useRef<number>(0);
 
   useEffect(() => {
     const triA = document.getElementById('triA');
@@ -49,23 +49,22 @@ export function useTriangleAnimation() {
       const progress = elapsed / duration;
       const s = getPhase(progress);
 
-      triA.style.clipPath = clipFor(s.cornerA, s.scale);
-      triA.style.transformOrigin = originFor(s.cornerA);
-      triA.style.transform = `scale(${s.scale})`;
+      triA!.style.clipPath = clipFor(s.cornerA, s.scale);
+      triA!.style.transformOrigin = originFor(s.cornerA);
+      triA!.style.transform = `scale(${s.scale})`;
 
-      triB.style.clipPath = clipFor(s.cornerB, s.scale);
-      triB.style.transformOrigin = originFor(s.cornerB);
-      triB.style.transform = `scale(${s.scale})`;
+      triB!.style.clipPath = clipFor(s.cornerB, s.scale);
+      triB!.style.transformOrigin = originFor(s.cornerB);
+      triB!.style.transform = `scale(${s.scale})`;
 
       const touchA =
         (s.cornerA === 'tl' && s.scale > 0.4) || (s.cornerB === 'bl' && s.scale > 0.4);
       const touchB =
         (s.cornerA === 'tr' && s.scale > 0.4) || (s.cornerB === 'br' && s.scale > 0.4);
-
-      cardA.style.transition = 'opacity 0.4s';
-      cardB.style.transition = 'opacity 0.4s';
-      (cardA as HTMLElement).style.opacity = touchA ? '0.12' : '1';
-      (cardB as HTMLElement).style.opacity = touchB ? '0.12' : '1';
+      cardA!.style.transition = 'opacity 0.4s';
+      cardB!.style.transition = 'opacity 0.4s';
+      cardA!.style.opacity = touchA ? '0.12' : '1';
+      cardB!.style.opacity = touchB ? '0.12' : '1';
 
       triAnimId.current = requestAnimationFrame(frame);
     }

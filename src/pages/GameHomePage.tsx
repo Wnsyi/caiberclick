@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch } from '../contexts/GameContext';
+import { useGameDispatch } from '../contexts/GameContext';
 import { EXPERIENCE_CARDS } from '../data/experienceCards';
 import { LOVE_CARDS } from '../data/loveCards';
 import { initCloudBase, getCardCounts, incrementCardCount } from '../cloudbase';
@@ -12,7 +12,6 @@ import { useRipple } from '../hooks/useRipple';
 import { useTriangleAnimation } from '../hooks/useTriangleAnimation';
 
 export function GameHomePage() {
-  const state = useGameState();
   const dispatch = useGameDispatch();
 
   useRipple('rippleCanvas');

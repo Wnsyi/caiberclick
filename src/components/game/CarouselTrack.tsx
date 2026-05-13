@@ -11,8 +11,9 @@ export function CarouselTrack({ onSelectCard }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<HTMLDivElement>(null);
   const carouselPos = useRef(0);
-  const carouselRaf = useRef<number>();
+  const carouselRaf = useRef<number>(0);
   const carouselPaused = useRef(false);
+  const touchStart = useRef<{ x: number; y: number; pos: number } | null>(null);
   const CAROUSEL_SPEED = 0.06; // px/ms
   const n = EXPERIENCE_CARDS.length;
 
@@ -25,6 +26,28 @@ export function CarouselTrack({ onSelectCard }: Props) {
     const onLeave = () => { carouselPaused.current = false; };
     wrapper.addEventListener('mouseenter', onEnter);
     wrapper.addEventListener('mouseleave', onLeave);
+
+    // Touch swipe support
+    const onTouchStart = (e: TouchEvent) => {
+      carouselPaused.current = true;
+      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, pos: carouselPos.current };
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!touchStart.current) return;
+      const dx = touchStart.current.x - e.touches[0].clientX;
+      const dy = touchStart.current.y - e.touches[0].clientY;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        carouselPos.current = touchStart.current.pos + dx;
+        e.preventDefault();
+      }
+    };
+    const onTouchEnd = () => {
+      touchStart.current = null;
+      carouselPaused.current = false;
+    };
+    wrapper.addEventListener('touchstart', onTouchStart, { passive: false });
+    wrapper.addEventListener('touchmove', onTouchMove, { passive: false });
+    wrapper.addEventListener('touchend', onTouchEnd);
 
     let lastTime = 0;
     const slides = track.querySelectorAll('.carousel-slide');
@@ -40,6 +63,8 @@ export function CarouselTrack({ onSelectCard }: Props) {
         const gap = 20;
         const cardW = slideW + gap;
         const tw = n * cardW;
+        const wrapper = wrapperRef.current;
+      if (!wrapper) return;
         const vw = wrapper.offsetWidth;
 
         slides.forEach((slide, i) => {
@@ -64,6 +89,9 @@ export function CarouselTrack({ onSelectCard }: Props) {
       if (carouselRaf.current) cancelAnimationFrame(carouselRaf.current);
       wrapper.removeEventListener('mouseenter', onEnter);
       wrapper.removeEventListener('mouseleave', onLeave);
+      wrapper.removeEventListener('touchstart', onTouchStart);
+      wrapper.removeEventListener('touchmove', onTouchMove);
+      wrapper.removeEventListener('touchend', onTouchEnd);
     };
   }, [n]);
 

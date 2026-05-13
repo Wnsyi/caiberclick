@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 export function useRipple(canvasId: string) {
-  const rippleRef = useRef<number>();
+  const rippleRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;

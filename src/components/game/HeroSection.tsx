@@ -1,9 +1,7 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { LIGHT_SEQUENCE, GROUP_PERSONS, POS_PARAMS, TRANS_DUR, TRANS_EASE } from '../../data/gacha';
-import { useGameDispatch } from '../../contexts/GameContext';
 
 export function HeroSection() {
-  const dispatch = useGameDispatch();
   const beamCenter = useRef<HTMLDivElement>(null);
   const beamLeft = useRef<HTMLDivElement>(null);
   const beamRight = useRef<HTMLDivElement>(null);
@@ -12,9 +10,9 @@ export function HeroSection() {
   const slideshowRight = useRef<HTMLImageElement>(null);
   const confettiCanvas = useRef<HTMLCanvasElement>(null);
   const lightField = useRef(0);
-  const lightTimer = useRef<ReturnType<typeof setTimeout>>();
+  const lightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const groupSwitching = useRef(false);
-  const groupTimer = useRef<ReturnType<typeof setInterval>>();
+  const groupTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const groupCenterIdx = useRef(0);
   const posEls = useRef<{ left: HTMLImageElement | null; center: HTMLImageElement | null; right: HTMLImageElement | null }>({
     left: null, center: null, right: null,
@@ -24,7 +22,7 @@ export function HeroSection() {
     x: number; y: number; w: number; h: number; color: string;
     vx: number; vy: number; op: number; rot: number; rotSpd: number;
   }>>([]);
-  const confettiRaf = useRef<number>();
+  const confettiRaf = useRef<number>(0);
   const confettiRunning = useRef(false);
 
   // Light show
@@ -72,7 +70,7 @@ export function HeroSection() {
   const rotateGroupPositions = useCallback(() => {
     if (groupSwitching.current) return;
     groupSwitching.current = true;
-    if (groupTimer.current) { clearInterval(groupTimer.current); groupTimer.current = undefined; }
+    if (groupTimer.current) { clearInterval(groupTimer.current); groupTimer.current = null; }
 
     const oldLeft = posEls.current.left;
     const oldCenter = posEls.current.center;
@@ -109,8 +107,8 @@ export function HeroSection() {
       if (groupSwitching.current) return;
       groupCenterIdx.current++;
       if (groupCenterIdx.current >= images.length) {
-        clearInterval(groupTimer.current);
-        groupTimer.current = undefined;
+        clearInterval(groupTimer.current!);
+        groupTimer.current = null;
         rotateGroupPositions();
         return;
       }

@@ -1,6 +1,6 @@
 import type { BaseCard } from './gameTypes';
-import { buildResults, populateCardResults } from './personalityMappings';
-
+// 改为
+import { populateCardResults } from './personalityMappings';
 const cardData: BaseCard[] = [
   {
     id: 'love_crush', emoji: '💌', badge: 'LOVE STORY', stars: 5, reviews: '0 人体验过',

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useGameState, useGameDispatch } from '../../contexts/GameContext';
-import { CAPSULE_COLORS, GACHA_CARD_ICONS } from '../../data/gacha';
+import { CAPSULE_COLORS } from '../../data/gacha';
 import { MagicianHat, GachaButtons } from './MagicianHat';
 import { GachaCardGrid } from './GachaCardGrid';
 import { PersonalityDetailModal, GachaHintModal } from './Modals';

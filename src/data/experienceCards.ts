@@ -1,5 +1,6 @@
 import type { BaseCard } from './gameTypes';
-import { buildResults, populateCardResults } from './personalityMappings';
+// 改为
+import { populateCardResults } from './personalityMappings';
 
 const cardData: BaseCard[] = [
   {

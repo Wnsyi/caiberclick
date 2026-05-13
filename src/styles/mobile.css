@@ -1,0 +1,462 @@
+/* ============================================================
+   MOBILE RESPONSIVE — max-width: 768px
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* Global mobile tweaks */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  a, button, [role="button"], .carousel-slide, .comp3-card, .gacha-card-slot {
+    touch-action: manipulation;
+  }
+
+  /* ==========================================================
+     STICKY NAVIGATION
+     ========================================================== */
+  .sticky-nav {
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .sticky-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-left {
+    flex-shrink: 0;
+  }
+  .nav-logo-img {
+    height: 24px;
+  }
+  .nav-center {
+    gap: 16px;
+    flex-shrink: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-center::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-center a {
+    font-size: 12px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .nav-right {
+    flex-shrink: 0;
+  }
+  .nav-right .nav-btn {
+    font-size: 11px;
+    padding: 6px 14px;
+  }
+  .nav-dropdown-card p {
+    width: min(280px, 85vw);
+    padding: 16px 20px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  /* ==========================================================
+     COMP1 — FULL-SCREEN HERO
+     ========================================================== */
+  .comp1 {
+    min-height: 0;
+  }
+  .comp1-overlay {
+    padding: 60px 20px 100px;
+  }
+  .comp1-btns {
+    bottom: 24px;
+    left: 24px;
+    gap: 12px;
+  }
+  .comp1-btn {
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 12px 22px;
+  }
+  .beam {
+    width: 100vw;
+  }
+  .comp1-slideshow {
+    max-width: 90%;
+    max-height: 55vh;
+  }
+  .comp1-slideshow-left {
+    max-width: 30%;
+    max-height: 25vh;
+    left: 2%;
+  }
+  .comp1-slideshow-right {
+    max-width: 30%;
+    max-height: 25vh;
+    right: 2%;
+  }
+
+  /* ==========================================================
+     COMP2 — GACHA + CAROUSEL
+     ========================================================== */
+
+  /* Upper: Gacha machine */
+  .comp2-upper {
+    height: auto;
+    min-height: 0;
+    padding-bottom: 24px;
+  }
+  .comp2-upper-text {
+    font-size: clamp(24px, 7vw, 40px);
+    position: relative;
+    padding: 24px 0 12px;
+  }
+  .gacha-container {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  .gacha-machine-wrapper {
+    flex: 0 0 auto;
+    transform: scale(0.85);
+    margin-top: 0;
+  }
+  .gacha-machine {
+    margin-top: 18px;
+  }
+  .gacha-btn-row {
+    margin-top: 40px;
+  }
+  .gacha-collection {
+    width: 100%;
+    padding: 0 8px;
+  }
+  .gacha-collection-header {
+    margin-bottom: 8px;
+  }
+  .gacha-collection-title {
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  .gacha-collection-sub {
+    font-size: 12px;
+  }
+  .gacha-card-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  /* Lower: Carousel */
+  .comp2-lower {
+    padding: 32px 0 48px;
+  }
+  .section-header {
+    margin-bottom: 20px;
+    padding: 0 20px;
+  }
+  .section-header h2 {
+    font-size: 26px;
+  }
+  .carousel-track {
+    height: auto;
+    min-height: 420px;
+  }
+  .carousel-slide {
+    width: calc(100vw - 48px);
+    height: auto;
+    min-height: 380px;
+    padding: 18px 16px 14px;
+  }
+  .card-img-area {
+    aspect-ratio: 16/9;
+  }
+  .carousel-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  .carousel-arrow-left {
+    left: 4px;
+  }
+  .carousel-arrow-right {
+    right: 4px;
+  }
+
+  /* ==========================================================
+     COMP3 — LOVE CARDS
+     ========================================================== */
+  .comp3-upper {
+    height: 35vh;
+    min-height: 240px;
+  }
+  .comp3-lower {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 24px;
+    padding: 48px 16px;
+  }
+  .comp3-card-a {
+    grid-row: auto;
+    grid-column: auto;
+    margin-left: 0;
+    transform: none;
+  }
+  .comp3-card-a:hover {
+    transform: translateY(-4px);
+  }
+  .comp3-card-b {
+    grid-row: auto;
+    grid-column: auto;
+    margin-right: 0;
+    transform: none;
+  }
+  .comp3-card-b:hover {
+    transform: translateY(-4px);
+  }
+  .comp3-card-upper {
+    height: 160px;
+  }
+  .comp3-card-lower {
+    padding: 18px 20px 22px;
+  }
+  .comp3-card-title {
+    font-size: 16px;
+  }
+  .comp3-card-text {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .comp3-insert {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+  }
+  .comp3-footer {
+    padding: 24px 16px 36px;
+    font-size: 10px;
+  }
+
+  /* ==========================================================
+     COMP4 — FILM STRIP
+     ========================================================== */
+  .comp4-lower {
+    height: auto !important;
+  }
+  .comp4-shape {
+    top: 0 !important;
+    height: 120px;
+  }
+  .comp4-bottom-row {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 20px;
+    position: relative;
+    bottom: auto;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+  .comp4-info-col {
+    max-width: none;
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .comp4-info-col p {
+    margin-bottom: 12px;
+  }
+  .film-frame {
+    width: 140px;
+    height: 100px;
+  }
+  .film-strip {
+    padding: 12px 0;
+  }
+
+  /* ==========================================================
+     CHAT PAGE
+     ========================================================== */
+  #page-chat {
+    max-width: 100%;
+  }
+  .chat-topbar {
+    padding: 10px 12px;
+  }
+  .system-banner {
+    top: auto;
+    bottom: 80px;
+    right: 8px;
+    left: 8px;
+    max-width: none;
+    width: auto;
+    padding: 14px 12px 10px;
+  }
+  .system-banner .sys-text {
+    font-size: 11px;
+  }
+  .system-banner .sys-option {
+    font-size: 12px;
+  }
+  .chat-messages {
+    padding: 6px 8px 100px;
+  }
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .msg-bubble {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .chat-input-bar {
+    max-width: 100%;
+    padding: 8px 8px 12px;
+    gap: 6px;
+  }
+  .chat-input-bar input {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .chat-input-bar .btn-primary {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .chat-input-bar .btn-end {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  /* ==========================================================
+     LOVE STORY PAGE
+     ========================================================== */
+  .ls-topbar {
+    padding: 10px 14px;
+    gap: 12px;
+  }
+  .ls-stage {
+    padding: 16px 16px 32px;
+  }
+  .ls-bottom-row {
+    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ls-char-area {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    margin-bottom: 16px;
+  }
+  .ls-char-avatar img {
+    max-width: min(200px, 50vw);
+    max-height: 35vh;
+  }
+  .ls-char-avatar img.char-large {
+    max-width: min(280px, 70vw);
+    max-height: 50vh;
+  }
+  .ls-dialog-bubble {
+    padding: 16px 18px;
+  }
+  .ls-dialog-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .ls-choices {
+    flex-wrap: wrap;
+  }
+  .ls-choice-btn {
+    flex: 1 1 100%;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .ls-story-card-overlay {
+    overflow-y: auto;
+  }
+  .ls-story-card {
+    width: min(380px, 92vw);
+    padding: 24px 20px 18px;
+  }
+
+  /* ==========================================================
+     RESULT PAGE
+     ========================================================== */
+  .result-right-character {
+    opacity: 0.18;
+    right: 4px;
+  }
+  .result-left-graphic {
+    opacity: 0.22;
+    left: 4px;
+  }
+  .prescription-card {
+    width: 94%;
+    padding: 22px 18px 16px;
+    margin: 16px auto;
+    border-radius: 14px;
+  }
+  .prescription-card .pc-persona {
+    font-size: 22px;
+  }
+  .result-buttons {
+    padding: 0 16px 24px;
+  }
+  .result-buttons button {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  /* ==========================================================
+     MODALS & OVERLAYS
+     ========================================================== */
+  .pd-modal {
+    width: 94vw;
+    padding: 32px 20px 24px;
+    border-radius: 14px;
+  }
+  .pd-persona {
+    font-size: 24px;
+  }
+  .pd-graphic {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 12px;
+  }
+  .pd-character {
+    display: none;
+  }
+  .pd-close {
+    width: 34px;
+    height: 34px;
+    top: 10px;
+    right: 12px;
+  }
+  .pd-diagnosis,
+  .pd-med-box,
+  .pd-advice {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .pd-disclaimer {
+    font-size: 9px;
+    padding-top: 16px;
+    margin-top: 8px;
+  }
+
+  .gh-modal {
+    width: 92vw;
+    padding: 28px 20px 22px;
+  }
+  .gh-modal .gh-title {
+    font-size: 16px;
+  }
+  .gh-modal .gh-message {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .overlay .overlay-text {
+    font-size: 15px;
+    padding: 0 20px;
+  }
+}

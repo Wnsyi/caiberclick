@@ -5,6 +5,7 @@
 @import "./styles/game-chat.css";
 @import "./styles/game-love-story.css";
 @import "./styles/game-result.css";
+@import "./styles/mobile.css";
 
 /* 手写字体 - 用于处方笺 */
 @font-face {

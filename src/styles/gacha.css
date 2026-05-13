@@ -232,7 +232,7 @@
 /* 按钮 */
 .gacha-btn-row{margin-top:133px;display:flex;gap:6px;justify-content:center}
 .gacha-start-btn{
-  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  width:90px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#FF7777 0%,#EE5555 50%,#CC5555 100%);
   box-shadow:0 6px 18px rgba(220,100,100,0.35),inset 0 3px 8px rgba(255,255,255,0.25),inset 0 -4px 8px rgba(0,0,0,0.25);
   transition:all 0.12s;position:relative;
@@ -252,11 +252,12 @@
   box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:not-allowed;transform:none;
 }
 .gacha-start-btn .gacha-btn-inner{
-  font-family:var(--font-display);font-size:10px;letter-spacing:1px;color:#fff;
+  font-family:var(--font-display);font-size:24px;line-height:1;letter-spacing:2px;color:#fff;
   text-shadow:0 2px 4px rgba(0,0,0,0.5);
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
 }
 .gacha-reset-btn{
-  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  width:90px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#FFC060 0%,#F0A030 50%,#C88030 100%);
   box-shadow:0 6px 16px rgba(220,160,60,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
   transition:all 0.12s;position:relative;outline:none;
@@ -271,10 +272,11 @@
   box-shadow:0 2px 8px rgba(220,160,60,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
 }
 .gacha-reset-btn .gacha-btn-inner{
-  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+  font-size:24px;line-height:1;letter-spacing:2px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
 }
 .gacha-all-btn{
-  width:60px;height:38px;border-radius:0;border:none;cursor:pointer;
+  width:90px;height:38px;border-radius:0;border:none;cursor:pointer;
   background:linear-gradient(180deg,#90B8F0 0%,#70A0E0 50%,#5080C0 100%);
   box-shadow:0 6px 16px rgba(80,130,200,0.3),inset 0 3px 8px rgba(255,255,255,0.2),inset 0 -3px 6px rgba(0,0,0,0.22);
   transition:all 0.12s;position:relative;outline:none;
@@ -289,7 +291,8 @@
   box-shadow:0 2px 8px rgba(80,130,200,0.25),inset 0 4px 10px rgba(0,0,0,0.3);
 }
 .gacha-all-btn .gacha-btn-inner{
-  font-size:10px;letter-spacing:1px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+  font-size:24px;line-height:1;letter-spacing:2px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
 }
 
 /* 卡片收集板 */
