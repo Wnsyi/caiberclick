@@ -36,8 +36,8 @@ export const LIGHT_SEQUENCE: LightField[] = [
 
 export const GROUP_PERSONS: GroupPerson[] = [
   { images: ['images/ta.jpeg', 'images/ta.0.jpg', 'images/ta.1.jpg', 'images/ta.2.jpg', 'images/ta.3.jpg', 'images/ta.4.jpg'] },
-  { images: ['images/lovecard1ta.png', 'images/cta.0.jpg', 'images/cta.1.jpg', 'images/cta.2.jpg', 'images/cta.3.jpg', 'images/cta.4.jpg'] },
-  { images: ['images/azhe.png', 'images/azhe.0.jpg', 'images/azhe.1.jpg', 'images/azhe.2.jpg', 'images/azhe.3.jpg', 'images/azhe.4.jpg'] },
+  { images: ['images/lovecard1ta.png', 'images/cta.0.jpg', 'images/cta.1.jpg?v=2', 'images/cta.2.jpg', 'images/cta.3.jpg', 'images/cta.4.jpg'] },
+  { images: ['images/azhe.png', 'images/azhe.0.jpg', 'images/azhe.1.jpg?v=2', 'images/azhe.2.jpg', 'images/azhe.3.jpg', 'images/azhe.4.jpg'] },
 ];
 
 export const POS_PARAMS: Record<string, PositionParams> = {
