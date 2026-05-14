@@ -162,8 +162,7 @@
   }
   .carousel-slide {
     width: calc(100vw - 48px);
-    height: auto;
-    min-height: 380px;
+    height: 460px;
     padding: 18px 16px 14px;
   }
   .card-img-area {
