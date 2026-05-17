@@ -78,25 +78,35 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .comp1-slideshow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;max-width:82%;max-height:66%;object-fit:contain;pointer-events:none}
 .comp1-slideshow-left{position:absolute;top:50%;left:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
 .comp1-slideshow-right{position:absolute;top:50%;right:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
+.comp1-frost-card{
+  position:absolute;top:50%;left:300px;transform:translateY(-50%);z-index:10;
+  width:33.333%;height:66.667%;display:flex;flex-direction:column;justify-content:flex-start;
+  padding:1cm 28px 40px;
+  background:rgba(253,248,238,0.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,0.35);border-radius:4px;
+  box-shadow:0 8px 32px rgba(60,40,20,0.10);
+}
+.comp1-frost-title{
+  margin:0 0 24px 0;font-family:'Ma Shan Zheng',cursive;font-size:80px;font-weight:400;
+  color:#5D4E3A;line-height:1.1;text-align:center;letter-spacing:6px;
+}
+.comp1-frost-card p{
+  margin:0;font-family:var(--font-body);font-size:19px;color:#5D4E3A;line-height:2;letter-spacing:0.5px;text-indent:2em;
+}
+.comp1-frost-btn{
+  margin-top:24px;align-self:center;
+  font-family:var(--font-body);font-size:15px;letter-spacing:3px;
+  background:rgba(229,144,47,0.75);color:#fff;border:none;padding:12px 36px;
+  border-radius:0;cursor:pointer;transition:background 0.2s;
+}
+.comp1-frost-btn:hover{background:var(--orange-dark)}
+.comp1-frost-android{margin-top:12px;background:rgba(229,144,47,0.75)}
 .comp1-overlay{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:80px 24px 120px;text-align:center;z-index:3;
   background:linear-gradient(180deg,rgba(253,248,238,0.2) 0%,rgba(253,248,238,0.5) 50%,rgba(253,248,238,0.85) 100%);
 }
 .comp1-title{font-family:var(--font-body);font-size:clamp(40px,8vw,72px);font-weight:900;line-height:1.15;background:linear-gradient(90deg,transparent 0%,rgba(61,48,32,0.15) 15%,#3D3020 40%,#3D3020 60%,rgba(61,48,32,0.15) 85%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.comp1-btns{
-  position:absolute;bottom:48px;left:48px;z-index:5;
-  display:flex;gap:16px;
-}
-.comp1-btn{
-  font-family:var(--font-display);font-size:14px;letter-spacing:2px;
-  background:var(--orange);color:#fff;border:none;
-  padding:14px 28px;border-radius:0;cursor:pointer;
-  transition:all 0.3s;box-shadow:0 8px 32px rgba(229,144,47,0.3);
-  white-space:nowrap;
-}
-.comp1-btn:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(229,144,47,0.45)}
-.comp1-btn:active{transform:scale(0.96)}
 .comp1-confetti{position:absolute;inset:0;z-index:6;pointer-events:none;transition:opacity 0.8s}
 .comp1-confetti.hidden{opacity:0}
 

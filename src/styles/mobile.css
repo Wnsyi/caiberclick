@@ -67,15 +67,20 @@
   .comp1-overlay {
     padding: 60px 20px 100px;
   }
-  .comp1-btns {
-    bottom: 24px;
-    left: 24px;
-    gap: 12px;
+  .comp1-frost-card {
+    left: 12px;right:12px;top:auto;bottom:100px;transform:none;
+    max-width:none;width:auto;height:auto;max-height:50vh;
+    display:flex;flex-direction:column;justify-content:flex-start;
+    padding:20px 20px 24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   }
-  .comp1-btn {
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 12px 22px;
+  .comp1-frost-title {
+    font-size:42px;letter-spacing:4px;margin:0 0 14px 0;
+  }
+  .comp1-frost-card p {
+    font-size:15px;line-height:1.8;
+  }
+  .comp1-frost-btn {
+    font-size:13px;letter-spacing:2px;padding:10px 28px;
   }
   .beam {
     width: 100vw;

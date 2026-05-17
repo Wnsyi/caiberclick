@@ -32,7 +32,7 @@ export interface GachaState {
   collectedFlags: boolean[];
 }
 
-export type PageId = 'page-home' | 'page-chat' | 'page-love-story' | 'page-result';
+export type PageId = 'page-landing' | 'page-home' | 'page-chat' | 'page-love-story' | 'page-result';
 
 export interface AppState {
   page: PageId;
@@ -109,7 +109,7 @@ const initialGacha: GachaState = {
 };
 
 const initialState: AppState = {
-  page: 'page-home',
+  page: 'page-landing',
   game: initialGame,
   love: initialLove,
   gacha: initialGacha,

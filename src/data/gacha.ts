@@ -42,8 +42,8 @@ export const GROUP_PERSONS: GroupPerson[] = [
 
 export const POS_PARAMS: Record<string, PositionParams> = {
   left:   { txOffset: -0.32, scale: 0.38, zIndex: '4' },
-  center: { txOffset: 0,     scale: 1,    zIndex: '6' },
-  right:  { txOffset: 0.32,  scale: 0.38, zIndex: '4' },
+  center: { txOffset: 0,     scale: 0.38, zIndex: '4' },
+  right:  { txOffset: 0.24,  scale: 1.35, zIndex: '6' },
 };
 
 export const TRANS_DUR = '0.7s';
