@@ -3,6 +3,12 @@ import { LIGHT_SEQUENCE, GROUP_PERSONS, POS_PARAMS, TRANS_DUR, TRANS_EASE } from
 
 const ALL_IMAGES = GROUP_PERSONS.flatMap((p) => p.images);
 
+const LANDING_POS_PARAMS: Record<string, { txOffset: number; scale: number; zIndex: string }> = {
+  left:   { txOffset: -0.32, scale: 0.38, zIndex: '4' },
+  center: { txOffset: 0,     scale: 0.38, zIndex: '4' },
+  right:  { txOffset: 0.24,  scale: 1.35, zIndex: '6' },
+};
+
 const LANDING_LIGHT_SEQUENCE = [
   { d: 1800, c: 'purple', l: null,    r: 'orange' },
   { d: 1800, c: 'orange', l: null,    r: 'purple' },
@@ -25,7 +31,8 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
   const lightSeq = useRef(LIGHT_SEQUENCE);
   const groupSwitching = useRef(false);
   const groupTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const groupRightIdx = useRef(0);
+  const posParamsRef = useRef(POS_PARAMS);
+  const groupIdx = useRef(0);
   const posEls = useRef<{ left: HTMLImageElement | null; center: HTMLImageElement | null; right: HTMLImageElement | null }>({
     left: null, center: null, right: null,
   });
@@ -70,7 +77,7 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
 
   const applyPosStyle = useCallback((el: HTMLImageElement | null, pos: 'left' | 'center' | 'right') => {
     if (!el) return;
-    const s = POS_PARAMS[pos];
+    const s = posParamsRef.current[pos];
     const txPx = getGroupParentWidth() * s.txOffset;
     el.style.transform = `translateX(calc(${txPx}px - 50%)) translateY(-50%) scale(${s.scale})`;
     el.style.zIndex = s.zIndex;
@@ -102,31 +109,31 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
       [oldLeft, oldCenter, oldRight].forEach((el) => { if (el) setElTransition(el, false); });
       if (posEls.current.left) posEls.current.left.src = GROUP_PERSONS[elPerson.current.get(posEls.current.left)!].images[0];
       if (posEls.current.center) posEls.current.center.src = GROUP_PERSONS[elPerson.current.get(posEls.current.center)!].images[0];
-      groupRightIdx.current = 0;
+      groupIdx.current = 0;
       groupSwitching.current = false;
-      startRightCycle();
+      startHomeCycle();
     }, 750);
   }, [applyPosStyle, setElTransition]);
 
-  const startRightCycle = useCallback(() => {
+  const startHomeCycle = useCallback(() => {
     if (groupTimer.current) clearInterval(groupTimer.current);
-    groupRightIdx.current = 0;
-    const rightEl = posEls.current.right;
-    if (!rightEl) return;
-    const personIdx = elPerson.current.get(rightEl);
+    groupIdx.current = 0;
+    const centerEl = posEls.current.center;
+    if (!centerEl) return;
+    const personIdx = elPerson.current.get(centerEl);
     if (personIdx === undefined) return;
     const images = GROUP_PERSONS[personIdx].images;
-    rightEl.src = images[0];
+    centerEl.src = images[0];
     groupTimer.current = setInterval(() => {
       if (groupSwitching.current) return;
-      groupRightIdx.current++;
-      if (groupRightIdx.current >= images.length) {
+      groupIdx.current++;
+      if (groupIdx.current >= images.length) {
         clearInterval(groupTimer.current!);
         groupTimer.current = null;
         rotateGroupPositions();
         return;
       }
-      if (posEls.current.right) posEls.current.right.src = images[groupRightIdx.current];
+      if (posEls.current.center) posEls.current.center.src = images[groupIdx.current];
     }, 300);
   }, [rotateGroupPositions]);
 
@@ -145,6 +152,8 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
 
   // Initialize slideshow
   useEffect(() => {
+    posParamsRef.current = landing ? LANDING_POS_PARAMS : POS_PARAMS;
+
     if (landing) {
       const el = slideshowRight.current;
       if (!el) return;
@@ -190,12 +199,12 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     applyPosStyle(rightEl, 'right');
     rightEl.src = GROUP_PERSONS[2].images[0];
 
-    const t = setTimeout(() => startRightCycle(), 1200);
+    const t = setTimeout(() => startHomeCycle(), 1200);
     return () => {
       clearTimeout(t);
       if (groupTimer.current) clearInterval(groupTimer.current);
     };
-  }, [applyPosStyle, startRightCycle, startLandingCycle, landing]);
+  }, [applyPosStyle, startHomeCycle, startLandingCycle, landing]);
 
   // Confetti
   const CONFETTI_COLORS = ['#E5902F', '#F5A623', '#E07060', '#7C3AED', '#5B8CDE', '#0D9488', '#00A86B', '#FF6B9D', '#FFD93D', '#C084FC'];
