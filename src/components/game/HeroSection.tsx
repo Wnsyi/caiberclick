@@ -44,6 +44,10 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
   const confettiRaf = useRef<number>(0);
   const confettiRunning = useRef(false);
   const nativeRef = useRef(false);
+  const bgSlideA = useRef<HTMLImageElement>(null);
+  const bgSlideB = useRef<HTMLImageElement>(null);
+  const bgIdx = useRef(0);
+  const bgTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Light show
   const setBeam = useCallback((el: HTMLDivElement | null, color: string | null) => {
@@ -314,6 +318,42 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     return () => clearTimeout(retry);
   }, []);
 
+  // Background slideshow (landing page only)
+  const LANDING_BG_IMAGES = ['images/danduye1.jpg', 'images/danduye2.jpg', 'images/danduye3.jpg', 'images/danduye.4.jpg'];
+
+  useEffect(() => {
+    if (!landing) return;
+    const a = bgSlideA.current;
+    const b = bgSlideB.current;
+    if (!a || !b) return;
+
+    const len = LANDING_BG_IMAGES.length;
+    a.style.opacity = '1';
+    b.style.opacity = '0';
+    a.src = LANDING_BG_IMAGES[0];
+    b.src = LANDING_BG_IMAGES[1];
+    bgIdx.current = 0;
+
+    bgTimer.current = setInterval(() => {
+      const next = (bgIdx.current + 1) % len;
+      // hidden image gets the upcoming src, then we crossfade
+      if (a.style.opacity === '1') {
+        b.src = LANDING_BG_IMAGES[next];
+        a.style.opacity = '0';
+        b.style.opacity = '1';
+      } else {
+        a.src = LANDING_BG_IMAGES[next];
+        a.style.opacity = '1';
+        b.style.opacity = '0';
+      }
+      bgIdx.current = next;
+    }, 4000);
+
+    return () => {
+      if (bgTimer.current) clearInterval(bgTimer.current);
+    };
+  }, [landing]);
+
   // Init light show
   useEffect(() => {
     lightSeq.current = landing ? LANDING_LIGHT_SEQUENCE : LIGHT_SEQUENCE;
@@ -324,19 +364,27 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
 
   return (
     <section className="comp1" id="comp1">
-      <img
-        className="comp1-bg"
-        src="https://placehold.co/1600x900/E5902F/FDF8EE?text=+"
-        alt="Hero Background"
-      />
-      <div className="comp1-image-sub" />
-      <div className="comp1-lights" id="comp1Lights">
-        <div className="beam beam-left" ref={beamLeft} />
-        <div className="beam beam-center" ref={beamCenter} />
-        <div className="beam beam-right" ref={beamRight} />
-      </div>
+      {!landing && (
+        <img
+          className="comp1-bg"
+          src="https://placehold.co/1600x900/E5902F/FDF8EE?text=+"
+          alt="Hero Background"
+        />
+      )}
+      {!landing && <div className="comp1-image-sub" />}
+      {landing && (
+        <>
+          <img className="comp1-bg-slide" ref={bgSlideA} alt="" />
+          <img className="comp1-bg-slide" ref={bgSlideB} alt="" />
+        </>
+      )}
       {!landing && (
         <>
+          <div className="comp1-lights" id="comp1Lights">
+            <div className="beam beam-left" ref={beamLeft} />
+            <div className="beam beam-center" ref={beamCenter} />
+            <div className="beam beam-right" ref={beamRight} />
+          </div>
           <img
             className="comp1-slideshow-left"
             id="comp1SlideshowLeft"
@@ -351,15 +399,15 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
             alt="Slideshow"
             style={{ position: 'absolute' }}
           />
+          <img
+            className="comp1-slideshow-right"
+            id="comp1SlideshowRight"
+            ref={slideshowRight}
+            alt="Slideshow Right"
+            style={{ position: 'absolute' }}
+          />
         </>
       )}
-      <img
-        className="comp1-slideshow-right"
-        id="comp1SlideshowRight"
-        ref={slideshowRight}
-        alt="Slideshow Right"
-        style={{ position: 'absolute' }}
-      />
       {landing && (
         <div className="comp1-frost-card">
           <h2 className="comp1-frost-title">开药吗</h2>

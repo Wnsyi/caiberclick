@@ -4,6 +4,7 @@ import { useGameState } from '../contexts/GameContext';
 import type { PageId } from '../contexts/GameContext';
 
 const PAGE_TO_URL: Record<PageId, string> = {
+  'page-landing': '/',
   'page-home': '/',
   'page-chat': '/chat',
   'page-love-story': '/love-story',
@@ -22,7 +23,7 @@ export function usePageSync() {
       return;
     }
     const targetUrl = PAGE_TO_URL[page];
-    if (location.pathname !== targetUrl) {
+    if (targetUrl && location.pathname !== targetUrl) {
       navigate(targetUrl, { replace: true });
     }
   }, [page]);

@@ -65,6 +65,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   position:relative;width:100%;height:100vh;min-height:600px;overflow:hidden;background:var(--dark);
 }
 .comp1-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.comp1-bg-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:opacity 1.5s ease-in-out}
 .comp1-image-sub{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#F0B860 0%,#F5C898 40%,#F8D8B8 70%,#FDF8EE 100%)}
 .comp1-lights{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
 .beam{position:absolute;top:0;height:100%;filter:blur(22px);mix-blend-mode:screen;transition:opacity 0.3s}
@@ -79,10 +80,10 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .comp1-slideshow-left{position:absolute;top:50%;left:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
 .comp1-slideshow-right{position:absolute;top:50%;right:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
 .comp1-frost-card{
-  position:absolute;top:50%;left:300px;transform:translateY(-50%);z-index:10;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;
   width:33.333%;height:66.667%;display:flex;flex-direction:column;justify-content:flex-start;
   padding:1cm 28px 40px;
-  background:rgba(253,248,238,0.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(253,248,238,0.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border:1px solid rgba(255,255,255,0.35);border-radius:4px;
   box-shadow:0 8px 32px rgba(60,40,20,0.10);
 }
