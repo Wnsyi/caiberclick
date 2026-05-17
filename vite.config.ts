@@ -15,19 +15,25 @@ function copyGameAssets() {
       const imgDst = resolve(dist, 'images')
       if (existsSync(imgSrc)) cpSync(imgSrc, imgDst, { recursive: true })
 
-      // Copy downloads
+      // Copy downloads (skip .apk to avoid recursive bundling into Capacitor APK)
+      // The APK should be uploaded to cloudbase separately after build
       const dlsSrc = resolve(root, 'public/downloads')
       const dlsDst = resolve(dist, 'downloads')
-      if (existsSync(dlsSrc)) cpSync(dlsSrc, dlsDst, { recursive: true })
+      if (existsSync(dlsSrc)) {
+        cpSync(dlsSrc, dlsDst, {
+          recursive: true,
+          filter: (src) => !src.endsWith('.apk'),
+        })
+      }
 
       console.log('[copy-game-assets] images/ + downloads/ → dist/')
     },
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react(), copyGameAssets()],
-  base: '/',
+  base: command === 'build' ? '/mental-hospital/' : '/',
   build: {
     rollupOptions: {
       input: {
@@ -35,4 +41,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

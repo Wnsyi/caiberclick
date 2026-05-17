@@ -24,6 +24,7 @@ export function HeroSection() {
   }>>([]);
   const confettiRaf = useRef<number>(0);
   const confettiRunning = useRef(false);
+  const nativeRef = useRef(false);
 
   // Light show
   const setBeam = useCallback((el: HTMLDivElement | null, color: string | null) => {
@@ -218,6 +219,45 @@ export function HeroSection() {
       if (confettiRaf.current) cancelAnimationFrame(confettiRaf.current);
       window.removeEventListener('resize', resize);
     };
+  }, []);
+
+  // Detect Capacitor native platform (via DOM manipulation, no state/re-render)
+  useEffect(() => {
+    const hideBtn = () => {
+      const btns = document.querySelector('.comp1-btns') as HTMLElement | null;
+      if (btns) btns.style.display = 'none';
+    };
+
+    const checkNative = () => {
+      const C = (window as any).Capacitor;
+      if (!C) return false;
+      // Capacitor 3+ uses isNativePlatform() method
+      if (typeof C.isNativePlatform === 'function' && C.isNativePlatform()) return true;
+      // Capacitor 2.x uses isNative property (kept for safety)
+      if (C.isNative === true) return true;
+      // getPlatform returns 'android'/'ios' when native, 'web' otherwise
+      if (typeof C.getPlatform === 'function') {
+        const p = C.getPlatform();
+        if (p === 'android' || p === 'ios') return true;
+      }
+      return false;
+    };
+
+    if (checkNative()) {
+      nativeRef.current = true;
+      hideBtn();
+      return;
+    }
+
+    // Retry: Capacitor bridge may inject asynchronously on slow devices
+    const retry = setTimeout(() => {
+      if (checkNative()) {
+        nativeRef.current = true;
+        hideBtn();
+      }
+    }, 600);
+
+    return () => clearTimeout(retry);
   }, []);
 
   // Init light show

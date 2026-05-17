@@ -3,7 +3,7 @@
    ============================================================ */
 #page-result{
   background:linear-gradient(180deg,#FDF8EE 0%,#F5EFE0 50%,#FDF8EE 100%);
-  min-height:100vh;display:none;flex-direction:column;align-items:center;
+  min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 #page-result.active{display:flex}
@@ -29,9 +29,9 @@
 /* 处方笺卡片 */
 .prescription-card{
   background:linear-gradient(160deg,#FFF8E7 0%,#FFFDF5 30%,#FFF8E7 60%,#FEF3C7 100%);
-  border-radius:var(--radius);padding:28px 24px 20px;
+  border-radius:0;padding:28px 24px 20px;
   max-width:420px;width:92%;margin:24px auto;
-  box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(180,130,50,0.2);
+  box-shadow:0 8px 32px rgba(60,40,20,0.10),0 0 0 1px rgba(180,130,50,0.15);
   color:#3D2E0A;position:relative;overflow:hidden;
 }
 .prescription-card .pc-watermark{
@@ -58,7 +58,7 @@
 
 /* 结果页按钮 */
 .result-buttons{display:flex;flex-direction:column;gap:10px;padding:0 20px 32px;width:100%;max-width:420px}
-.result-buttons button{width:100%;padding:14px;border-radius:28px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
+.result-buttons button{width:100%;padding:14px;border-radius:0;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
 .result-buttons .btn-retry{background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;box-shadow:0 6px 24px rgba(255,107,53,0.3)}
 .result-buttons .btn-retry:active{transform:scale(0.96)}
 .result-buttons .btn-home{background:rgba(60,40,20,0.04);color:#3D3020;border:1px solid rgba(60,40,20,0.12)}
@@ -90,7 +90,7 @@
   position:relative;
   width:min(720px,94vw);max-height:90vh;
   background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
-  border-radius:16px;
+  border-radius:0;
   box-shadow:0 24px 80px rgba(40,20,10,0.25);
   overflow-y:auto;overflow-x:hidden;
   padding:48px 36px 36px;
@@ -131,18 +131,18 @@
 .pd-diagnosis{
   font-size:14px;color:#3D2E0A;line-height:1.85;
   background:rgba(251,191,36,0.08);padding:14px 16px;
-  border-radius:10px;border:1px solid rgba(251,191,36,0.12);
+  border-radius:0;border:1px solid rgba(251,191,36,0.12);
 }
 .pd-med-box{
   background:rgba(255,255,255,0.65);border:1px solid rgba(180,130,50,0.2);
-  border-radius:10px;padding:14px 16px;
+  border-radius:0;padding:14px 16px;
 }
 .pd-med-name{font-size:18px;font-weight:900;color:#B45309;margin-bottom:6px}
 .pd-med-usage{font-size:13px;color:#6B5A3A;line-height:1.8}
 .pd-advice{
   font-size:14px;color:#3D2E0A;line-height:1.85;
   background:rgba(255,45,120,0.04);border:1px solid rgba(255,45,120,0.1);
-  border-radius:10px;padding:14px 16px;
+  border-radius:0;padding:14px 16px;
 }
 .pd-disclaimer{
   font-size:10px;color:rgba(139,125,104,0.5);text-align:center;
@@ -160,7 +160,7 @@
 }
 .pd-char-img{
   width:min(140px,18vw);
-  display:block;opacity:0.15;
+  display:block;opacity:0.45;
 }
 
 /* 卡牌背面点击提示弹窗 */
@@ -177,7 +177,7 @@
   position:relative;
   width:min(420px,88vw);
   background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 30%,#FBE8D4 70%,#F5DCC3 100%);
-  border-radius:16px;
+  border-radius:0;
   box-shadow:0 24px 80px rgba(40,20,10,0.25);
   padding:40px 28px 28px;
   text-align:center;
@@ -186,5 +186,5 @@
 .gh-modal .gh-icon{font-size:48px;margin-bottom:12px}
 .gh-modal .gh-title{font-family:var(--font-display);font-size:18px;color:var(--orange);letter-spacing:3px;margin-bottom:16px}
 .gh-modal .gh-message{font-family:var(--font-body);font-size:15px;color:#3D3020;line-height:1.8;margin-bottom:20px}
-.gh-modal .gh-btn{display:inline-block;padding:10px 36px;border-radius:24px;border:2px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--font-display);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all 0.25s}
+.gh-modal .gh-btn{display:inline-block;padding:10px 36px;border-radius:0;border:2px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--font-display);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all 0.25s}
 .gh-modal .gh-btn:hover{background:#fff;color:var(--orange)}

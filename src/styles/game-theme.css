@@ -38,7 +38,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
   color:#3D3020;text-decoration:none;cursor:pointer;transition:color 0.2s;
 }
 .nav-center a:hover{color:var(--orange)}
-.nav-dropdown{position:relative;display:inline-block}
+.nav-dropdown{position:relative;display:flex;align-items:center}
 .nav-dropdown-card{
   display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);
   padding-top:8px;z-index:110;
@@ -46,7 +46,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .nav-dropdown:hover .nav-dropdown-card{display:block}
 .nav-dropdown-card p{
   background:linear-gradient(160deg,#FFF8E7 0%,#FDF5E6 50%,#FBE8D4 100%);
-  border-radius:12px;box-shadow:0 12px 40px rgba(40,20,10,0.18);
+  border-radius:0;box-shadow:0 12px 40px rgba(40,20,10,0.18);
   padding:20px 24px;width:300px;white-space:normal;
   font-family:var(--font-body);font-size:13px;color:#5D4E3A;line-height:2;
   letter-spacing:0.5px;margin:0;
@@ -54,7 +54,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .nav-right .nav-btn{
   font-family:var(--font-display);font-size:13px;letter-spacing:2px;
   background:var(--orange);color:#fff;border:none;padding:8px 18px;
-  border-radius:20px;cursor:pointer;transition:all 0.2s;
+  border-radius:0;cursor:pointer;transition:all 0.2s;
 }
 .nav-right .nav-btn:hover{background:var(--orange-dark)}
 
@@ -91,7 +91,7 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .comp1-btn{
   font-family:var(--font-display);font-size:14px;letter-spacing:2px;
   background:var(--orange);color:#fff;border:none;
-  padding:14px 28px;border-radius:30px;cursor:pointer;
+  padding:14px 28px;border-radius:0;cursor:pointer;
   transition:all 0.3s;box-shadow:0 8px 32px rgba(229,144,47,0.3);
   white-space:nowrap;
 }
@@ -296,8 +296,9 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .film-track{
   display:flex;gap:0;width:max-content;
   animation:filmScroll 40s linear infinite;
+  will-change:transform;
+  transform:translateZ(0);
 }
-.film-track:hover{animation-play-state:paused}
 .film-frame{
   width:180px;height:120px;flex-shrink:0;
   border:3px solid rgba(180,160,140,0.35);
