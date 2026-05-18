@@ -26,5 +26,7 @@ export function usePageSync() {
     if (targetUrl && location.pathname !== targetUrl) {
       navigate(targetUrl, { replace: true });
     }
+    // navigate and location from React Router are stable refs — intentionally not in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 }

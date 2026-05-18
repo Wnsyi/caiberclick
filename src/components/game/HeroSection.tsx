@@ -287,7 +287,7 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     };
 
     const checkNative = () => {
-      const C = (window as any).Capacitor;
+      const C = window.Capacitor;
       if (!C) return false;
       // Capacitor 3+ uses isNativePlatform() method
       if (typeof C.isNativePlatform === 'function' && C.isNativePlatform()) return true;

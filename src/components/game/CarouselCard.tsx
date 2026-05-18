@@ -3,9 +3,10 @@ import type { BaseCard } from '../../data/gameTypes';
 interface Props {
   card: BaseCard;
   onSelect: (cardId: string) => void;
+  reviewsText?: string;
 }
 
-export function CarouselCard({ card, onSelect }: Props) {
+export function CarouselCard({ card, onSelect, reviewsText }: Props) {
   return (
     <>
       <span className="card-badge-top">{card.badge}</span>
@@ -19,7 +20,7 @@ export function CarouselCard({ card, onSelect }: Props) {
           {'★'.repeat(Math.floor(card.stars))}
           {card.stars % 1 ? '☆' : ''}
         </span>
-        <span className="review-count">{card.reviews}</span>
+        <span className="review-count">{reviewsText ?? card.reviews}</span>
       </div>
       <div className="card-desc-short">{card.desc}</div>
       <div className="card-actions">

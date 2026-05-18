@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { EXPERIENCE_CARDS } from '../../data/experienceCards';
+import { useGameState } from '../../contexts/GameContext';
 import { CarouselCard } from './CarouselCard';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function CarouselTrack({ onSelectCard }: Props) {
+  const { cardReviews } = useGameState();
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<HTMLDivElement>(null);
@@ -132,7 +134,7 @@ export function CarouselTrack({ onSelectCard }: Props) {
             style={{ left: '0px' }}
             onClick={() => onSelectCard(card.id)}
           >
-            <CarouselCard card={card} onSelect={onSelectCard} />
+            <CarouselCard card={card} onSelect={onSelectCard} reviewsText={cardReviews[card.id] ?? card.reviews} />
           </div>
         ))}
       </div>

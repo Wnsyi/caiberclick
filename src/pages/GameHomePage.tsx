@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useGameDispatch } from '../contexts/GameContext';
+import { useGameDispatch, useGameState } from '../contexts/GameContext';
 import { EXPERIENCE_CARDS } from '../data/experienceCards';
 import { LOVE_CARDS } from '../data/loveCards';
 import { initCloudBase, getCardCounts, incrementCardCount } from '../cloudbase';
@@ -13,6 +13,7 @@ import { useTriangleAnimation } from '../hooks/useTriangleAnimation';
 
 export function GameHomePage() {
   const dispatch = useGameDispatch();
+  const { cardReviews } = useGameState();
 
   useRipple('rippleCanvas');
   useTriangleAnimation();
@@ -35,13 +36,13 @@ export function GameHomePage() {
       incrementCardCount(cardId);
       const card = EXPERIENCE_CARDS.find((c) => c.id === cardId);
       if (card) {
-        const cur = parseInt(card.reviews) || 0;
-        card.reviews = cur + 1 + ' 人体验过';
-        dispatch({ type: 'SET_CARD_REVIEWS', cardId, reviews: card.reviews });
+        const cur = parseInt(cardReviews[cardId] ?? card.reviews) || 0;
+        const next = cur + 1 + ' 人体验过';
+        dispatch({ type: 'SET_CARD_REVIEWS', cardId, reviews: next });
       }
       dispatch({ type: 'SELECT_CARD', cardId });
     },
-    [dispatch],
+    [dispatch, cardReviews],
   );
 
   const handleSelectLove = useCallback(

@@ -40,6 +40,7 @@ export interface AppState {
   love: LoveState;
   gacha: GachaState;
   loveChatMode: boolean;
+  cardReviews: Record<string, string>;
 }
 
 // ---- Actions ----
@@ -114,6 +115,7 @@ const initialState: AppState = {
   love: initialLove,
   gacha: initialGacha,
   loveChatMode: false,
+  cardReviews: {},
 };
 
 // ---- Reducer ----
@@ -296,6 +298,7 @@ function gameReducer(state: AppState, action: GameAction): AppState {
       };
 
     case 'GACHA_COLLECT': {
+      if (action.slotIndex < 0 || action.slotIndex >= 16) return state;
       const newFlags = [...state.gacha.collectedFlags];
       newFlags[action.slotIndex] = true;
       return {
@@ -320,11 +323,10 @@ function gameReducer(state: AppState, action: GameAction): AppState {
       };
 
     case 'SET_CARD_REVIEWS': {
-      const expCard = EXPERIENCE_CARDS.find((c) => c.id === action.cardId);
-      if (expCard) expCard.reviews = action.reviews;
-      const loveCard = LOVE_CARDS.find((c) => c.id === action.cardId);
-      if (loveCard) loveCard.reviews = action.reviews;
-      return { ...state };
+      return {
+        ...state,
+        cardReviews: { ...state.cardReviews, [action.cardId]: action.reviews },
+      };
     }
 
     default:

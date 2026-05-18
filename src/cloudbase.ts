@@ -62,8 +62,8 @@ export async function saveConsultation(data: {
   try {
     await tcbDb.collection('consultations').add({ ...data, timestamp: Date.now() });
     console.log('[CloudBase] 问诊记录已保存');
-  } catch (err: any) {
-    console.warn('[CloudBase] 保存问诊失败:', err.message || err);
+  } catch (err: unknown) {
+    console.warn('[CloudBase] 保存问诊失败:', err instanceof Error ? err.message : err);
   }
 }
 
@@ -81,7 +81,7 @@ export async function savePrescription(data: {
   try {
     await tcbDb.collection('prescriptions').add({ ...data, timestamp: Date.now() });
     console.log('[CloudBase] 处方数据已保存');
-  } catch (err: any) {
-    console.warn('[CloudBase] 保存处方失败:', err.message || err);
+  } catch (err: unknown) {
+    console.warn('[CloudBase] 保存处方失败:', err instanceof Error ? err.message : err);
   }
 }
