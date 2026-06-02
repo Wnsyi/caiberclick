@@ -81,27 +81,29 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 .comp1-slideshow-right{position:absolute;top:50%;right:8%;transform:translateY(-50%);z-index:4;max-width:20%;max-height:36%;object-fit:contain;pointer-events:none}
 .comp1-frost-card{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;
-  width:33.333%;height:66.667%;display:flex;flex-direction:column;justify-content:flex-start;
-  padding:1cm 28px 40px;
+  width:33.333%;max-height:85vh;display:flex;flex-direction:column;justify-content:flex-start;
+  padding:clamp(16px, 3vh, 40px) 28px 40px;
+  overflow-y:auto;
   background:rgba(253,248,238,0.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border:1px solid rgba(255,255,255,0.35);border-radius:4px;
   box-shadow:0 8px 32px rgba(60,40,20,0.10);
 }
 .comp1-frost-title{
-  margin:0 0 24px 0;font-family:'Ma Shan Zheng',cursive;font-size:80px;font-weight:400;
+  margin:0 0 24px 0;font-family:'Ma Shan Zheng',cursive;font-size:clamp(36px, 6vw, 80px);font-weight:400;
   color:#5D4E3A;line-height:1.1;text-align:center;letter-spacing:6px;
 }
 .comp1-frost-card p{
-  margin:0;font-family:var(--font-body);font-size:19px;color:#5D4E3A;line-height:2;letter-spacing:0.5px;text-indent:2em;
+  margin:0;font-family:var(--font-body);font-size:clamp(13px, 1.4vw, 19px);color:#5D4E3A;line-height:2;letter-spacing:0.5px;text-indent:2em;
 }
 .comp1-frost-btn{
-  margin-top:24px;align-self:center;
-  font-family:var(--font-body);font-size:15px;letter-spacing:3px;
-  background:rgba(229,144,47,0.75);color:#fff;border:none;padding:12px 36px;
+  margin-top:clamp(12px, 2vh, 24px);align-self:center;flex-shrink:0;
+  font-family:var(--font-body);font-size:clamp(13px, 1.1vw, 15px);letter-spacing:3px;
+  background:rgba(229,144,47,0.75);color:#fff;border:none;padding:10px 28px;
+  white-space:nowrap;
   border-radius:0;cursor:pointer;transition:background 0.2s;
 }
 .comp1-frost-btn:hover{background:var(--orange-dark)}
-.comp1-frost-android{margin-top:12px;background:rgba(229,144,47,0.75)}
+.comp1-frost-android{margin-top:10px;background:rgba(229,144,47,0.75)}
 .comp1-overlay{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:80px 24px 120px;text-align:center;z-index:3;

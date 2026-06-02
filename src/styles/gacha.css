@@ -2,7 +2,7 @@
    GACHA MACHINE — 魔术师扭蛋机 + CARD COLLECTION
    ============================================================ */
 .gacha-container{display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;gap:24px;padding:20px 24px;position:relative}
-.gacha-machine-wrapper{display:flex;flex-direction:column;align-items:center;flex:0 0 200px;gap:12px}
+.gacha-machine-wrapper{display:flex;flex-direction:column;align-items:center;flex:0 0 clamp(140px,18%,200px);gap:12px;transform-origin:top center}
 .gacha-machine{
   position:relative;width:200px;display:flex;flex-direction:column;align-items:center;
   filter:drop-shadow(0 12px 32px rgba(60,30,10,0.25));
@@ -377,4 +377,42 @@
 .gacha-card-fly{
   position:fixed;z-index:200;pointer-events:none;
   animation:cardFlyUp 1s ease-out forwards;
+}
+
+/* ============================================================
+   DESKTOP SCALING — 中等桌面宽度等比缩小扭蛋机
+   ============================================================ */
+@media (min-width: 769px) and (max-width: 950px) {
+  .gacha-machine-wrapper {
+    flex: 0 0 145px;
+  }
+  .gacha-machine {
+    transform: scale(0.72);
+    transform-origin: top center;
+    margin-bottom: -30px;
+  }
+  .gacha-btn-row {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 38px;
+    transform: scale(0.72);
+    transform-origin: top center;
+  }
+}
+@media (min-width: 951px) and (max-width: 1150px) {
+  .gacha-machine-wrapper {
+    flex: 0 0 170px;
+  }
+  .gacha-machine {
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: -14px;
+  }
+  .gacha-btn-row {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 64px;
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
 }
