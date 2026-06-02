@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useGameState } from '../../contexts/GameContext';
+import { useGameState, useGameDispatch } from '../../contexts/GameContext';
 
 export function StickyNav() {
   const { page } = useGameState();
+  const dispatch = useGameDispatch();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -53,11 +54,9 @@ export function StickyNav() {
       <div className="nav-right">
         <button
           className="nav-btn"
-          onClick={() => {
-            document.getElementById('comp2-cards')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-landing' })}
         >
-          开始
+          返回
         </button>
       </div>
     </nav>

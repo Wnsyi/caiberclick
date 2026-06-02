@@ -173,6 +173,9 @@ export function LoveStoryPage() {
 
   const handleBack = useCallback(() => {
     dispatch({ type: 'GO_HOME' });
+    setTimeout(() => {
+      document.getElementById('comp3')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   }, [dispatch]);
 
   if (!card) return null;

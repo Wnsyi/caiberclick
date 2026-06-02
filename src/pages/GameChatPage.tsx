@@ -155,6 +155,9 @@ export function GameChatPage() {
 
   const handleEndExperience = useCallback(() => {
     dispatch({ type: 'GO_HOME' });
+    setTimeout(() => {
+      document.getElementById('comp2-cards')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   }, [dispatch]);
 
   if (!card) return null;
