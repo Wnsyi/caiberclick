@@ -6,6 +6,9 @@ export function LoveStoryPage() {
   const { love } = useGameState();
   const dispatch = useGameDispatch();
 
+  const card = love.currentCard;
+  const phaseId = love.currentPhase;
+
   const [displayText, setDisplayText] = useState('');
   const [charName, setCharName] = useState('');
   const [charImg, setCharImg] = useState('');
@@ -13,14 +16,17 @@ export function LoveStoryPage() {
   const [showChoices, setShowChoices] = useState(false);
   const [choiceTexts, setChoiceTexts] = useState<string[]>(['', '']);
   const [showTapHint, setShowTapHint] = useState(false);
-  const [showStoryCard, setShowStoryCard] = useState(true);
+  const [showStoryCard, setShowStoryCard] = useState(() => {
+    // Only show story card on initial entry (when at the start phase).
+    // When returning from chat mode mid-story, the phase will already be
+    // past the start, so we skip the overlay.
+    if (!card) return false;
+    return !phaseId || phaseId === card.startPhase;
+  });
   const [isLargeChar, setIsLargeChar] = useState(true);
 
   const msgIndexRef = useRef(0);
   const lastPhaseRef = useRef<string | null>(null);
-
-  const card = love.currentCard;
-  const phaseId = love.currentPhase;
 
   // Initialize love story when card changes
   useEffect(() => {
@@ -40,7 +46,9 @@ export function LoveStoryPage() {
     setCharName('');
     msgIndexRef.current = 0;
     lastPhaseRef.current = null;
-    setShowStoryCard(true);
+    // Only show story card on initial entry (start phase), not when
+    // returning from chat mode mid-story with the same card.
+    setShowStoryCard(phaseId === card.startPhase);
   }, [card]);
 
   // Play messages for current phase (tracked by phase ID string)

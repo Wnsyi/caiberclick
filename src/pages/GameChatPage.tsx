@@ -145,6 +145,15 @@ export function GameChatPage() {
       }
 
       const nextPhase = card?.phases[option.next];
+
+      // When a love card ends via chat (after loveChatMode was reset in a previous round),
+      // finish through love path so all choices are captured for personality mapping
+      if (card?.id?.startsWith('love_') && nextPhase?.isEnd) {
+        dispatch({ type: 'LOVE_PUSH_CHOICE', choice });
+        dispatch({ type: 'LOVE_FINISH' });
+        return;
+      }
+
       if (nextPhase?.isEnd) {
         dispatch({ type: 'FINISH_GAME' });
       } else {

@@ -380,39 +380,50 @@
 }
 
 /* ============================================================
-   DESKTOP SCALING — 中等桌面宽度等比缩小扭蛋机
+   DESKTOP SCALING — 中等桌面宽度切换为 4×4 网格
+   魔术师扭蛋机保持在卡牌左边，两者同步缩放
    ============================================================ */
-@media (min-width: 769px) and (max-width: 950px) {
+
+/* 第一档：1050px 以下切换为 4×4 网格 */
+@media (min-width: 769px) and (max-width: 1050px) {
+  .gacha-card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .gacha-container {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
   .gacha-machine-wrapper {
-    flex: 0 0 145px;
+    flex: 0 0 clamp(120px, 24%, 180px);
+    position: sticky;
+    top: 0;
   }
   .gacha-machine {
-    transform: scale(0.72);
+    transform: scale(0.80);
     transform-origin: top center;
-    margin-bottom: -30px;
+    margin-bottom: -24px;
   }
   .gacha-btn-row {
     flex-direction: column;
     align-items: center;
-    margin-top: 38px;
-    transform: scale(0.72);
+    margin-top: 90px;
+    transform: scale(0.80);
     transform-origin: top center;
   }
 }
-@media (min-width: 951px) and (max-width: 1150px) {
+
+/* 第二档：880px 以下进一步缩小，扭蛋机和卡牌同步缩放 */
+@media (min-width: 769px) and (max-width: 880px) {
   .gacha-machine-wrapper {
-    flex: 0 0 170px;
+    flex: 0 0 clamp(105px, 22%, 140px);
   }
   .gacha-machine {
-    transform: scale(0.85);
+    transform: scale(0.66);
     transform-origin: top center;
-    margin-bottom: -14px;
+    margin-bottom: -36px;
   }
   .gacha-btn-row {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 64px;
-    transform: scale(0.85);
-    transform-origin: top center;
+    margin-top: 32px;
+    transform: scale(0.66);
   }
 }

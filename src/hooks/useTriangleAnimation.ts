@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 
 export function useTriangleAnimation() {
   const triAnimId = useRef<number>(0);
+  const hoverA = useRef(false);
+  const hoverB = useRef(false);
 
   useEffect(() => {
     const triA = document.getElementById('triA');
@@ -11,6 +13,19 @@ export function useTriangleAnimation() {
     const lower = document.getElementById('comp3Lower');
 
     if (!triA || !triB || !cardA || !cardB || !lower) return;
+
+    const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+    // Track hover state on love cards
+    const onMouseEnterA = () => { hoverA.current = true; };
+    const onMouseLeaveA = () => { hoverA.current = false; };
+    const onMouseEnterB = () => { hoverB.current = true; };
+    const onMouseLeaveB = () => { hoverB.current = false; };
+
+    cardA.addEventListener('mouseenter', onMouseEnterA);
+    cardA.addEventListener('mouseleave', onMouseLeaveA);
+    cardB.addEventListener('mouseenter', onMouseEnterB);
+    cardB.addEventListener('mouseleave', onMouseLeaveB);
 
     const duration = 10000;
 
@@ -61,10 +76,19 @@ export function useTriangleAnimation() {
         (s.cornerA === 'tl' && s.scale > 0.4) || (s.cornerB === 'bl' && s.scale > 0.4);
       const touchB =
         (s.cornerA === 'tr' && s.scale > 0.4) || (s.cornerB === 'br' && s.scale > 0.4);
+
       cardA!.style.transition = 'opacity 0.4s';
       cardB!.style.transition = 'opacity 0.4s';
-      cardA!.style.opacity = touchA ? '0.12' : '1';
-      cardB!.style.opacity = touchB ? '0.12' : '1';
+
+      if (isMobile()) {
+        // Mobile: always fully opaque
+        cardA!.style.opacity = '1';
+        cardB!.style.opacity = '1';
+      } else {
+        // Desktop: only transparent when triangle covers AND mouse is NOT hovering
+        cardA!.style.opacity = touchA && !hoverA.current ? '0.12' : '1';
+        cardB!.style.opacity = touchB && !hoverB.current ? '0.12' : '1';
+      }
 
       triAnimId.current = requestAnimationFrame(frame);
     }
@@ -73,6 +97,10 @@ export function useTriangleAnimation() {
 
     return () => {
       if (triAnimId.current) cancelAnimationFrame(triAnimId.current);
+      cardA.removeEventListener('mouseenter', onMouseEnterA);
+      cardA.removeEventListener('mouseleave', onMouseLeaveA);
+      cardB.removeEventListener('mouseenter', onMouseEnterB);
+      cardB.removeEventListener('mouseleave', onMouseLeaveB);
     };
   }, []);
 }
