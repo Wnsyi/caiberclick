@@ -1,6 +1,6 @@
 import cloudbase from '@cloudbase/js-sdk';
 
-const ENV_ID = 'game-one-d1gx1gwhbee34fff7';
+const ENV_ID = import.meta.env.VITE_CLOUDBASE_ENV_ID || 'game-one-d1gx1gwhbee34fff7';
 
 const app = cloudbase.init({ env: ENV_ID });
 

@@ -416,11 +416,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
             if (onCtaClick) { onCtaClick(); return; }
             document.getElementById('comp2-cards')?.scrollIntoView({ behavior: 'smooth' });
           }}>立即体验 →</button>
-          <button className="comp1-frost-btn comp1-frost-android" onClick={() => {
-            window.open('downloads/app-debug.apk', '_blank');
-          }}>
+          <a
+            className="comp1-frost-btn comp1-frost-android"
+            href="downloads/app-debug.apk"
+            download
+            style={{ textDecoration: 'none', display: 'inline-block' }}
+          >
             🤖 Android 下载
-          </button>
+          </a>
         </div>
       )}
       <div className="comp1-overlay" />
