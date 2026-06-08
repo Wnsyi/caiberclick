@@ -286,7 +286,7 @@ export async function addComment(
       createdAt: Date.now(),
     });
     return {
-      _id: res.id,
+      _id: res.id || '',
       content,
       authorEmail,
       authorName,

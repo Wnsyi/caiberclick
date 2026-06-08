@@ -9,6 +9,7 @@ const PAGE_TO_URL: Record<PageId, string> = {
   'page-chat': '/chat',
   'page-love-story': '/love-story',
   'page-result': '/result',
+  'page-feedback': '/feedback',
 };
 
 export function usePageSync() {
