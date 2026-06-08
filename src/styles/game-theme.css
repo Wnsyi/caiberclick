@@ -116,14 +116,14 @@ body{font-family:var(--font-body);background:var(--darker);color:#3D3020;min-hei
 /* ============================================================
    COMPONENT 2 — CARDS CAROUSEL
    ============================================================ */
-.comp2{background:linear-gradient(180deg,#FDF8EE 0%,#F8D8B8 35%,#F5C090 50%,#F8D8B8 65%,#FDF8EE 100%)}
-.comp2-upper{position:relative;width:100%;height:60vh;min-height:400px;overflow:hidden;background:linear-gradient(180deg,#FDF8EE 0%,#FDF8EE 20%,#FBE8D4 50%,#F5C898 72%,#EEB060 100%)}
+.comp2{background:#FDF8EE}
+.comp2-upper{position:relative;width:100%;height:60vh;min-height:400px;overflow:hidden;background:#FDF8EE}
 .comp2-upper-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;
   font-family:var(--font-display);font-size:clamp(32px,5vw,56px);letter-spacing:4px;
   color:rgba(61,48,32,0.35);pointer-events:none;
 }
-.comp2-lower{padding:48px 0 64px;background:linear-gradient(180deg,#EEB060 0%,#F5C898 35%,#FBE8D4 65%,#FDF8EE 100%)}
+.comp2-lower{padding:48px 0 64px;background:#FDF8EE}
 .section-header{text-align:center;margin-bottom:32px;padding:0 32px}
 .section-tag{font-family:var(--font-display);font-size:12px;letter-spacing:3px;color:var(--orange)}
 .section-header h2{font-family:var(--font-body);font-size:32px;font-weight:900;color:#3D3020;margin:8px 0}

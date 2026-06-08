@@ -101,9 +101,9 @@ export function GameChatPage() {
     });
   }, [chatHistory, showTyping]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback((arg?: number | React.MouseEvent) => {
     if (!game.awaitingChoice || game.isShowingMessages) return;
-    const choice = parseInt(inputValue.trim());
+    const choice = typeof arg === 'number' ? arg : parseInt(inputValue.trim());
     if (choice !== 1 && choice !== 2) return;
     const option = game.currentOptions?.find((o) => o.id === choice);
     if (!option) return;
@@ -204,6 +204,7 @@ export function GameChatPage() {
         prompt={phase?.prompt ?? ''}
         options={game.awaitingChoice ? game.currentOptions : null}
         visible={showBanner}
+        onOptionClick={(id) => handleSend(id)}
       />
 
       <div className="chat-messages" ref={messagesRef}>

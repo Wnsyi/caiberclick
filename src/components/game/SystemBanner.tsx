@@ -5,9 +5,10 @@ interface Props {
   prompt: string;
   options: GameOption[] | null;
   visible: boolean;
+  onOptionClick?: (id: number) => void;
 }
 
-export function SystemBanner({ prompt, options, visible }: Props) {
+export function SystemBanner({ prompt, options, visible, onOptionClick }: Props) {
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; startLeft: number; startTop: number } | null>(null);
@@ -58,6 +59,8 @@ export function SystemBanner({ prompt, options, visible }: Props) {
       className={`system-banner${dragging ? ' dragging' : ''}`}
       style={style}
       onMouseDown={(e) => {
+        // 点击选项时不做拖拽处理
+        if ((e.target as HTMLElement).classList.contains('sys-option')) return;
         const rect = bannerRef.current?.getBoundingClientRect();
         if (!rect) return;
         dragRef.current = { startX: e.clientX, startY: e.clientY, startLeft: rect.left, startTop: rect.top };
@@ -76,7 +79,12 @@ export function SystemBanner({ prompt, options, visible }: Props) {
       <div className="sys-label">⚡ 系统提示</div>
       <div className="sys-text">{prompt}</div>
       {(options ?? []).map((opt) => (
-        <span key={opt.id} className="sys-option">
+        <span
+          key={opt.id}
+          className="sys-option"
+          style={{ cursor: 'pointer' }}
+          onClick={(e) => { e.stopPropagation(); onOptionClick?.(opt.id); }}
+        >
           {opt.id}. {opt.text}
         </span>
       ))}

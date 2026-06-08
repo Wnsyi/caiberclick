@@ -1,7 +1,22 @@
-import { useRef, useEffect, useCallback } from 'react';
-import { LIGHT_SEQUENCE, GROUP_PERSONS, POS_PARAMS, TRANS_DUR, TRANS_EASE } from '../../data/gacha';
+import { useRef, useEffect, useCallback, useState } from 'react';
+import { LIGHT_SEQUENCE, FILM_IMAGES, POS_PARAMS, TRANS_DUR, TRANS_EASE } from '../../data/gacha';
+import { PERSONALITIES, PERSONALITY_CHARACTERS } from '../../data/personalities';
 
-const ALL_IMAGES = GROUP_PERSONS.flatMap((p) => p.images);
+// 图片路径 → 人格名称 反向映射
+const IMG_TO_PERSONA: Record<string, string> = {};
+for (const [pid, img] of Object.entries(PERSONALITY_CHARACTERS)) {
+  IMG_TO_PERSONA[img] = PERSONALITIES[Number(pid) - 1].persona;
+}
+
+// 16 个人格代表人物图片池（首页三个组件使用）
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 const LANDING_POS_PARAMS: Record<string, { txOffset: number; scale: number; zIndex: string }> = {
   left:   { txOffset: -0.32, scale: 0.38, zIndex: '4' },
@@ -32,11 +47,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
   const groupSwitching = useRef(false);
   const groupTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const posParamsRef = useRef(POS_PARAMS);
-  const groupIdx = useRef(0);
+  const centerLabelRef = useRef<HTMLDivElement>(null);  // 中间组件人格标签 DOM
+  const centerImgRef = useRef('');                       // 当前中间组件显示的图片路径
+  const [centerPersona, setCenterPersona] = useState(''); // React state 驱动标签文字
+  const imagePool = useRef<string[]>([]);       // 16 人格图片（洗牌后）
+  const poolIdx = useRef(0);                      // 当前取到第几张
   const posEls = useRef<{ left: HTMLImageElement | null; center: HTMLImageElement | null; right: HTMLImageElement | null }>({
     left: null, center: null, right: null,
   });
-  const elPerson = useRef<Map<HTMLImageElement, number>>(new Map());
   const confettiParticles = useRef<Array<{
     x: number; y: number; w: number; h: number; color: string;
     vx: number; vy: number; op: number; rot: number; rotSpd: number;
@@ -83,8 +101,26 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     if (!el) return;
     const s = posParamsRef.current[pos];
     const txPx = getGroupParentWidth() * s.txOffset;
-    el.style.transform = `translateX(calc(${txPx}px - 50%)) translateY(-50%) scale(${s.scale})`;
+    // 中间组件下移（-25% 代替 -50%）
+    const yOff = pos === 'center' ? '-25%' : '-50%';
+    el.style.transform = `translateX(calc(${txPx}px - 50%)) translateY(${yOff}) scale(${s.scale})`;
     el.style.zIndex = s.zIndex;
+  }, [getGroupParentWidth]);
+
+  // 根据图片路径解析人格名称
+  const resolvePersona = useCallback((src: string): string => {
+    const match = src.match(/(images\/[^/?#]+\.(?:jpg|jpeg|png|svg))/i);
+    return match ? (IMG_TO_PERSONA[match[0]] ?? '') : '';
+  }, []);
+
+  // 定位标签 DOM（文字由 React state 驱动）
+  const positionCenterLabel = useCallback(() => {
+    const label = centerLabelRef.current;
+    if (!label) return;
+    const s = posParamsRef.current.center;
+    const txPx = getGroupParentWidth() * s.txOffset;
+    label.style.transform = `translateX(calc(${txPx}px - 50%)) translateY(-230px) scale(${s.scale})`;
+    label.style.zIndex = '7';
   }, [getGroupParentWidth]);
 
   const setElTransition = useCallback((el: HTMLImageElement | null, enabled: boolean) => {
@@ -92,53 +128,58 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     el.style.transition = enabled ? `transform ${TRANS_DUR} ${TRANS_EASE}` : 'none';
   }, []);
 
+  // 取下一张人格图片（池子用完自动洗牌）
+  const takeNextImage = useCallback((): string => {
+    if (poolIdx.current >= imagePool.current.length) {
+      imagePool.current = shuffleArray(FILM_IMAGES);
+      poolIdx.current = 0;
+    }
+    const img = imagePool.current[poolIdx.current];
+    poolIdx.current++;
+    return img;
+  }, []);
+
   const rotateGroupPositions = useCallback(() => {
     if (groupSwitching.current) return;
     groupSwitching.current = true;
-    if (groupTimer.current) { clearInterval(groupTimer.current); groupTimer.current = null; }
 
     const oldLeft = posEls.current.left;
     const oldCenter = posEls.current.center;
     const oldRight = posEls.current.right;
 
     [oldLeft, oldCenter, oldRight].forEach((el) => { if (el) setElTransition(el, true); });
+    if (centerLabelRef.current) setElTransition(centerLabelRef.current as unknown as HTMLImageElement, true);
 
+    // 位置轮换：center → left，right → center，left → right（将取新图）
     applyPosStyle(oldCenter, 'left');
     applyPosStyle(oldRight, 'center');
     applyPosStyle(oldLeft, 'right');
 
     posEls.current = { left: oldCenter, center: oldRight, right: oldLeft };
 
+    // 更新中心图片引用 + 标签文字
+    const newCenterSrc = oldRight?.src ?? '';
+    centerImgRef.current = newCenterSrc;
+    setCenterPersona(resolvePersona(newCenterSrc));
+    positionCenterLabel();
+
+    // 新进入 right 位置的图片
+    const nextImg = takeNextImage();
+
     setTimeout(() => {
       [oldLeft, oldCenter, oldRight].forEach((el) => { if (el) setElTransition(el, false); });
-      if (posEls.current.left) posEls.current.left.src = GROUP_PERSONS[elPerson.current.get(posEls.current.left)!].images[0];
-      if (posEls.current.center) posEls.current.center.src = GROUP_PERSONS[elPerson.current.get(posEls.current.center)!].images[0];
-      groupIdx.current = 0;
+      if (centerLabelRef.current) setElTransition(centerLabelRef.current as unknown as HTMLImageElement, false);
+      if (posEls.current.right) posEls.current.right.src = nextImg;
       groupSwitching.current = false;
-      startHomeCycle();
     }, 750);
-  }, [applyPosStyle, setElTransition]);
+  }, [applyPosStyle, setElTransition, takeNextImage, resolvePersona, positionCenterLabel]);
 
+  // 每 3 秒轮换一次
   const startHomeCycle = useCallback(() => {
     if (groupTimer.current) clearInterval(groupTimer.current);
-    groupIdx.current = 0;
-    const centerEl = posEls.current.center;
-    if (!centerEl) return;
-    const personIdx = elPerson.current.get(centerEl);
-    if (personIdx === undefined) return;
-    const images = GROUP_PERSONS[personIdx].images;
-    centerEl.src = images[0];
     groupTimer.current = setInterval(() => {
-      if (groupSwitching.current) return;
-      groupIdx.current++;
-      if (groupIdx.current >= images.length) {
-        clearInterval(groupTimer.current!);
-        groupTimer.current = null;
-        rotateGroupPositions();
-        return;
-      }
-      if (posEls.current.center) posEls.current.center.src = images[groupIdx.current];
-    }, 300);
+      rotateGroupPositions();
+    }, 3000);
   }, [rotateGroupPositions]);
 
   const startLandingCycle = useCallback(() => {
@@ -146,11 +187,11 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     let idx = 0;
     const el = slideshowRight.current;
     if (!el) return;
-    el.src = ALL_IMAGES[0];
+    el.src = FILM_IMAGES[0];
     groupTimer.current = setInterval(() => {
       idx++;
-      if (idx >= ALL_IMAGES.length) idx = 0;
-      if (slideshowRight.current) slideshowRight.current.src = ALL_IMAGES[idx];
+      if (idx >= FILM_IMAGES.length) idx = 0;
+      if (slideshowRight.current) slideshowRight.current.src = FILM_IMAGES[idx];
     }, 350);
   }, []);
 
@@ -168,7 +209,7 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
       el.style.maxHeight = '66%';
       el.style.transition = 'none';
       applyPosStyle(el, 'right');
-      el.src = ALL_IMAGES[0];
+      el.src = FILM_IMAGES[0];
 
       const t = setTimeout(() => startLandingCycle(), 800);
       return () => {
@@ -182,9 +223,6 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     const rightEl = slideshowRight.current;
     if (!leftEl || !centerEl || !rightEl) return;
 
-    elPerson.current.set(leftEl, 1);
-    elPerson.current.set(centerEl, 0);
-    elPerson.current.set(rightEl, 2);
     posEls.current = { left: leftEl, center: centerEl, right: rightEl };
 
     [leftEl, centerEl, rightEl].forEach((el) => {
@@ -196,19 +234,28 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
       el.style.transition = 'none';
     });
 
-    applyPosStyle(leftEl, 'left');
-    leftEl.src = GROUP_PERSONS[1].images[0];
-    applyPosStyle(centerEl, 'center');
-    centerEl.src = GROUP_PERSONS[0].images[0];
-    applyPosStyle(rightEl, 'right');
-    rightEl.src = GROUP_PERSONS[2].images[0];
+    // 初始化图片池（洗牌），取前三张作为初始 left/center/right
+    imagePool.current = shuffleArray(FILM_IMAGES);
+    poolIdx.current = 0;
 
-    const t = setTimeout(() => startHomeCycle(), 1200);
+    applyPosStyle(leftEl, 'left');
+    leftEl.src = takeNextImage();
+    applyPosStyle(centerEl, 'center');
+    centerEl.src = takeNextImage();
+    applyPosStyle(rightEl, 'right');
+    rightEl.src = takeNextImage();
+
+    // 初始中心标签
+    centerImgRef.current = centerEl.src;
+    setCenterPersona(resolvePersona(centerEl.src));
+    positionCenterLabel();
+
+    const t = setTimeout(() => startHomeCycle(), 3000);
     return () => {
       clearTimeout(t);
       if (groupTimer.current) clearInterval(groupTimer.current);
     };
-  }, [applyPosStyle, startHomeCycle, startLandingCycle, landing]);
+  }, [applyPosStyle, startHomeCycle, startLandingCycle, takeNextImage, resolvePersona, positionCenterLabel, landing]);
 
   // Confetti
   const CONFETTI_COLORS = ['#E5902F', '#F5A623', '#E07060', '#7C3AED', '#5B8CDE', '#0D9488', '#00A86B', '#FF6B9D', '#FFD93D', '#C084FC'];
@@ -367,11 +414,10 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
       {!landing && (
         <img
           className="comp1-bg"
-          src="https://placehold.co/1600x900/E5902F/FDF8EE?text=+"
+          src="images/shouye.jpeg"
           alt="Hero Background"
         />
       )}
-      {!landing && <div className="comp1-image-sub" />}
       {landing && (
         <>
           <img className="comp1-bg-slide" ref={bgSlideA} alt="" />
@@ -380,11 +426,6 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
       )}
       {!landing && (
         <>
-          <div className="comp1-lights" id="comp1Lights">
-            <div className="beam beam-left" ref={beamLeft} />
-            <div className="beam beam-center" ref={beamCenter} />
-            <div className="beam beam-right" ref={beamRight} />
-          </div>
           <img
             className="comp1-slideshow-left"
             id="comp1SlideshowLeft"
@@ -406,6 +447,25 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
             alt="Slideshow Right"
             style={{ position: 'absolute' }}
           />
+          <div
+            ref={centerLabelRef}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              fontFamily: "'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive",
+              fontSize: '1.4rem',
+              color: '#5D4E37',
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              textShadow: '1px 1px 2px rgba(255,255,240,0.8)',
+              letterSpacing: '0.05em',
+              transition: `transform ${TRANS_DUR} ${TRANS_EASE}`,
+            }}
+          >
+            {centerPersona ? centerPersona + ' 代表人物' : ''}
+          </div>
         </>
       )}
       {landing && (
@@ -427,7 +487,8 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
         </div>
       )}
       <div className="comp1-overlay" />
-      <canvas className="comp1-confetti" ref={confettiCanvas} />
+
+
     </section>
   );
 }

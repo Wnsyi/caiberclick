@@ -8,7 +8,7 @@ const cardData: BaseCard[] = [
     title: '突然中彩票100万一日体验卡',
     desc: '一觉醒来你中了100万。24小时内必须花完，否则清零。朋友、家人、陌生人蜂拥而至——人性在金钱面前从不撒谎。',
     slideClass: 'slide-lottery',
-    imgSrc: 'https://placehold.co/600x400/FF6B35/FFFFFF?text=Lottery+Experience',
+    imgSrc: 'images/tiyanka1.jpeg',
     avatarColors: { '发小阿杰': '#4f46e5', '闺蜜小美': '#db2777', '妈妈': '#059669', '彩票店老板': '#d97706', '投资顾问': '#7c3aed', '远房表姐': '#dc2626' },
     startPhase: 'lot_1', results: null,
     phases: {
@@ -88,7 +88,7 @@ const cardData: BaseCard[] = [
     title: '霍格沃茨一日交换生体验卡',
     desc: '猫头鹰信送到了你桌上。你被邀请去霍格沃茨做一日交换生。只有24小时——你会用来追寻什么样的魔法？',
     slideClass: 'slide-hogwarts',
-    imgSrc: 'https://placehold.co/600x400/7C3AED/FFFFFF?text=Hogwarts+Experience',
+    imgSrc: 'images/tiyanka2.jpeg',
     avatarColors: { '分院帽': '#8b5cf6', '赫敏': '#f59e0b', '海格': '#92400e', '马尔福': '#10b981', '邓布利多': '#6366f1', '卢娜': '#ec4899' },
     startPhase: 'hw_1', results: null,
     phases: {
@@ -166,7 +166,7 @@ const cardData: BaseCard[] = [
     title: '透明人一日体验卡',
     desc: '你变成了透明人。没人看得见你，没人听得到你的声音。24小时——你会用这绝对的自由来做什么？',
     slideClass: 'slide-invisible',
-    imgSrc: 'https://placehold.co/600x400/1E293B/94A3B8?text=Invisible+Experience',
+    imgSrc: 'images/tiyanka3.jpeg',
     avatarColors: { '老板': '#1e40af', '同事小周': '#2563eb', '拾荒老人': '#92400e', '便利店员': '#d97706', '小女孩': '#ec4899' },
     startPhase: 'inv_1', results: null,
     phases: {
@@ -244,7 +244,7 @@ const cardData: BaseCard[] = [
     title: '和去世的亲人再吃一顿饭',
     desc: '你获得了只有一顿饭时间的重逢机会。对面坐着那个你无数次梦见的人。这顿饭，你会怎么吃？',
     slideClass: 'slide-reunion',
-    imgSrc: 'https://placehold.co/600x400/D97706/FFFFFF?text=Reunion+Experience',
+    imgSrc: 'images/tiyanka4.jpeg',
     avatarColors: { '奶奶': '#d97706', '爸爸': '#4f46e5', '妈妈': '#059669', '服务员': '#6b7280' },
     startPhase: 'reu_1', results: null,
     phases: {
@@ -322,7 +322,7 @@ const cardData: BaseCard[] = [
     title: '重启人生：回到高考那天',
     desc: '你带着现在的记忆回到了高考当天。你清楚地知道每道题的答案——但你也知道人生从来不只是关于分数。',
     slideClass: 'slide-gaokao',
-    imgSrc: 'https://placehold.co/600x400/059669/FFFFFF?text=Gaokao+Experience',
+    imgSrc: 'images/tiyanka5.jpeg',
     avatarColors: { '同桌': '#2563eb', '班主任': '#7c3aed', '妈妈': '#059669', '大学室友': '#d97706' },
     startPhase: 'gk_1', results: null,
     phases: {
@@ -399,7 +399,7 @@ const cardData: BaseCard[] = [
     title: '时间循环一日体验卡',
     desc: '今天是你经历的第37个一模一样的周一。无论你做什么，每天早上醒来都是这一天。你会崩溃，还是会在无限重复中找到意义？',
     slideClass: 'slide-timeloop',
-    imgSrc: 'https://placehold.co/600x400/DB2777/FFFFFF?text=Time+Loop+Experience',
+    imgSrc: 'images/tiyanka6.jpeg',
     avatarColors: { '咖啡师阿木': '#d97706', '神秘人林': '#7c3aed', '暗恋对象': '#db2777', '爸爸': '#4f46e5', '邻居奶奶': '#059669' },
     startPhase: 'tl_1', results: null,
     phases: {

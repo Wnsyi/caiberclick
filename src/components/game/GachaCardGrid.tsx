@@ -1,6 +1,5 @@
-import { getCardBackGraphic, getPersonalityGraphicSVG } from '../../data/personalityMappings';
-
-import { PERSONALITIES } from '../../data/personalities';
+import { getCardBackGraphic } from '../../data/personalityMappings';
+import { PERSONALITIES, PERSONALITY_CHARACTERS } from '../../data/personalities';
 
 interface Props {
   collectedFlags: boolean[];
@@ -24,10 +23,11 @@ export function GachaCardGrid({ collectedFlags, onSlotClick, onEmptyClick }: Pro
               className="gacha-card-slot collected"
               onClick={() => onSlotClick(i)}
             >
-              <div className="card-slot-inner">
-                <div className="card-slot-graphic" dangerouslySetInnerHTML={{ __html: getPersonalityGraphicSVG(i + 1) }} />
-                <span className="card-slot-label">{PERSONALITIES[i]?.persona ?? `#${i + 1}`}</span>
-              </div>
+              <img
+                className="card-slot-img"
+                src={PERSONALITY_CHARACTERS[i + 1] ?? ''}
+                alt={PERSONALITIES[i]?.persona ?? `#${i + 1}`}
+              />
             </div>
           ) : (
             <div
