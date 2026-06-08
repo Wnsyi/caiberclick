@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGameState, useGameDispatch } from '../../contexts/GameContext';
+import { logout, getSession } from '../../cloudbase';
 
 export function StickyNav() {
   const { page } = useGameState();
@@ -50,13 +51,19 @@ export function StickyNav() {
         <a onClick={() => document.getElementById('comp4')?.scrollIntoView({ behavior: 'smooth' })}>
           关于
         </a>
+        <a onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-feedback' })}>
+          意见
+        </a>
       </div>
       <div className="nav-right">
         <button
           className="nav-btn"
-          onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-landing' })}
+          onClick={async () => {
+            if (getSession()) await logout();
+            dispatch({ type: 'SET_PAGE', page: 'page-landing' });
+          }}
         >
-          返回
+          退出
         </button>
       </div>
     </nav>

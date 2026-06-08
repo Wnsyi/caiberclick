@@ -1,6 +1,7 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback, useState, type FormEvent } from 'react';
 import { LIGHT_SEQUENCE, FILM_IMAGES, POS_PARAMS, TRANS_DUR, TRANS_EASE } from '../../data/gacha';
 import { PERSONALITIES, PERSONALITY_CHARACTERS } from '../../data/personalities';
+import { login, register, initCloudBase } from '../../cloudbase';
 
 // 图片路径 → 人格名称 反向映射
 const IMG_TO_PERSONA: Record<string, string> = {};
@@ -34,6 +35,14 @@ const LANDING_LIGHT_SEQUENCE = [
 ];
 
 export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; landing?: boolean }) {
+  const [authMode, setAuthMode] = useState<'intro' | 'login' | 'register'>('intro');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+
   const beamCenter = useRef<HTMLDivElement>(null);
   const beamLeft = useRef<HTMLDivElement>(null);
   const beamRight = useRef<HTMLDivElement>(null);
@@ -401,6 +410,47 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     };
   }, [landing]);
 
+  // 落地页加载时初始化数据库，确保登录注册可用
+  useEffect(() => {
+    if (landing) { initCloudBase(); }
+  }, [landing]);
+
+  // 登录
+  const handleLogin = useCallback(async (e: FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password) { setAuthError('请填写邮箱和密码'); return; }
+    setAuthLoading(true);
+    setAuthError('');
+    const result = await login(email.trim(), password);
+    setAuthLoading(false);
+    if (result.success) { onCtaClick?.(); }
+    else { setAuthError(result.error || '登录失败'); }
+  }, [email, password, onCtaClick]);
+
+  // 注册
+  const handleRegister = useCallback(async (e: FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !username.trim() || !password) { setAuthError('请填写所有字段'); return; }
+    if (password !== confirmPassword) { setAuthError('两次输入的密码不一致'); return; }
+    if (password.length < 6) { setAuthError('密码长度不能少于 6 位'); return; }
+    setAuthLoading(true);
+    setAuthError('');
+    const result = await register(email.trim(), username.trim(), password);
+    setAuthLoading(false);
+    if (result.success) { onCtaClick?.(); }
+    else { setAuthError(result.error || '注册失败'); }
+  }, [email, username, password, confirmPassword, onCtaClick]);
+
+  // 切换模式清空表单
+  const switchAuthMode = useCallback((mode: 'intro' | 'login' | 'register') => {
+    setAuthMode(mode);
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    setAuthError('');
+  }, []);
+
   // Init light show
   useEffect(() => {
     lightSeq.current = landing ? LANDING_LIGHT_SEQUENCE : LIGHT_SEQUENCE;
@@ -468,14 +518,11 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
           </div>
         </>
       )}
-      {landing && (
+      {landing && authMode === 'intro' && (
         <div className="comp1-frost-card">
           <h2 className="comp1-frost-title">开药吗</h2>
           <p>这是一个结合了二次元的心理诊疗所。我们通过沉静式体验，根据你的选择来判断你的人格。根据每个人格，我们都会开出不一样的处方哦！快来试试吧！对了，每个人格都有一个代表人物哦，点击人格介绍，看看有没有你喜欢的角色吧！</p>
-          <button className="comp1-frost-btn" onClick={() => {
-            if (onCtaClick) { onCtaClick(); return; }
-            document.getElementById('comp2-cards')?.scrollIntoView({ behavior: 'smooth' });
-          }}>立即体验 →</button>
+          <button className="comp1-frost-btn" onClick={() => switchAuthMode('login')}>登录体验 →</button>
           <a
             className="comp1-frost-btn comp1-frost-android"
             href="downloads/app-debug.apk"
@@ -484,6 +531,59 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
           >
             🤖 Android 下载
           </a>
+        </div>
+      )}
+      {landing && authMode === 'login' && (
+        <div className="comp1-frost-card">
+          <h2 className="comp1-frost-title">登录</h2>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <input type="email" placeholder="邮箱" value={email}
+              onChange={(e) => { setEmail(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            <input type="password" placeholder="密码" value={password}
+              onChange={(e) => { setPassword(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            {authError && <div style={{ color: '#DC3545', fontSize: '0.82rem', textAlign: 'center', padding: '4px 0' }}>{authError}</div>}
+            <button type="submit" className="comp1-frost-btn" style={{ width: '100%' }} disabled={authLoading}>
+              {authLoading ? '登录中...' : '登录'}
+            </button>
+          </form>
+          <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+            <button onClick={() => switchAuthMode('intro')} style={{ background: 'none', border: 'none', color: 'rgba(93,78,55,0.6)', cursor: 'pointer', textDecoration: 'underline' }}>← 返回首页</button>
+            <button onClick={() => switchAuthMode('register')} style={{ background: 'none', border: 'none', color: '#B6563A', cursor: 'pointer' }}>没有账号？去注册 →</button>
+          </div>
+        </div>
+      )}
+      {landing && authMode === 'register' && (
+        <div className="comp1-frost-card">
+          <h2 className="comp1-frost-title">注册</h2>
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <input type="email" placeholder="邮箱" value={email}
+              onChange={(e) => { setEmail(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            <input type="text" placeholder="用户名" value={username}
+              onChange={(e) => { setUsername(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            <input type="password" placeholder="密码（至少 6 位）" value={password}
+              onChange={(e) => { setPassword(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            <input type="password" placeholder="确认密码" value={confirmPassword}
+              onChange={(e) => { setConfirmPassword(e.target.value); setAuthError(''); }}
+              style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+            />
+            {authError && <div style={{ color: '#DC3545', fontSize: '0.82rem', textAlign: 'center', padding: '4px 0' }}>{authError}</div>}
+            <button type="submit" className="comp1-frost-btn" style={{ width: '100%' }} disabled={authLoading}>
+              {authLoading ? '注册中...' : '注册'}
+            </button>
+          </form>
+          <div style={{ marginTop: '14px', textAlign: 'center', fontSize: '0.85rem' }}>
+            <button onClick={() => switchAuthMode('login')} style={{ background: 'none', border: 'none', color: '#B6563A', cursor: 'pointer' }}>已有账号？去登录 →</button>
+          </div>
         </div>
       )}
       <div className="comp1-overlay" />
