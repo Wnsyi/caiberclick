@@ -183,11 +183,10 @@ export function ProfilePage() {
       next = emojis[Math.floor(Math.random() * emojis.length)];
     } while (next === current && emojis.length > 1);
     localStorage.setItem(key, next);
+    setAvatarEmoji(next);
     // 同步到 CloudBase
     await updateProfile(session.username, bio || '');
     setSaved(false);
-    setEditing((v) => !v);
-    setTimeout(() => setEditing((v) => !v), 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, session, bio]);
 
@@ -201,9 +200,21 @@ export function ProfilePage() {
     }
   }, [expandedId]);
 
-  const avatarEmoji = isLoggedIn
-    ? (localStorage.getItem(`caiber_avatar_${session?.email}`) || '😶')
-    : '😶';
+  const [avatarEmoji, setAvatarEmoji] = useState(() => {
+    if (isLoggedIn && session) {
+      return localStorage.getItem(`caiber_avatar_${session.email}`) || '😶';
+    }
+    return '😶';
+  });
+
+  // 登录状态变化时同步头像
+  useEffect(() => {
+    if (isLoggedIn && session) {
+      setAvatarEmoji(localStorage.getItem(`caiber_avatar_${session.email}`) || '😶');
+    } else {
+      setAvatarEmoji('😶');
+    }
+  }, [isLoggedIn, session?.email]);
 
   const getPersonaDetail = (pid?: number) => {
     if (!pid || pid < 1 || pid > PERSONALITIES.length) return null;

@@ -168,8 +168,8 @@ export function FeedbackPage() {
             </div>
           ) : (
           <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#B6563A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, flexShrink: 0 }}>
-              {session.username.charAt(0).toUpperCase()}
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#B6563A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: localStorage.getItem(`caiber_avatar_${session.email}`) ? '1.3rem' : '1rem', fontWeight: 700, flexShrink: 0 }}>
+              {localStorage.getItem(`caiber_avatar_${session.email}`) || session.username.charAt(0).toUpperCase()}
             </div>
             <textarea
               placeholder="说点什么..."

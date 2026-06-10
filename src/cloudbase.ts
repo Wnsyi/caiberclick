@@ -855,7 +855,7 @@ export async function getPublicProfile(email: string): Promise<PublicProfile | n
       username: user.username || user.name || email,
       email: user.email || email,
       bio: localStorage.getItem(`caiber_bio_${user.email}`) || '',
-      avatar: user.avatar || localStorage.getItem(`caiber_avatar_${user.email}`) || '😶',
+      avatar: localStorage.getItem(`caiber_avatar_${user.email}`) || user.avatar || '😶',
       createdAt: user.createdAt,
     };
   } catch { return null; }
