@@ -31,13 +31,15 @@ function copyGameAssets() {
   }
 }
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  // 通过命令行 --base 参数或 .env 中 VITE_BASE_PATH 控制
+  const base = process.env.VITE_BASE_PATH || env.VITE_BASE_PATH || '/'
+  console.log('[vite] base =', base)
 
   return {
     plugins: [react(), copyGameAssets()],
-    // BASE_PATH: / → Express 本地服务器；/mental-hospital/ → CloudBase 部署
-    base: env.BASE_PATH ?? (command === 'build' ? '/mental-hospital/' : '/'),
+    base,
     build: {
       rollupOptions: {
         input: {
