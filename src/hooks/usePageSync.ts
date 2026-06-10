@@ -10,6 +10,7 @@ const PAGE_TO_URL: Record<PageId, string> = {
   'page-love-story': '/love-story',
   'page-result': '/result',
   'page-feedback': '/feedback',
+  'page-profile': '/profile',
 };
 
 export function usePageSync() {

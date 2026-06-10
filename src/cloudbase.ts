@@ -42,6 +42,7 @@ interface Session {
   email: string;
   username: string;
   token: string;
+  isAdmin?: boolean;
 }
 
 const SESSION_KEY = 'caiber_session';
@@ -90,23 +91,37 @@ export async function register(
       return { success: false, error: '该邮箱已被注册，请直接登录' };
     }
 
+    // 1.5 禁止使用管理员作为用户名
+    const blockedNames = ['管理员', 'admin', 'Admin', 'ADMIN', '管理', '版主', 'moderator', 'Moderator'];
+    if (blockedNames.includes(username.trim())) {
+      return { success: false, error: '该用户名不可使用，请换一个' };
+    }
+
     // 2. 哈希密码 + 生成 session token
     const hashedPwd = await hashPassword(password);
     const token = crypto.randomUUID();
 
     // 3. 存入数据库
+    const isAdminUser = email.toLowerCase() === '1111@qq.com';
     await tcbDb.collection('users').add({
+      name: isAdminUser ? '管理员' : username,
       email: email.toLowerCase(),
-      username,
+      username: isAdminUser ? '管理员' : username,
       password: hashedPwd,
       token,
+      isAdmin: isAdminUser,
       createdAt: Date.now(),
       lastLoginAt: Date.now(),
       loginCount: 1,
     });
 
     // 4. 写入本地会话
-    saveSession({ email: email.toLowerCase(), username, token });
+    saveSession({
+      email: email.toLowerCase(),
+      username: isAdminUser ? '管理员' : username,
+      token,
+      isAdmin: isAdminUser,
+    });
 
     console.log('[CloudBase] 注册成功:', email);
     return { success: true };
@@ -162,10 +177,39 @@ export async function login(
       loginCount: (user.loginCount || 0) + 1,
     });
 
-    // 4. 写入本地会话
-    saveSession({ email: email.toLowerCase(), username: user.username || email, token });
+    // 4. 自动将管理员邮箱用户设为管理员，非管理员邮箱则清除
+    let adminFlag = user.isAdmin === true;
+    const adminEmail = (user.email || '').toLowerCase();
+    if (adminEmail === '1111@qq.com') {
+      if (!adminFlag) {
+        await tcbDb!.collection('users').doc(user._id).update({
+          isAdmin: true,
+          username: '管理员',
+          name: '管理员',
+        });
+        adminFlag = true;
+        user.username = '管理员';
+      }
+    } else if (adminFlag || user.username === '管理员' || user.name === '管理员') {
+      // 非管理员邮箱但数据库有管理员标记 → 清除
+      await tcbDb!.collection('users').doc(user._id).update({
+        isAdmin: false,
+        username: user.email.split('@')[0],
+        name: user.email.split('@')[0],
+      });
+      adminFlag = false;
+      user.username = user.email.split('@')[0];
+    }
 
-    console.log('[CloudBase] 登录成功:', email);
+    // 5. 写入本地会话
+    saveSession({
+      email: email.toLowerCase(),
+      username: user.username || email,
+      token,
+      isAdmin: adminFlag,
+    });
+
+    console.log('[CloudBase] 登录成功:', email, user.isAdmin ? '(管理员)' : '');
     return { success: true };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : '登录失败';
@@ -208,6 +252,7 @@ export async function validateSession(): Promise<Session | null> {
       email: session.email,
       username: user.username || session.email,
       token: session.token,
+      isAdmin: user.isAdmin === true,
     };
     saveSession(updated);
     return updated;
@@ -238,6 +283,53 @@ export async function logout() {
   }
   clearSession();
   console.log('[CloudBase] 已退出登录');
+}
+
+// ===== 更新用户资料 =====
+
+export async function updateProfile(username: string, bio: string): Promise<boolean> {
+  const session = getSession();
+  if (!session) return false;
+  await initCloudBase();
+  if (!tcbReady || !tcbDb) return false;
+  // 禁止空用户名和敏感用户名（管理员可保留自己的名字）
+  const blocked = ['admin', 'Admin', 'ADMIN', '管理', '版主', 'moderator', 'Moderator'];
+  if (!username.trim()) return false;
+  if (!session.isAdmin && blocked.includes(username.trim())) return false;
+  try {
+    const res = await tcbDb!
+      .collection('users')
+      .where({ email: session.email })
+      .limit(1)
+      .get();
+    if (!res.data || res.data.length === 0) return false;
+    await tcbDb.collection('users').doc(res.data[0]._id).update({
+      username,
+      name: username,
+      avatar: localStorage.getItem(`caiber_avatar_${session.email}`) || '😶',
+    });
+    // 同步更新该用户所有评论的用户名
+    const oldComments = await tcbDb!
+      .collection('comments')
+      .where({ authorEmail: session.email })
+      .limit(500)
+      .get();
+    for (const c of (oldComments.data || [])) {
+      if (c.authorName !== username) {
+        await tcbDb!.collection('comments').doc(c._id).update({ authorName: username });
+      }
+    }
+    // 更新本地 session
+    session.username = username;
+    saveSession(session);
+    // 同时存 localStorage 的 bio
+    localStorage.setItem(`caiber_bio_${session.email}`, bio);
+    console.log('[CloudBase] 资料已更新:', username);
+    return true;
+  } catch (err) {
+    console.warn('[CloudBase] 更新资料失败:', err);
+    return false;
+  }
 }
 
 // ===== 以下不变 =====
@@ -301,7 +393,7 @@ export async function addComment(
   }
 }
 
-/** 删除评论（仅作者可删） */
+/** 删除评论（作者或管理员可删） */
 export async function deleteComment(commentId: string): Promise<boolean> {
   if (!tcbReady || !tcbDb) return false;
   try {
@@ -314,6 +406,43 @@ export async function deleteComment(commentId: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.warn('[CloudBase] 删除评论失败:', err);
+    return false;
+  }
+}
+
+/** 检查当前用户是否为管理员 */
+export function isAdmin(): boolean {
+  const session = getSession();
+  return session?.isAdmin === true;
+}
+
+// 暴露到全局，方便一次性设置管理员的同学在控制台调用
+(window as any).__setAdmin = async (email: string) => {
+  await initCloudBase();
+  const ok = await setUserAsAdmin(email);
+  if (ok) alert('管理员设置成功！请重新登录。');
+  else alert('设置失败，请检查邮箱是否正确。');
+};
+
+/** 将指定邮箱的用户设为管理员并改名为"管理员"（仅管理员可调用） */
+export async function setUserAsAdmin(targetEmail: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb!
+      .collection('users')
+      .where({ email: targetEmail.toLowerCase() })
+      .limit(1)
+      .get();
+    if (!res.data || res.data.length === 0) return false;
+    await tcbDb.collection('users').doc(res.data[0]._id).update({
+      isAdmin: true,
+      username: '管理员',
+      name: '管理员',
+    });
+    console.log('[CloudBase] 已设置管理员:', targetEmail);
+    return true;
+  } catch (err) {
+    console.warn('[CloudBase] 设置管理员失败:', err);
     return false;
   }
 }
@@ -374,9 +503,19 @@ export async function saveConsultation(data: {
   personalityId?: number;
   persona?: string;
 }) {
+  const session = getSession();
+  if (!session) return; // 游客不保存
+
+  const record = {
+    ...data,
+    userEmail: session.email,
+    username: session.username,
+    timestamp: Date.now(),
+  };
+
   if (!tcbReady || !tcbDb) return;
   try {
-    await tcbDb.collection('consultations').add({ ...data, timestamp: Date.now() });
+    await tcbDb.collection('consultations').add(record);
     console.log('[CloudBase] 问诊记录已保存');
   } catch (err: unknown) {
     console.warn('[CloudBase] 保存问诊失败:', err instanceof Error ? err.message : err);
@@ -393,11 +532,333 @@ export async function savePrescription(data: {
   usage: string;
   advice: string;
 }) {
+  const session = getSession();
+  if (!session) return; // 游客不保存
+
+  const record = {
+    ...data,
+    userEmail: session.email,
+    username: session.username,
+    timestamp: Date.now(),
+  };
+
   if (!tcbReady || !tcbDb) return;
   try {
-    await tcbDb.collection('prescriptions').add({ ...data, timestamp: Date.now() });
+    await tcbDb.collection('prescriptions').add(record);
     console.log('[CloudBase] 处方数据已保存');
   } catch (err: unknown) {
     console.warn('[CloudBase] 保存处方失败:', err instanceof Error ? err.message : err);
   }
 }
+
+// ===== 类型 =====
+
+interface ConsultationRecord {
+  cardId: string;
+  cardTitle: string;
+  choicePath: number[];
+  personalityId?: number;
+  persona?: string;
+  userEmail: string;
+  username: string;
+  timestamp: number;
+}
+
+interface PrescriptionRecord {
+  cardId: string;
+  cardTitle: string;
+  personalityId?: number;
+  persona?: string;
+  dia: string;
+  med: string;
+  usage: string;
+  advice: string;
+  userEmail: string;
+  username: string;
+  timestamp: number;
+}
+
+/** 从 CloudBase 拉取当前登录用户的问诊记录 */
+export async function getMyConsultations(): Promise<ConsultationRecord[]> {
+  const session = getSession();
+  if (!session || !tcbReady || !tcbDb) return [];
+
+  try {
+    const res = await tcbDb!
+      .collection('consultations')
+      .where({ userEmail: session.email })
+      .orderBy('timestamp', 'desc')
+      .limit(200)
+      .get();
+    return (res.data || []) as ConsultationRecord[];
+  } catch {
+    return [];
+  }
+}
+
+/** 根据 cardId + 时间范围 查处方 */
+export async function getPrescriptionFor(cardId: string, ts: number): Promise<PrescriptionRecord | null> {
+  const session = getSession();
+  if (!session || !tcbReady || !tcbDb) return null;
+
+  try {
+    const res = await tcbDb!
+      .collection('prescriptions')
+      .where({ userEmail: session.email, cardId })
+      .orderBy('timestamp', 'desc')
+      .limit(50)
+      .get();
+    const list: PrescriptionRecord[] = (res.data || []) as PrescriptionRecord[];
+    let best: PrescriptionRecord | null = null;
+    let minDiff = 5000;
+    for (const p of list) {
+      const diff = Math.abs(p.timestamp - ts);
+      if (diff < minDiff) { minDiff = diff; best = p; }
+    }
+    return best;
+  } catch { return null; }
+}
+
+// ===== 管理员：用户管理 =====
+
+interface UserRecord {
+  _id: string;
+  email: string;
+  username: string;
+  name?: string;
+  isAdmin?: boolean;
+  banned?: boolean;
+  mutedUntil?: number;
+  createdAt?: number;
+}
+
+/** 获取所有用户列表（管理员用） */
+export async function getAllUsers(): Promise<UserRecord[]> {
+  if (!tcbReady || !tcbDb) return [];
+  try {
+    const res = await tcbDb.collection('users').limit(500).get();
+    return (res.data || []) as UserRecord[];
+  } catch { return []; }
+}
+
+/** 拉黑用户（永久禁止评论） */
+export async function banUser(email: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
+    if (!res.data || res.data.length === 0) return false;
+    await tcbDb.collection('users').doc(res.data[0]._id).update({
+      banned: true,
+      mutedUntil: null,
+    });
+    return true;
+  } catch { return false; }
+}
+
+/** 禁言用户（1天后自动恢复） */
+export async function muteUser(email: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
+    if (!res.data || res.data.length === 0) return false;
+    await tcbDb.collection('users').doc(res.data[0]._id).update({
+      mutedUntil: Date.now() + 24 * 60 * 60 * 1000,
+    });
+    return true;
+  } catch { return false; }
+}
+
+/** 解除拉黑/禁言 */
+export async function unbanUser(email: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
+    if (!res.data || res.data.length === 0) return false;
+    await tcbDb.collection('users').doc(res.data[0]._id).update({
+      banned: false,
+      mutedUntil: null,
+    });
+    return true;
+  } catch { return false; }
+}
+
+/** 检查当前用户是否可以评论，返回禁止原因 */
+export async function checkCanComment(): Promise<{ ok: boolean; reason: string }> {
+  const session = getSession();
+  if (!session) return { ok: false, reason: '请先登录后再评论' };
+  if (!tcbReady || !tcbDb) return { ok: true, reason: '' };
+
+  try {
+    const res = await tcbDb!
+      .collection('users')
+      .where({ email: session.email })
+      .limit(1)
+      .get();
+    if (!res.data || res.data.length === 0) return { ok: true, reason: '' };
+
+    const user = res.data[0];
+    if (user.banned === true) return { ok: false, reason: '你已被管理员拉黑，无法发表评论' };
+
+    if (user.mutedUntil && user.mutedUntil > Date.now()) {
+      const remaining = Math.ceil((user.mutedUntil - Date.now()) / (60 * 60 * 1000));
+      return { ok: false, reason: `你已被管理员禁言，${remaining} 小时后恢复` };
+    }
+
+    // 禁言到期自动清除
+    if (user.mutedUntil && user.mutedUntil <= Date.now()) {
+      await tcbDb.collection('users').doc(user._id).update({ mutedUntil: null });
+    }
+
+    return { ok: true, reason: '' };
+  } catch {
+    return { ok: true, reason: '' };
+  }
+}
+
+// ===== 申诉 =====
+
+interface AppealRecord {
+  _id: string;
+  userEmail: string;
+  username: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected' | 'replied';
+  reply?: string;
+  createdAt: number;
+  resolvedAt?: number;
+}
+
+/** 普通用户发起申诉 */
+export async function submitAppeal(reason: string): Promise<boolean> {
+  const session = getSession();
+  if (!session) return false;
+  await initCloudBase();
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('appeals').add({
+      userEmail: session.email,
+      username: session.username,
+      reason: reason.trim(),
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+    console.log('[CloudBase] 申诉已提交:', session.email);
+    return true;
+  } catch (err) {
+    console.warn('[CloudBase] 提交申诉失败:', err);
+    return false;
+  }
+}
+
+/** 获取当前用户的申诉列表 */
+export async function getMyAppeals(): Promise<AppealRecord[]> {
+  const session = getSession();
+  if (!session) return [];
+  await initCloudBase();
+  if (!tcbReady || !tcbDb) return [];
+  try {
+    const res = await tcbDb!
+      .collection('appeals')
+      .where({ userEmail: session.email })
+      .orderBy('createdAt', 'desc')
+      .limit(50)
+      .get();
+    return (res.data || []) as AppealRecord[];
+  } catch { return []; }
+}
+
+/** 管理员获取所有申诉 */
+export async function getAllAppeals(): Promise<AppealRecord[]> {
+  await initCloudBase();
+  if (!tcbReady || !tcbDb) return [];
+  try {
+    const res = await tcbDb.collection('appeals').orderBy('createdAt', 'desc').limit(200).get();
+    return (res.data || []) as AppealRecord[];
+  } catch { return []; }
+}
+
+/** 撤回申诉（仅待处理状态可撤回） */
+export async function withdrawAppeal(appealId: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb.collection('appeals').doc(appealId).get();
+    if (!res.data || res.data.length === 0) return false;
+    if (res.data[0].status !== 'pending') return false;
+    await tcbDb.collection('appeals').doc(appealId).remove();
+    return true;
+  } catch { return false; }
+}
+
+/** 重新编辑申诉（仅待处理状态可编辑） */
+export async function editAppeal(appealId: string, newReason: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    const res = await tcbDb.collection('appeals').doc(appealId).get();
+    if (!res.data || res.data.length === 0) return false;
+    if (res.data[0].status !== 'pending') return false;
+    await tcbDb.collection('appeals').doc(appealId).update({
+      reason: newReason.trim(),
+      createdAt: Date.now(),
+    });
+    return true;
+  } catch { return false; }
+}
+
+/** 管理员回复申诉（回复即已处理） */
+export async function replyToAppeal(appealId: string, reply: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('appeals').doc(appealId).update({
+      status: 'replied',
+      reply: reply.trim(),
+      resolvedAt: Date.now(),
+    });
+    return true;
+  } catch { return false; }
+}
+
+/** 管理员处理申诉 */
+export async function resolveAppeal(appealId: string, approved: boolean): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('appeals').doc(appealId).update({
+      status: approved ? 'approved' : 'rejected',
+      reply: null,
+      resolvedAt: Date.now(),
+    });
+    return true;
+  } catch { return false; }
+}
+
+// ===== 查看用户公开资料 =====
+
+interface PublicProfile {
+  username: string;
+  email: string;
+  bio: string;
+  avatar: string;
+  createdAt?: number;
+}
+
+export async function getPublicProfile(email: string): Promise<PublicProfile | null> {
+  await initCloudBase();
+  if (!tcbReady || !tcbDb) return null;
+  try {
+    const res = await tcbDb!
+      .collection('users')
+      .where({ email: email.toLowerCase() })
+      .limit(1)
+      .get();
+    if (!res.data || res.data.length === 0) return null;
+    const user = res.data[0];
+    return {
+      username: user.username || user.name || email,
+      email: user.email || email,
+      bio: localStorage.getItem(`caiber_bio_${user.email}`) || '',
+      avatar: user.avatar || localStorage.getItem(`caiber_avatar_${user.email}`) || '😶',
+      createdAt: user.createdAt,
+    };
+  } catch { return null; }
+}
+
+export type { ConsultationRecord, PrescriptionRecord, UserRecord, AppealRecord };

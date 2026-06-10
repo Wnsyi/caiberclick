@@ -32,7 +32,7 @@ export interface GachaState {
   collectedFlags: boolean[];
 }
 
-export type PageId = 'page-landing' | 'page-home' | 'page-chat' | 'page-love-story' | 'page-result' | 'page-feedback';
+export type PageId = 'page-landing' | 'page-home' | 'page-chat' | 'page-love-story' | 'page-result' | 'page-feedback' | 'page-profile';
 
 export interface AppState {
   page: PageId;

@@ -102,3 +102,61 @@ export function LoveStoryCardOverlay({
     </div>
   );
 }
+
+export function ConfirmModal({
+  show,
+  title,
+  message,
+  confirmText,
+  cancelText,
+  onConfirm,
+  onCancel,
+}: {
+  show: boolean;
+  title?: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  if (!show) return null;
+
+  return (
+    <div
+      className="gh-overlay show"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
+      <div
+        className="gh-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '340px' }}
+      >
+        {title && <div className="gh-title">{title}</div>}
+        <div className="gh-message">{message}</div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+          <button
+            onClick={onCancel}
+            style={{
+              flex: 1, padding: '10px 0', borderRadius: '10px',
+              border: '1px solid rgba(139,125,104,0.2)', background: '#fff',
+              color: '#5D4E37', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            {cancelText || '取消'}
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1, padding: '10px 0', borderRadius: '10px',
+              border: 'none', background: '#DC3545', color: '#fff',
+              fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            {confirmText || '确定'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

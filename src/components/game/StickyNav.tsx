@@ -54,6 +54,9 @@ export function StickyNav() {
         <a onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-feedback' })}>
           意见
         </a>
+        <a onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-profile' })}>
+          我的
+        </a>
       </div>
       <div className="nav-right">
         <button

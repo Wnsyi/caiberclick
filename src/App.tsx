@@ -6,6 +6,7 @@ import { GameChatPage } from './pages/GameChatPage';
 import { LoveStoryPage } from './pages/LoveStoryPage';
 import { GameResultPage } from './pages/GameResultPage';
 import { FeedbackPage } from './pages/FeedbackPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { StickyNav } from './components/game/StickyNav';
 import { HeroSection } from './components/game/HeroSection';
 import { PageSync } from './components/game/PageSync';
@@ -43,6 +44,8 @@ function AppRoutes() {
       return <GameResultPage />;
     case 'page-feedback':
       return <FeedbackPage />;
+    case 'page-profile':
+      return <ProfilePage />;
     case 'page-home':
     default:
       return <GameHomePage />;

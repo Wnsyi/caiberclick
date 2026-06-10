@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, useState, type FormEvent } from 'react'
 import { LIGHT_SEQUENCE, FILM_IMAGES, POS_PARAMS, TRANS_DUR, TRANS_EASE } from '../../data/gacha';
 import { PERSONALITIES, PERSONALITY_CHARACTERS } from '../../data/personalities';
 import { login, register, initCloudBase } from '../../cloudbase';
+import { Captcha, checkCaptcha } from './Captcha';
 
 // 图片路径 → 人格名称 反向映射
 const IMG_TO_PERSONA: Record<string, string> = {};
@@ -40,6 +41,8 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -419,13 +422,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
   const handleLogin = useCallback(async (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) { setAuthError('请填写邮箱和密码'); return; }
+    if (!checkCaptcha(captchaInput)) { setAuthError('验证码错误，请重试'); return; }
     setAuthLoading(true);
     setAuthError('');
     const result = await login(email.trim(), password);
     setAuthLoading(false);
     if (result.success) { onCtaClick?.(); }
     else { setAuthError(result.error || '登录失败'); }
-  }, [email, password, onCtaClick]);
+  }, [email, password, captchaInput, onCtaClick]);
 
   // 注册
   const handleRegister = useCallback(async (e: FormEvent) => {
@@ -433,13 +437,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     if (!email.trim() || !username.trim() || !password) { setAuthError('请填写所有字段'); return; }
     if (password !== confirmPassword) { setAuthError('两次输入的密码不一致'); return; }
     if (password.length < 6) { setAuthError('密码长度不能少于 6 位'); return; }
+    if (!checkCaptcha(captchaInput)) { setAuthError('验证码错误，请重试'); return; }
     setAuthLoading(true);
     setAuthError('');
     const result = await register(email.trim(), username.trim(), password);
     setAuthLoading(false);
-    if (result.success) { onCtaClick?.(); }
+    if (result.success) { setRegisterSuccess(true); }
     else { setAuthError(result.error || '注册失败'); }
-  }, [email, username, password, confirmPassword, onCtaClick]);
+  }, [email, username, password, confirmPassword, captchaInput, onCtaClick]);
 
   // 切换模式清空表单
   const switchAuthMode = useCallback((mode: 'intro' | 'login' | 'register') => {
@@ -448,6 +453,8 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
     setUsername('');
     setPassword('');
     setConfirmPassword('');
+    setCaptchaInput('');
+    setRegisterSuccess(false);
     setAuthError('');
   }, []);
 
@@ -522,15 +529,18 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
         <div className="comp1-frost-card">
           <h2 className="comp1-frost-title">开药吗</h2>
           <p>这是一个结合了二次元的心理诊疗所。我们通过沉静式体验，根据你的选择来判断你的人格。根据每个人格，我们都会开出不一样的处方哦！快来试试吧！对了，每个人格都有一个代表人物哦，点击人格介绍，看看有没有你喜欢的角色吧！</p>
-          <button className="comp1-frost-btn" onClick={() => switchAuthMode('login')}>登录体验 →</button>
-          <a
-            className="comp1-frost-btn comp1-frost-android"
-            href="downloads/app-debug.apk"
-            download
-            style={{ textDecoration: 'none', display: 'inline-block' }}
-          >
-            🤖 Android 下载
-          </a>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <button className="comp1-frost-btn" onClick={() => onCtaClick?.()}>游客访问</button>
+            <button className="comp1-frost-btn" onClick={() => switchAuthMode('login')}>登录体验 →</button>
+            <a
+              className="comp1-frost-btn comp1-frost-android"
+              href="downloads/app-debug.apk"
+              download
+              style={{ textDecoration: 'none' }}
+            >
+              🤖 Android 下载
+            </a>
+          </div>
         </div>
       )}
       {landing && authMode === 'login' && (
@@ -545,6 +555,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
               onChange={(e) => { setPassword(e.target.value); setAuthError(''); }}
               style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
             />
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input type="text" placeholder="验证码" value={captchaInput}
+                onChange={(e) => { setCaptchaInput(e.target.value); setAuthError(''); }}
+                maxLength={4}
+                style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+              />
+              <Captcha onValidate={() => {}} />
+            </div>
             {authError && <div style={{ color: '#DC3545', fontSize: '0.82rem', textAlign: 'center', padding: '4px 0' }}>{authError}</div>}
             <button type="submit" className="comp1-frost-btn" style={{ width: '100%' }} disabled={authLoading}>
               {authLoading ? '登录中...' : '登录'}
@@ -556,7 +574,17 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
           </div>
         </div>
       )}
-      {landing && authMode === 'register' && (
+      {landing && authMode === 'register' && registerSuccess ? (
+        <div className="comp1-frost-card">
+          <h2 className="comp1-frost-title">注册成功 🎉</h2>
+          <p style={{ textAlign: 'center', color: '#5D4E37', fontSize: '0.9rem', lineHeight: 1.8, margin: '8px 0 20px' }}>
+            账号注册成功！请返回登录页面进行登录。
+          </p>
+          <button className="comp1-frost-btn" style={{ width: '100%' }} onClick={() => { setRegisterSuccess(false); switchAuthMode('login'); }}>
+            去登录 →
+          </button>
+        </div>
+      ) : landing && authMode === 'register' && (
         <div className="comp1-frost-card">
           <h2 className="comp1-frost-title">注册</h2>
           <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -576,6 +604,14 @@ export function HeroSection({ onCtaClick, landing }: { onCtaClick?: () => void; 
               onChange={(e) => { setConfirmPassword(e.target.value); setAuthError(''); }}
               style={{ padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
             />
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input type="text" placeholder="验证码" value={captchaInput}
+                onChange={(e) => { setCaptchaInput(e.target.value); setAuthError(''); }}
+                maxLength={4}
+                style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', border: `1px solid ${authError ? 'rgba(220,53,69,0.5)' : 'rgba(139,125,104,0.3)'}`, background: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', color: '#3D3020', outline: 'none', fontFamily: 'inherit' }}
+              />
+              <Captcha onValidate={() => {}} />
+            </div>
             {authError && <div style={{ color: '#DC3545', fontSize: '0.82rem', textAlign: 'center', padding: '4px 0' }}>{authError}</div>}
             <button type="submit" className="comp1-frost-btn" style={{ width: '100%' }} disabled={authLoading}>
               {authLoading ? '注册中...' : '注册'}

@@ -8,13 +8,14 @@ export function LoveCardsSection({ onSelectLove }: Props) {
   return (
     <section className="comp3" id="comp3">
       <div className="comp3-upper" id="comp3Upper">
-        <img
-          id="comp3BgImg"
-          src="https://placehold.co/1600x800/E0D8CB/3D3020?text=JOIN+THE+EXPERIENCE"
-          alt="Community Banner"
-          loading="lazy"
-          crossOrigin="anonymous"
-        />
+        <h2 style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+          fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2rem, 5vw, 4rem)',
+          color: '#8B7D68', letterSpacing: '0.08em',
+          pointerEvents: 'none', zIndex: 2, margin: 0, whiteSpace: 'nowrap',
+        }}>
+          JOIN THE EXPERIENCE
+        </h2>
         <canvas className="comp3-ripple-canvas" id="rippleCanvas" />
         <div className="comp3-splatter">
           <span className="splat s1" />
