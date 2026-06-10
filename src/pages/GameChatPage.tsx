@@ -62,7 +62,8 @@ export function GameChatPage() {
       })
       .catch((err) => {
         console.error('[AI] 初始化失败:', err);
-        setAiMessages([{ role: 'assistant' as const, text: '🤖 AI暂时无法连接，请稍后再试...' }]);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        setAiMessages([{ role: 'assistant' as const, text: `🤖 AI连接失败: ${errMsg}` }]);
         setAiLoading(false);
       });
   }, [isAIMode, card]);
@@ -93,7 +94,8 @@ export function GameChatPage() {
       }
     } catch (err) {
       console.error('[AI] 发送失败:', err);
-      setAiMessages([...newHistory, { role: 'assistant' as const, text: '🤖 网络有点问题，请重试...' }]);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setAiMessages([...newHistory, { role: 'assistant' as const, text: `🤖 发送失败: ${errMsg}` }]);
       setAiLoading(false);
     }
   }, [inputValue, aiLoading, aiFinished, card, aiMessages, dispatch]);

@@ -2,7 +2,7 @@ import cloudbase from '@cloudbase/js-sdk';
 
 const ENV_ID = import.meta.env.VITE_CLOUDBASE_ENV_ID || 'game-one-d1gx1gwhbee34fff7';
 
-const app = cloudbase.init({ env: ENV_ID });
+export const app = cloudbase.init({ env: ENV_ID });
 
 let tcbReady = false;
 let tcbDb: ReturnType<typeof app.database> | null = null;
