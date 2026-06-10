@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGameDispatch } from '../contexts/GameContext';
-import { getSession, initCloudBase, getMyConsultations, isAdmin, getAllUsers, banUser, muteUser, unbanUser, submitAppeal, getMyAppeals, getAllAppeals, resolveAppeal, replyToAppeal, updateProfile, withdrawAppeal, editAppeal, type ConsultationRecord, type UserRecord, type AppealRecord } from '../cloudbase';
+import { getSession, initCloudBase, getMyConsultations, isAdmin, getAllUsers, banUser, muteUser, unbanUser, submitAppeal, getMyAppeals, getAllAppeals, resolveAppeal, replyToAppeal, updateProfile, withdrawAppeal, editAppeal, deleteConsultation, type ConsultationRecord, type UserRecord, type AppealRecord } from '../cloudbase';
+import { analyzeTestHistory } from '../ai';
 import { PERSONALITIES, PERSONALITY_CHARACTERS } from '../data/personalities';
 import { EXPERIENCE_CARDS } from '../data/experienceCards';
 import { LOVE_CARDS } from '../data/loveCards';
@@ -69,6 +70,10 @@ export function ProfilePage() {
   const [appealOpen, setAppealOpen] = useState(false);
   const [adminAppealOpen, setAdminAppealOpen] = useState(false);
   const [appealLoading, setAppealLoading] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState('');
+  const [aiAnalysisOpen, setAiAnalysisOpen] = useState(false);
 
   const loadMyAppeals = useCallback(async () => {
     const list = await getMyAppeals();
@@ -116,6 +121,12 @@ export function ProfilePage() {
     await withdrawAppeal(appealId);
     await loadMyAppeals();
   }, [loadMyAppeals]);
+
+  const handleDeleteRecord = useCallback(async (id: string) => {
+    await deleteConsultation(id);
+    setDeleteConfirmId(null);
+    setConsultations(prev => prev.filter(c => (c as any)._id !== id));
+  }, []);
 
   const handleEditAppeal = useCallback(async () => {
     if (!editingAppealId || !editingAppealReason.trim()) return;
@@ -349,7 +360,30 @@ export function ProfilePage() {
           }}>
           <summary style={{ fontWeight: 700, fontSize: '0.95rem', color: '#5D4E37', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
             🧪 测试记录
-            <span style={{ fontSize: '0.75rem', color: 'rgba(139,125,104,0.4)' }}>{testRecordsOpen ? '收起' : '展开'}</span>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              {consultations.length >= 2 && (
+                <button onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setAiAnalyzing(true);
+                  setAiAnalysisOpen(true);
+                  const result = await analyzeTestHistory(
+                    consultations.map(c => ({ cardTitle: c.cardTitle, persona: c.persona || '', dia: '' }))
+                  );
+                  setAiAnalysis(result);
+                  setAiAnalyzing(false);
+                }}
+                  disabled={aiAnalyzing}
+                  style={{
+                    padding: '4px 12px', border: '1px solid #7c3aed', background: aiAnalyzing ? '#f5f3ff' : '#fff',
+                    color: '#7c3aed', cursor: 'pointer', fontSize: '0.78rem', borderRadius: '0',
+                    fontWeight: 600,
+                  }}>
+                  {aiAnalyzing ? '🤖 分析中...' : '🤖 AI 综合分析'}
+                </button>
+              )}
+              <span style={{ fontSize: '0.75rem', color: 'rgba(139,125,104,0.4)' }}>{testRecordsOpen ? '收起' : '展开'}</span>
+            </div>
           </summary>
 
           {!isLoggedIn ? (
@@ -387,6 +421,18 @@ export function ProfilePage() {
                         <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '0', background: 'rgba(124,58,237,0.06)', color: '#7C3AED', fontWeight: 600, whiteSpace: 'nowrap' }}>
                           {persona ? persona.persona : '未知'}
                         </span>
+                        {deleteConfirmId === (rec as any)._id ? (
+                          <>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteRecord((rec as any)._id); }}
+                              style={{ padding: '3px 8px', border: 'none', background: '#DC3545', color: '#fff', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600 }}>确认删除</button>
+                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(null); }}
+                              style={{ padding: '3px 8px', border: '1px solid rgba(139,125,104,0.3)', background: '#fff', color: '#5D4E37', cursor: 'pointer', fontSize: '0.7rem' }}>取消</button>
+                          </>
+                        ) : (
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId((rec as any)._id); }}
+                            style={{ background: 'none', border: 'none', color: 'rgba(220,53,69,0.4)', cursor: 'pointer', fontSize: '0.85rem', padding: '2px 4px' }}
+                            title="删除记录">🗑</button>
+                        )}
                         <span style={{ color: 'rgba(139,125,104,0.3)', fontSize: '0.8rem' }}>{isExpanded ? '▲' : '▼'}</span>
                       </div>
 
@@ -430,6 +476,25 @@ export function ProfilePage() {
             </>
           )}
         </details>
+        {/* ===== AI 综合分析结果 ===== */}
+        {aiAnalysisOpen && (
+          <div style={{
+            background: '#fff', borderRadius: '0', padding: '20px 24px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)', marginBottom: '16px',
+            borderLeft: '4px solid #7c3aed',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#7c3aed' }}>🤖 AI 综合分析</span>
+              <button onClick={() => setAiAnalysisOpen(false)}
+                style={{ background: 'none', border: 'none', fontSize: '1rem', color: 'rgba(139,125,104,0.5)', cursor: 'pointer' }}>✕</button>
+            </div>
+            {aiAnalyzing ? (
+              <div style={{ textAlign: 'center', padding: '24px', color: 'rgba(139,125,104,0.4)' }}>🤖 AI 正在分析你的测试记录...</div>
+            ) : (
+              <div style={{ fontSize: '0.9rem', color: '#5D4E37', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{aiAnalysis}</div>
+            )}
+          </div>
+        )}
         {/* ===== 管理用户（仅管理员可见） ===== */}
         {admin && (
           <details

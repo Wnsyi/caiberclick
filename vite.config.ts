@@ -40,6 +40,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), copyGameAssets()],
     base,
+    server: {
+      proxy: {
+        '/api': 'http://localhost:3000',
+      },
+    },
     build: {
       rollupOptions: {
         input: {

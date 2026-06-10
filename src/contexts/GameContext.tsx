@@ -41,13 +41,14 @@ export interface AppState {
   gacha: GachaState;
   loveChatMode: boolean;
   cardReviews: Record<string, string>;
+  aiResult: { personalityId: number; persona: string; dia: string; med: string; usage: string; advice: string } | null;
 }
 
 // ---- Actions ----
 
 export type GameAction =
   | { type: 'SET_PAGE'; page: PageId }
-  | { type: 'SELECT_CARD'; cardId: string }
+  | { type: 'SELECT_CARD'; cardId: string; card?: BaseCard }
   | { type: 'SET_PHASE'; phaseId: string }
   | { type: 'PUSH_CHOICE'; choice: number }
   | { type: 'SET_AWAITING_CHOICE'; value: boolean; options: GameOption[] | null }
@@ -69,7 +70,8 @@ export type GameAction =
   | { type: 'GACHA_INIT' }
   | { type: 'GACHA_COLLECT'; slotIndex: number }
   | { type: 'GACHA_REVEAL_ALL' }
-  | { type: 'SET_CARD_REVIEWS'; cardId: string; reviews: string };
+  | { type: 'SET_CARD_REVIEWS'; cardId: string; reviews: string }
+  | { type: 'FINISH_AI_GAME'; personalityId: number; persona: string; dia: string; med: string; usage: string; advice: string };
 
 // ---- Initial state ----
 
@@ -116,6 +118,7 @@ const initialState: AppState = {
   gacha: initialGacha,
   loveChatMode: false,
   cardReviews: {},
+  aiResult: null,
 };
 
 // ---- Reducer ----
@@ -130,7 +133,7 @@ function gameReducer(state: AppState, action: GameAction): AppState {
       return { ...state, page: action.page };
 
     case 'SELECT_CARD': {
-      const card = findCard(action.cardId);
+      const card = action.card || findCard(action.cardId);
       if (!card) return state;
       return {
         ...state,
@@ -328,6 +331,21 @@ function gameReducer(state: AppState, action: GameAction): AppState {
         cardReviews: { ...state.cardReviews, [action.cardId]: action.reviews },
       };
     }
+
+    case 'FINISH_AI_GAME':
+      return {
+        ...state,
+        page: 'page-result',
+        game: { ...state.game, isPlaying: false },
+        aiResult: {
+          personalityId: action.personalityId,
+          persona: action.persona,
+          dia: action.dia,
+          med: action.med,
+          usage: action.usage,
+          advice: action.advice,
+        },
+      };
 
     default:
       return state;

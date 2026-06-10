@@ -616,16 +616,30 @@ export async function getMyConsultations(): Promise<ConsultationRecord[]> {
   if (!session || !tcbReady || !tcbDb) return [];
 
   try {
-    const res = await tcbDb!
-      .collection('consultations')
-      .where({ userEmail: session.email })
-      .orderBy('timestamp', 'desc')
-      .limit(200)
-      .get();
-    return (res.data || []) as ConsultationRecord[];
+    const [cmtRes, delRes] = await Promise.all([
+      tcbDb!.collection('consultations').where({ userEmail: session.email }).orderBy('timestamp', 'desc').limit(200).get(),
+      tcbDb!.collection('users').limit(1000).get(),
+    ]);
+    const deletedIds = new Set((delRes.data || []).filter((d: any) => d.type === '_consultation_deletion' && d.userEmail === session.email).map((d: any) => d.consultationId));
+    return ((cmtRes.data || []) as ConsultationRecord[]).filter(c => !deletedIds.has((c as any)._id));
   } catch {
     return [];
   }
+}
+
+/** 删除问诊记录 */
+export async function deleteConsultation(consultationId: string): Promise<boolean> {
+  const session = getSession();
+  if (!session || !tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('users').add({
+      type: '_consultation_deletion',
+      consultationId,
+      userEmail: session.email,
+      timestamp: Date.now(),
+    });
+    return true;
+  } catch (err) { console.error('[deleteConsultation] 失败:', err); return false; }
 }
 
 /** 根据 cardId + 时间范围 查处方 */
@@ -961,6 +975,27 @@ export async function loadCardEdits<T extends { id: string }>(baseCards: T[]): P
     const cards = [...baseMap.values()].filter(c => !deletedIds.has(c.id));
     return { cards, deletedIds };
   } catch { return { cards: baseCards, deletedIds: new Set() }; }
+}
+
+// ===== AI 聊天记录存储 =====
+
+export async function saveAIChat(
+  cardId: string,
+  messages: { role: string; text: string }[],
+  result: { personalityId: number; persona: string; dia: string; med: string; usage: string; advice: string },
+): Promise<void> {
+  if (!tcbReady || !tcbDb) return;
+  const session = getSession();
+  try {
+    await tcbDb.collection('users').add({
+      type: '_ai_chat',
+      cardId,
+      userEmail: session?.email || '',
+      messages,
+      result,
+      timestamp: Date.now(),
+    });
+  } catch (err) { console.warn('[CloudBase] 保存AI聊天失败:', err); }
 }
 
 export type { ConsultationRecord, PrescriptionRecord, UserRecord, AppealRecord };

@@ -6,7 +6,7 @@ import { saveConsultation, savePrescription } from '../cloudbase';
 import type { PersonalityArchetype } from '../data/gameTypes';
 
 export function GameResultPage() {
-  const { game } = useGameState();
+  const { game, aiResult } = useGameState();
   const dispatch = useGameDispatch();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<PersonalityArchetype | null>(null);
@@ -14,44 +14,41 @@ export function GameResultPage() {
 
   useEffect(() => {
     setLoading(true);
-    // Simulate loading delay
     const timer = setTimeout(() => {
-      const card = game.currentCard;
-      if (!card) {
+      // AI 结果优先
+      if (aiResult) {
+        const r: PersonalityArchetype = {
+          id: aiResult.personalityId,
+          persona: aiResult.persona,
+          dia: aiResult.dia,
+          med: aiResult.med,
+          usage: aiResult.usage,
+          advice: aiResult.advice,
+        };
+        setResult(r);
+        setPersonalityId(aiResult.personalityId);
         setLoading(false);
+        if (game.currentCard) {
+          saveConsultation({ cardId: game.currentCard.id, cardTitle: game.currentCard.title, choicePath: [], personalityId: aiResult.personalityId, persona: aiResult.persona });
+          savePrescription({ cardId: game.currentCard.id, cardTitle: game.currentCard.title, personalityId: aiResult.personalityId, persona: aiResult.persona, dia: aiResult.dia, med: aiResult.med, usage: aiResult.usage, advice: aiResult.advice });
+        }
         return;
       }
+
+      const card = game.currentCard;
+      if (!card) { setLoading(false); return; }
       const pathKey = game.choicePath.join('-');
       const raw = card.results?.[pathKey] ?? null;
       const pid = raw?.personalityId;
       const r = pid ? PERSONALITIES[pid - 1] : getFallbackResult();
-
       setResult(r);
       setPersonalityId(pid);
       setLoading(false);
-
-      // Save to CloudBase
-      saveConsultation({
-        cardId: card.id,
-        cardTitle: card.title,
-        choicePath: game.choicePath,
-        personalityId: pid,
-        persona: r.persona,
-      });
-      savePrescription({
-        cardId: card.id,
-        cardTitle: card.title,
-        personalityId: pid,
-        persona: r.persona,
-        dia: r.dia,
-        med: r.med,
-        usage: r.usage,
-        advice: r.advice,
-      });
+      saveConsultation({ cardId: card.id, cardTitle: card.title, choicePath: game.choicePath, personalityId: pid, persona: r.persona });
+      savePrescription({ cardId: card.id, cardTitle: card.title, personalityId: pid, persona: r.persona, dia: r.dia, med: r.med, usage: r.usage, advice: r.advice });
     }, 2000);
-
     return () => clearTimeout(timer);
-  }, [game.currentCard, game.choicePath]);
+  }, [game.currentCard, game.choicePath, aiResult]);
 
   const handleRetry = useCallback(() => {
     dispatch({ type: 'RETRY_SAME_CARD' });

@@ -59,7 +59,7 @@ export function GameHomePage() {
         const cur = parseInt(cardReviews[cardId] ?? card.reviews) || 0;
         dispatch({ type: 'SET_CARD_REVIEWS', cardId, reviews: (cur + 1) + ' 人体验过' });
       }
-      dispatch({ type: 'SELECT_CARD', cardId });
+      dispatch({ type: 'SELECT_CARD', cardId, card });
     },
     [dispatch, cardReviews, expCards],
   );
