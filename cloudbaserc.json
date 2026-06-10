@@ -1,5 +1,4 @@
 {
-  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
   "envId": "game-one-d1gx1gwhbee34fff7",
   "functionRoot": "cloudfunctions",
   "functions": [
