@@ -194,6 +194,14 @@ export function GameChatPage() {
         ))}
       </div>
 
+      <button
+        onClick={handleEndExperience}
+        style={{
+          position: 'fixed', left: '12px', top: '12px', zIndex: 30,
+          background: 'rgba(139,125,104,0.85)', border: 'none', borderRadius: '0',
+          padding: '6px 14px', cursor: 'pointer', fontSize: '0.85rem', color: '#fff',
+        }}
+      >← 返回</button>
       <div className="chat-topbar">
         <span className="room-emoji">💬</span>
         <div className="chat-room-name">{phase?.chatName || '群聊'}</div>

@@ -1,13 +1,15 @@
 import { useRef, useEffect, useCallback } from 'react';
-import { EXPERIENCE_CARDS } from '../../data/experienceCards';
 import { useGameState } from '../../contexts/GameContext';
 import { CarouselCard } from './CarouselCard';
+import type { BaseCard } from '../../data/gameTypes';
 
 interface Props {
   onSelectCard: (cardId: string) => void;
+  onEditCard?: (card: BaseCard) => void;
+  cards: BaseCard[];
 }
 
-export function CarouselTrack({ onSelectCard }: Props) {
+export function CarouselTrack({ onSelectCard, onEditCard, cards }: Props) {
   const { cardReviews } = useGameState();
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -17,7 +19,7 @@ export function CarouselTrack({ onSelectCard }: Props) {
   const carouselPaused = useRef(false);
   const touchStart = useRef<{ x: number; y: number; pos: number } | null>(null);
   const CAROUSEL_SPEED = 0.06; // px/ms
-  const n = EXPERIENCE_CARDS.length;
+  const n = cards.length;
 
   useEffect(() => {
     const track = trackRef.current;
@@ -126,7 +128,7 @@ export function CarouselTrack({ onSelectCard }: Props) {
   return (
     <div className="carousel-wrapper" ref={wrapperRef} id="carouselWrapper">
       <div className="carousel-track" ref={trackRef} id="carouselTrack">
-        {EXPERIENCE_CARDS.map((card, i) => (
+        {cards.map((card, i) => (
           <div
             key={card.id}
             className={`carousel-slide ${card.slideClass}`}
@@ -134,7 +136,7 @@ export function CarouselTrack({ onSelectCard }: Props) {
             style={{ left: '0px' }}
             onClick={() => onSelectCard(card.id)}
           >
-            <CarouselCard card={card} onSelect={onSelectCard} reviewsText={cardReviews[card.id] ?? card.reviews} />
+            <CarouselCard card={card} onSelect={onSelectCard} reviewsText={cardReviews[card.id] ?? card.reviews} onEdit={onEditCard} />
           </div>
         ))}
       </div>
@@ -145,7 +147,7 @@ export function CarouselTrack({ onSelectCard }: Props) {
         ▸
       </button>
       <div className="carousel-dots" ref={dotsRef} id="carouselDots">
-        {EXPERIENCE_CARDS.map((_, i) => (
+        {cards.map((_, i) => (
           <span key={i} className={`dot${i === 0 ? ' active' : ''}`} />
         ))}
       </div>

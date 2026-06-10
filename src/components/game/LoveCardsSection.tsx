@@ -1,10 +1,13 @@
-import { LOVE_CARDS } from '../../data/loveCards';
+import type { BaseCard } from '../../data/gameTypes';
+import { isAdmin } from '../../cloudbase';
 
 interface Props {
   onSelectLove: (cardId: string) => void;
+  cards: BaseCard[];
+  onEditCard?: (card: BaseCard) => void;
 }
 
-export function LoveCardsSection({ onSelectLove }: Props) {
+export function LoveCardsSection({ onSelectLove, cards, onEditCard }: Props) {
   return (
     <section className="comp3" id="comp3">
       <div className="comp3-upper" id="comp3Upper">
@@ -31,18 +34,24 @@ export function LoveCardsSection({ onSelectLove }: Props) {
       <div className="comp3-lower" id="comp3Lower">
         <div className="comp3-tri comp3-tri-a" id="triA" />
         <div className="comp3-tri comp3-tri-b" id="triB" />
-        {LOVE_CARDS.length > 0 && (
+        {cards.length > 0 && (
           <div
             id="cardA"
             className="comp3-card comp3-card-a"
-            onClick={() => onSelectLove(LOVE_CARDS[0].id)}
+            onClick={() => onSelectLove(cards[0].id)}
           >
             <div className="comp3-card-upper">
-              <img src={LOVE_CARDS[0].imgSrc} alt={LOVE_CARDS[0].title} draggable={false} />
+              <img src={cards[0].imgSrc} alt={cards[0].title} draggable={false} />
             </div>
             <div className="comp3-card-lower">
-              <div className="comp3-card-title">{LOVE_CARDS[0].title}</div>
-              <div className="comp3-card-text">{LOVE_CARDS[0].desc}</div>
+              <div className="comp3-card-title">{cards[0].title}</div>
+              <div className="comp3-card-text">{cards[0].desc}</div>
+              {isAdmin() && onEditCard && (
+                <button onClick={(e) => { e.stopPropagation(); onEditCard(cards[0]); }}
+                  style={{ marginTop: '8px', padding: '4px 12px', border: '1px solid rgba(139,125,104,0.3)', background: '#fff', color: '#5D4E37', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  ✏️ 编辑
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -52,18 +61,24 @@ export function LoveCardsSection({ onSelectLove }: Props) {
           <div className="comp3-insert-item"><img src="images/leftLow.jpg" alt="" draggable={false} /></div>
           <div className="comp3-insert-item"><img src="images/rightLow.jpg" alt="" draggable={false} /></div>
         </div>
-        {LOVE_CARDS.length > 1 && (
+        {cards.length > 1 && (
           <div
             id="cardB"
             className="comp3-card comp3-card-b"
-            onClick={() => onSelectLove(LOVE_CARDS[1].id)}
+            onClick={() => onSelectLove(cards[1].id)}
           >
             <div className="comp3-card-upper">
-              <img src={LOVE_CARDS[1].imgSrc} alt={LOVE_CARDS[1].title} draggable={false} />
+              <img src={cards[1].imgSrc} alt={cards[1].title} draggable={false} />
             </div>
             <div className="comp3-card-lower">
-              <div className="comp3-card-title">{LOVE_CARDS[1].title}</div>
-              <div className="comp3-card-text">{LOVE_CARDS[1].desc}</div>
+              <div className="comp3-card-title">{cards[1].title}</div>
+              <div className="comp3-card-text">{cards[1].desc}</div>
+              {isAdmin() && onEditCard && (
+                <button onClick={(e) => { e.stopPropagation(); onEditCard(cards[1]); }}
+                  style={{ marginTop: '8px', padding: '4px 12px', border: '1px solid rgba(139,125,104,0.3)', background: '#fff', color: '#5D4E37', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  ✏️ 编辑
+                </button>
+              )}
             </div>
           </div>
         )}

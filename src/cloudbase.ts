@@ -10,6 +10,7 @@ let tcbDb: ReturnType<typeof app.database> | null = null;
 // ===== 数据库初始化（匿名登录，仅用于访问数据库） =====
 
 export async function initCloudBase() {
+  if (tcbReady && tcbDb) return;
   try {
     const auth = app.auth();
     const loginState = await auth.getLoginState();
@@ -351,8 +352,30 @@ export interface CommentDoc {
 export async function getComments(): Promise<CommentDoc[]> {
   if (!tcbReady || !tcbDb) return [];
   try {
-    const res = await tcbDb.collection('comments').orderBy('createdAt', 'desc').limit(500).get();
-    return (res.data || []) as CommentDoc[];
+    const res = await tcbDb.collection('comments').limit(1000).get();
+    const allDocs = (res.data || []) as any[];
+    // 提取标记文档
+    const deletedIds = new Set<string>();
+    const likeRecords: any[] = [];
+    for (const d of allDocs) {
+      if (d.type === '_deletion') deletedIds.add(d.commentId);
+      else if (d.type === '_like') likeRecords.push(d);
+    }
+    likeRecords.sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
+    // 计算点赞状态
+    const likeState = new Map<string, string>();
+    for (const a of likeRecords) likeState.set(`${a.commentId}:${a.userEmail}`, a.action);
+    // 过滤并计算
+    return allDocs
+      .filter(d => !d.type && !deletedIds.has(d._id))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .map(c => {
+        let likes = 0; const likedBy: string[] = [];
+        for (const [key, action] of likeState) {
+          if (key.startsWith(c._id + ':') && action === 'like') { likes++; likedBy.push(key.slice(c._id.length + 1)); }
+        }
+        return { ...c, likes, likedBy };
+      }) as CommentDoc[];
   } catch (err) {
     console.warn('[CloudBase] 获取评论失败:', err);
     return [];
@@ -397,12 +420,7 @@ export async function addComment(
 export async function deleteComment(commentId: string): Promise<boolean> {
   if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('comments').doc(commentId).remove();
-    // 同时删除该评论下的所有回复
-    const replies = await tcbDb.collection('comments').where({ parentId: commentId }).get();
-    for (const reply of (replies.data || [])) {
-      await tcbDb.collection('comments').doc(reply._id).remove();
-    }
+    await tcbDb.collection('comments').add({ type: '_deletion', commentId, timestamp: Date.now() });
     return true;
   } catch (err) {
     console.warn('[CloudBase] 删除评论失败:', err);
@@ -451,15 +469,29 @@ export async function setUserAsAdmin(targetEmail: string): Promise<boolean> {
 export async function toggleLike(commentId: string, userEmail: string): Promise<CommentDoc | null> {
   if (!tcbReady || !tcbDb) return null;
   try {
-    const res = await tcbDb.collection('comments').doc(commentId).get();
-    if (!res.data || res.data.length === 0) return null;
-    const doc = res.data[0] as CommentDoc;
-    const likedBy: string[] = doc.likedBy || [];
-    const already = likedBy.includes(userEmail);
-    const newLikedBy = already ? likedBy.filter((e) => e !== userEmail) : [...likedBy, userEmail];
-    const newLikes = already ? Math.max(0, (doc.likes || 0) - 1) : (doc.likes || 0) + 1;
-    await tcbDb.collection('comments').doc(commentId).update({ likes: newLikes, likedBy: newLikedBy });
-    return { ...doc, likes: newLikes, likedBy: newLikedBy };
+    // 查当前该用户对该评论的点赞状态
+    const existing = await tcbDb.collection('comments')
+      .where({ type: '_like', commentId, userEmail }).limit(50).get();
+    const records = ((existing.data || []) as any[]).sort((a: any, b: any) => (b.timestamp || 0) - (a.timestamp || 0));
+    const cur = records.length > 0 ? records[0].action : 'unlike';
+    // 添加新记录
+    await tcbDb.collection('comments').add({
+      type: '_like', commentId, userEmail,
+      action: cur === 'like' ? 'unlike' : 'like',
+      timestamp: Date.now(),
+    });
+    // 计算最新状态
+    const all = await tcbDb.collection('comments')
+      .where({ type: '_like', commentId }).limit(500).get();
+    const userMap = new Map<string, string>();
+    for (const a of ((all.data || []) as any[]).sort((x: any, y: any) => (x.timestamp || 0) - (y.timestamp || 0))) {
+      userMap.set(a.userEmail, a.action);
+    }
+    let likes = 0; const likedBy: string[] = [];
+    for (const [email, action] of userMap) {
+      if (action === 'like') { likes++; likedBy.push(email); }
+    }
+    return { _id: commentId, content: '', authorEmail: '', authorName: '', parentId: null, likes, likedBy, createdAt: 0 };
   } catch (err) {
     console.warn('[CloudBase] 点赞失败:', err);
     return null;
@@ -619,7 +651,7 @@ export async function getPrescriptionFor(cardId: string, ts: number): Promise<Pr
   } catch { return null; }
 }
 
-// ===== 管理员：用户管理 =====
+// ===== 管理员：用户管理（在 users 集合中写入 _admin_action 标记文档） =====
 
 interface UserRecord {
   _id: string;
@@ -637,82 +669,85 @@ export async function getAllUsers(): Promise<UserRecord[]> {
   if (!tcbReady || !tcbDb) return [];
   try {
     const res = await tcbDb.collection('users').limit(500).get();
-    return (res.data || []) as UserRecord[];
+    const allDocs = (res.data || []) as any[];
+    // 分离用户文档和管理操作标记
+    const users = allDocs.filter(d => d.type !== '_admin_action') as UserRecord[];
+    const actions = allDocs.filter(d => d.type === '_admin_action');
+    actions.sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
+    const emailState = new Map<string, { banned: boolean; mutedUntil: number | null }>();
+    for (const r of actions) {
+      const e = r.targetEmail; if (!e) continue;
+      let s = emailState.get(e) || { banned: false, mutedUntil: null as number | null };
+      if (r.action === 'ban') s = { banned: true, mutedUntil: null };
+      else if (r.action === 'mute') s = { banned: false, mutedUntil: r.mutedUntil || null };
+      else if (r.action === 'unban') s = { banned: false, mutedUntil: null };
+      emailState.set(e, s);
+    }
+    for (const u of users) {
+      const s = emailState.get(u.email);
+      if (s) {
+        if (s.mutedUntil && s.mutedUntil <= Date.now()) { s.banned = false; s.mutedUntil = null; }
+        u.banned = s.banned;
+        u.mutedUntil = s.mutedUntil ?? undefined;
+      }
+    }
+    return users;
   } catch { return []; }
 }
 
-/** 拉黑用户（永久禁止评论） */
+/** 拉黑用户 */
 export async function banUser(email: string): Promise<boolean> {
   if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
-    if (!res.data || res.data.length === 0) return false;
-    await tcbDb.collection('users').doc(res.data[0]._id).update({
-      banned: true,
-      mutedUntil: null,
-    });
+    await tcbDb.collection('users').add({ type: '_admin_action', action: 'ban', targetEmail: email, timestamp: Date.now() });
     return true;
-  } catch { return false; }
+  } catch (err) { console.error('[banUser] 失败:', err); return false; }
 }
 
-/** 禁言用户（1天后自动恢复） */
+/** 禁言用户 */
 export async function muteUser(email: string): Promise<boolean> {
   if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
-    if (!res.data || res.data.length === 0) return false;
-    await tcbDb.collection('users').doc(res.data[0]._id).update({
-      mutedUntil: Date.now() + 24 * 60 * 60 * 1000,
+    await tcbDb.collection('users').add({
+      type: '_admin_action', action: 'mute', targetEmail: email,
+      mutedUntil: Date.now() + 24 * 60 * 60 * 1000, timestamp: Date.now(),
     });
     return true;
-  } catch { return false; }
+  } catch (err) { console.error('[muteUser] 失败:', err); return false; }
 }
 
 /** 解除拉黑/禁言 */
 export async function unbanUser(email: string): Promise<boolean> {
   if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb!.collection('users').where({ email }).limit(1).get();
-    if (!res.data || res.data.length === 0) return false;
-    await tcbDb.collection('users').doc(res.data[0]._id).update({
-      banned: false,
-      mutedUntil: null,
-    });
+    await tcbDb.collection('users').add({ type: '_admin_action', action: 'unban', targetEmail: email, timestamp: Date.now() });
     return true;
-  } catch { return false; }
+  } catch (err) { console.error('[unbanUser] 失败:', err); return false; }
 }
 
-/** 检查当前用户是否可以评论，返回禁止原因 */
+/** 检查当前用户是否可以评论 */
 export async function checkCanComment(): Promise<{ ok: boolean; reason: string }> {
   const session = getSession();
   if (!session) return { ok: false, reason: '请先登录后再评论' };
   if (!tcbReady || !tcbDb) return { ok: true, reason: '' };
-
   try {
-    const res = await tcbDb!
-      .collection('users')
-      .where({ email: session.email })
-      .limit(1)
-      .get();
-    if (!res.data || res.data.length === 0) return { ok: true, reason: '' };
-
-    const user = res.data[0];
-    if (user.banned === true) return { ok: false, reason: '你已被管理员拉黑，无法发表评论' };
-
-    if (user.mutedUntil && user.mutedUntil > Date.now()) {
-      const remaining = Math.ceil((user.mutedUntil - Date.now()) / (60 * 60 * 1000));
-      return { ok: false, reason: `你已被管理员禁言，${remaining} 小时后恢复` };
+    const res = await tcbDb.collection('users').limit(500).get();
+    const records = ((res.data || []) as any[])
+      .filter((d: any) => d.type === '_admin_action' && d.targetEmail === session.email)
+      .sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
+    let banned = false; let mutedUntil: number | null = null;
+    for (const r of records) {
+      if (r.action === 'ban') { banned = true; mutedUntil = null; }
+      else if (r.action === 'mute') { banned = false; mutedUntil = r.mutedUntil || null; }
+      else if (r.action === 'unban') { banned = false; mutedUntil = null; }
     }
-
-    // 禁言到期自动清除
-    if (user.mutedUntil && user.mutedUntil <= Date.now()) {
-      await tcbDb.collection('users').doc(user._id).update({ mutedUntil: null });
+    if (mutedUntil && mutedUntil <= Date.now()) { banned = false; mutedUntil = null; }
+    if (banned) return { ok: false, reason: '你已被管理员拉黑，无法发表评论' };
+    if (mutedUntil && mutedUntil > Date.now()) {
+      return { ok: false, reason: `你已被管理员禁言，${Math.ceil((mutedUntil - Date.now()) / 3600000)} 小时后恢复` };
     }
-
     return { ok: true, reason: '' };
-  } catch {
-    return { ok: true, reason: '' };
-  }
+  } catch { return { ok: true, reason: '' }; }
 }
 
 // ===== 申诉 =====
@@ -859,6 +894,73 @@ export async function getPublicProfile(email: string): Promise<PublicProfile | n
       createdAt: user.createdAt,
     };
   } catch { return null; }
+}
+
+// ===== 管理员：卡片管理（保存在 users 集合 _card_data 标记文档中） =====
+
+export interface CardRecord {
+  id: string;
+  emoji: string;
+  badge: string;
+  stars: number;
+  reviews: string;
+  title: string;
+  desc: string;
+  imgSrc: string;
+  slideClass: string;
+  isLove?: boolean;
+}
+
+export async function saveCard(card: CardRecord): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('users').add({
+      type: '_card_data', action: 'save',
+      cardId: card.id, cardData: card,
+      timestamp: Date.now(),
+    });
+    return true;
+  } catch (err) { console.error('[saveCard] 失败:', err); return false; }
+}
+
+export async function deleteCard(cardId: string): Promise<boolean> {
+  if (!tcbReady || !tcbDb) return false;
+  try {
+    await tcbDb.collection('users').add({
+      type: '_card_data', action: 'delete',
+      cardId, timestamp: Date.now(),
+    });
+    return true;
+  } catch (err) { console.error('[deleteCard] 失败:', err); return false; }
+}
+
+/** 从 CloudBase 加载管理员编辑过的卡片数据，合并到静态卡片列表 */
+export async function loadCardEdits<T extends { id: string }>(baseCards: T[]): Promise<{ cards: T[]; deletedIds: Set<string> }> {
+  if (!tcbReady || !tcbDb) return { cards: baseCards, deletedIds: new Set() };
+  try {
+    const res = await tcbDb.collection('users').limit(2000).get();
+    const actions = ((res.data || []) as any[])
+      .filter((d: any) => d.type === '_card_data')
+      .sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
+    const deletedIds = new Set<string>();
+    const cardMap = new Map<string, any>();
+    for (const a of actions) {
+      if (a.action === 'delete') {
+        deletedIds.add(a.cardId);
+        cardMap.delete(a.cardId);
+      } else if (a.action === 'save' && a.cardData) {
+        cardMap.set(a.cardId, a.cardData);
+        deletedIds.delete(a.cardId);
+      }
+    }
+    // 合并：baseCards 中用编辑版覆盖，去掉已删除的
+    const baseMap = new Map(baseCards.map(c => [c.id, c]));
+    for (const [id, data] of cardMap) {
+      baseMap.set(id, { ...baseMap.get(id), ...data, id } as any);
+    }
+    const cards = [...baseMap.values()].filter(c => !deletedIds.has(c.id));
+    return { cards, deletedIds };
+  } catch { return { cards: baseCards, deletedIds: new Set() }; }
 }
 
 export type { ConsultationRecord, PrescriptionRecord, UserRecord, AppealRecord };

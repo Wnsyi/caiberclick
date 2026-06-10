@@ -34,7 +34,7 @@ export function ProfilePage() {
   // 游客编辑资料弹提示
   const [profileOpen, setProfileOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
-  const [testRecordsOpen, setTestRecordsOpen] = useState(true);
+  const [testRecordsOpen, setTestRecordsOpen] = useState(false);
 
   // 管理员：用户管理
   const admin = isAdmin();
@@ -224,11 +224,11 @@ export function ProfilePage() {
   return (
     <div className="page active" id="page-profile" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#faf7f2' }}>
       {/* 顶栏 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid rgba(139,125,104,0.12)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
-        <h2 style={{ fontFamily: "'Ma Shan Zheng','KaiTi',cursive", fontSize: '1.4rem', color: '#5D4E37', margin: 0 }}>👤 我的</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 24px', borderBottom: '1px solid rgba(139,125,104,0.12)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => dispatch({ type: 'GO_HOME' })} style={{ background: 'rgba(139,125,104,0.08)', border: 'none', borderRadius: '0', padding: '8px 16px', cursor: 'pointer', fontSize: '0.9rem', color: '#5D4E37' }}>
           ✕ 返回
         </button>
+        <h2 style={{ fontFamily: "'Ma Shan Zheng','KaiTi',cursive", fontSize: '1.4rem', color: '#5D4E37', margin: 0 }}>👤 我的</h2>
       </div>
 
       <div style={{ flex: 1, padding: '24px', maxWidth: '640px', margin: '0 auto', width: '100%' }}>
@@ -342,7 +342,6 @@ export function ProfilePage() {
 
         {/* ===== 测试记录 ===== */}
         <details
-          open
           onToggle={(e) => setTestRecordsOpen((e.target as HTMLDetailsElement).open)}
           style={{
             background: '#fff', borderRadius: '0', padding: '24px',

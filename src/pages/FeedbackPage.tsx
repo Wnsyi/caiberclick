@@ -146,11 +146,11 @@ export function FeedbackPage() {
   return (
     <div className="page active" id="page-feedback" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#faf7f2' }}>
       {/* 顶栏 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid rgba(139,125,104,0.12)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
-        <h2 style={{ fontFamily: "'Ma Shan Zheng','KaiTi',cursive", fontSize: '1.4rem', color: '#5D4E37', margin: 0 }}>💬 意见反馈</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 24px', borderBottom: '1px solid rgba(139,125,104,0.12)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => dispatch({ type: 'SET_PAGE', page: 'page-home' })} style={{ background: 'rgba(139,125,104,0.08)', border: 'none', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '0.9rem', color: '#5D4E37' }}>
           ✕ 返回
         </button>
+        <h2 style={{ fontFamily: "'Ma Shan Zheng','KaiTi',cursive", fontSize: '1.4rem', color: '#5D4E37', margin: 0 }}>💬 意见反馈</h2>
       </div>
 
       {/* 输入区 */}

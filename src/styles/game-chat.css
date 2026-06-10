@@ -25,7 +25,7 @@
 
 /* 系统横幅 */
 .system-banner{
-  position:fixed;top:78px;right:113px;
+  position:fixed;top:50%;left:calc(20px + 3cm);transform:translateY(-50%);
   z-index:20;max-width:340px;width:auto;
   padding:18px 14px 12px;
   background:rgba(255,255,255,0.35);
