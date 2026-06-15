@@ -1,7 +1,0 @@
-{
-  "name": "aiProxy",
-  "version": "1.0.0",
-  "description": "AI API proxy for CaiberClick (CloudBase cloud function)",
-  "main": "index.js",
-  "dependencies": {}
-}

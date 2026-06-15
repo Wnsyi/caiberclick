@@ -1,40 +1,16 @@
-import cloudbase from '@cloudbase/js-sdk';
+// 数据库 API 模块
+// 通过 REST API 与 Express 服务器通信，替代 CloudBase SDK
 
-const ENV_ID = import.meta.env.VITE_CLOUDBASE_ENV_ID || 'game-one-d1gx1gwhbee34fff7';
-
-export const app = cloudbase.init({ env: ENV_ID });
-
-let tcbReady = false;
-let tcbDb: ReturnType<typeof app.database> | null = null;
-
-// ===== 数据库初始化（匿名登录，仅用于访问数据库） =====
-
-export async function initCloudBase() {
-  if (tcbReady && tcbDb) return;
-  try {
-    const auth = app.auth();
-    const loginState = await auth.getLoginState();
-    if (!loginState) {
-      await auth.signInAnonymously();
-    }
-    tcbDb = app.database();
-    tcbReady = true;
-  } catch (err) {
-    console.warn('[CloudBase] 初始化失败:', err);
-  }
-}
-
-// ===== 密码哈希（SHA-256，客户端加盐） =====
-
-const SALT_PREFIX = 'caiber_salt_';
+// ===== 密码哈希（SHA-256，客户端加盐，与服务端一致） =====
+const SALT_PREFIX = "caiber_salt_";
 
 async function hashPassword(password: string): Promise<string> {
   const salted = SALT_PREFIX + password;
   const encoder = new TextEncoder();
   const data = encoder.encode(salted);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 // ===== 会话管理（localStorage） =====
@@ -46,7 +22,7 @@ interface Session {
   isAdmin?: boolean;
 }
 
-const SESSION_KEY = 'caiber_session';
+const SESSION_KEY = "caiber_session";
 
 export function getSession(): Session | null {
   try {
@@ -66,74 +42,79 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+// ===== HTTP 帮助函数 =====
+
+function getAuthHeaders(): Record<string, string> {
+  const session = getSession();
+  if (session?.token) {
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.token}`,
+    };
+  }
+  return { "Content-Type": "application/json" };
+}
+
+async function apiFetch<T = any>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error((errData as any).error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// 用于兼容旧代码：初始化不再需要匿名登录，但保留函数
+let ready = true;
+
+export async function initCloudBase() {
+  if (ready) return;
+  const session = getSession();
+  if (session?.token) {
+    // 验证会话是否仍然有效
+    try {
+      const data = await apiFetch<{ session: Session | null }>(
+        `/api/auth/session?t=${Date.now()}`,
+        { headers: { Authorization: `Bearer ${session.token}` } }
+      );
+      if (data.session) {
+        saveSession(data.session);
+      } else {
+        clearSession();
+      }
+    } catch {
+      // 网络错误不踢用户
+    }
+  }
+  ready = true;
+}
+
 // ===== 注册 =====
 
 export async function register(
   email: string,
   username: string,
-  password: string,
+  password: string
 ): Promise<{ success: boolean; error?: string }> {
-  if (!tcbReady || !tcbDb) {
-    await initCloudBase();
-    if (!tcbReady || !tcbDb) {
-      return { success: false, error: '数据库未就绪，请刷新页面后重试' };
-    }
-  }
-
   try {
-    // 1. 查询数据库中是否已有该邮箱
-    const existing = await tcbDb!
-      .collection('users')
-      .where({ email: email.toLowerCase() })
-      .limit(1)
-      .get();
-
-    if (existing.data && existing.data.length > 0) {
-      return { success: false, error: '该邮箱已被注册，请直接登录' };
-    }
-
-    // 1.5 禁止使用管理员作为用户名
-    const blockedNames = ['管理员', 'admin', 'Admin', 'ADMIN', '管理', '版主', 'moderator', 'Moderator'];
-    if (blockedNames.includes(username.trim())) {
-      return { success: false, error: '该用户名不可使用，请换一个' };
-    }
-
-    // 2. 哈希密码 + 生成 session token
     const hashedPwd = await hashPassword(password);
-    const token = crypto.randomUUID();
-
-    // 3. 存入数据库
-    const isAdminUser = email.toLowerCase() === '1111@qq.com';
-    await tcbDb.collection('users').add({
-      name: isAdminUser ? '管理员' : username,
-      email: email.toLowerCase(),
-      username: isAdminUser ? '管理员' : username,
-      password: hashedPwd,
-      token,
-      isAdmin: isAdminUser,
-      createdAt: Date.now(),
-      lastLoginAt: Date.now(),
-      loginCount: 1,
+    const data = await apiFetch<{
+      success: boolean;
+      error?: string;
+      session?: Session;
+    }>("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, username, password: hashedPwd }),
     });
 
-    // 4. 写入本地会话
-    saveSession({
-      email: email.toLowerCase(),
-      username: isAdminUser ? '管理员' : username,
-      token,
-      isAdmin: isAdminUser,
-    });
-
-    console.log('[CloudBase] 注册成功:', email);
-    return { success: true };
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : '注册失败';
-    const code = (err as any)?.code || '';
-    console.error('[CloudBase] 注册失败 — 完整错误:', err);
-    if (code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('unauthorized')) {
-      return { success: false, error: '数据库权限不足。请去 CloudBase 控制台 → 数据库 → 安全规则 → 设为「所有用户可读写」' };
+    if (data.success && data.session) {
+      saveSession(data.session);
+      return { success: true };
     }
-    return { success: false, error: msg || '注册失败，请稍后重试' };
+    return { success: false, error: data.error || "注册失败" };
+  } catch (err: any) {
+    return { success: false, error: err.message || "注册失败，请稍后重试" };
   }
 }
 
@@ -141,149 +122,68 @@ export async function register(
 
 export async function login(
   email: string,
-  password: string,
+  password: string
 ): Promise<{ success: boolean; error?: string }> {
-  if (!tcbReady || !tcbDb) {
-    await initCloudBase();
-    if (!tcbReady || !tcbDb) {
-      return { success: false, error: '数据库未就绪，请刷新页面后重试' };
-    }
-  }
-
   try {
-    // 1. 查询数据库中是否有该邮箱
-    const res = await tcbDb!
-      .collection('users')
-      .where({ email: email.toLowerCase() })
-      .limit(1)
-      .get();
-
-    if (!res.data || res.data.length === 0) {
-      return { success: false, error: '该邮箱尚未注册，请先注册' };
-    }
-
-    const user = res.data[0];
-
-    // 2. 验证密码
     const hashedInput = await hashPassword(password);
-    if (user.password !== hashedInput) {
-      return { success: false, error: '密码错误，请重试' };
-    }
-
-    // 3. 生成新 token 并更新数据库
-    const token = crypto.randomUUID();
-    await tcbDb.collection('users').doc(user._id).update({
-      token,
-      lastLoginAt: Date.now(),
-      loginCount: (user.loginCount || 0) + 1,
+    const data = await apiFetch<{
+      success: boolean;
+      error?: string;
+      session?: Session;
+    }>("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password: hashedInput }),
     });
 
-    // 4. 自动将管理员邮箱用户设为管理员，非管理员邮箱则清除
-    let adminFlag = user.isAdmin === true;
-    const adminEmail = (user.email || '').toLowerCase();
-    if (adminEmail === '1111@qq.com') {
-      if (!adminFlag) {
-        await tcbDb!.collection('users').doc(user._id).update({
-          isAdmin: true,
-          username: '管理员',
-          name: '管理员',
-        });
-        adminFlag = true;
-        user.username = '管理员';
-      }
-    } else if (adminFlag || user.username === '管理员' || user.name === '管理员') {
-      // 非管理员邮箱但数据库有管理员标记 → 清除
-      await tcbDb!.collection('users').doc(user._id).update({
-        isAdmin: false,
-        username: user.email.split('@')[0],
-        name: user.email.split('@')[0],
-      });
-      adminFlag = false;
-      user.username = user.email.split('@')[0];
+    if (data.success && data.session) {
+      saveSession(data.session);
+      return { success: true };
     }
-
-    // 5. 写入本地会话
-    saveSession({
-      email: email.toLowerCase(),
-      username: user.username || email,
-      token,
-      isAdmin: adminFlag,
-    });
-
-    console.log('[CloudBase] 登录成功:', email, user.isAdmin ? '(管理员)' : '');
-    return { success: true };
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : '登录失败';
-    const code = (err as any)?.code || '';
-    console.error('[CloudBase] 登录失败 — 完整错误:', err);
-    if (code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('unauthorized')) {
-      return { success: false, error: '数据库权限不足。请去 CloudBase 控制台 → 数据库 → 安全规则 → 设为「所有用户可读写」' };
-    }
-    return { success: false, error: msg || '登录失败，请稍后重试' };
+    return { success: false, error: data.error || "登录失败" };
+  } catch (err: any) {
+    return { success: false, error: err.message || "登录失败，请稍后重试" };
   }
 }
 
-// ===== 验证会话（页面刷新时自动登录） =====
+// ===== 验证会话 =====
 
 export async function validateSession(): Promise<Session | null> {
   const session = getSession();
-  if (!session || !session.email || !session.token) return null;
-  if (!tcbReady || !tcbDb) return null;
+  if (!session?.email || !session?.token) return null;
 
   try {
-    const res = await tcbDb
-      .collection('users')
-      .where({ email: session.email })
-      .limit(1)
-      .get();
-
-    if (!res.data || res.data.length === 0) {
-      clearSession();
-      return null;
+    const data = await apiFetch<{ session: Session | null }>(
+      `/api/auth/session?t=${Date.now()}`,
+      { headers: { Authorization: `Bearer ${session.token}` } }
+    );
+    if (data.session) {
+      saveSession(data.session);
+      return data.session;
     }
-
-    const user = res.data[0];
-    if (user.token !== session.token) {
-      clearSession();
-      return null;
-    }
-
-    // Token 有效 → 更新会话中的 username（可能已变更）
-    const updated: Session = {
-      email: session.email,
-      username: user.username || session.email,
-      token: session.token,
-      isAdmin: user.isAdmin === true,
-    };
-    saveSession(updated);
-    return updated;
+    clearSession();
+    return null;
   } catch {
-    // 查询失败不踢用户，信任本地会话
-    return session;
+    return session; // 网络错误信任本地
   }
 }
 
 // ===== 退出登录 =====
 
 export async function logout() {
-  const session = getSession();
-  if (session && tcbReady && tcbDb) {
-    try {
-      const res = await tcbDb
-        .collection('users')
-        .where({ email: session.email })
-        .limit(1)
-        .get();
-      if (res.data && res.data.length > 0) {
-        // 清空数据库中的 token（使该设备下线）
-        await tcbDb.collection('users').doc(res.data[0]._id).update({ token: '' });
-      }
-    } catch (err) {
-      console.warn('[CloudBase] 清除 token 失败:', err);
+  try {
+    const session = getSession();
+    if (session?.token) {
+      await apiFetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({ token: session.token }),
+      });
     }
+  } catch (err) {
+    console.warn("[API] 清除 token 失败:", err);
   }
   clearSession();
-  console.log('[CloudBase] 已退出登录');
 }
 
 // ===== 更新用户资料 =====
@@ -291,49 +191,27 @@ export async function logout() {
 export async function updateProfile(username: string, bio: string): Promise<boolean> {
   const session = getSession();
   if (!session) return false;
-  await initCloudBase();
-  if (!tcbReady || !tcbDb) return false;
-  // 禁止空用户名和敏感用户名（管理员可保留自己的名字）
-  const blocked = ['admin', 'Admin', 'ADMIN', '管理', '版主', 'moderator', 'Moderator'];
+
+  // 禁止敏感用户名
+  const blocked = ["admin", "Admin", "ADMIN", "管理", "版主", "moderator", "Moderator"];
   if (!username.trim()) return false;
   if (!session.isAdmin && blocked.includes(username.trim())) return false;
+
   try {
-    const res = await tcbDb!
-      .collection('users')
-      .where({ email: session.email })
-      .limit(1)
-      .get();
-    if (!res.data || res.data.length === 0) return false;
-    await tcbDb.collection('users').doc(res.data[0]._id).update({
-      username,
-      name: username,
-      avatar: localStorage.getItem(`caiber_avatar_${session.email}`) || '😶',
+    await apiFetch("/api/users/profile", {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ username, bio }),
     });
-    // 同步更新该用户所有评论的用户名
-    const oldComments = await tcbDb!
-      .collection('comments')
-      .where({ authorEmail: session.email })
-      .limit(500)
-      .get();
-    for (const c of (oldComments.data || [])) {
-      if (c.authorName !== username) {
-        await tcbDb!.collection('comments').doc(c._id).update({ authorName: username });
-      }
-    }
-    // 更新本地 session
     session.username = username;
     saveSession(session);
-    // 同时存 localStorage 的 bio
     localStorage.setItem(`caiber_bio_${session.email}`, bio);
-    console.log('[CloudBase] 资料已更新:', username);
     return true;
   } catch (err) {
-    console.warn('[CloudBase] 更新资料失败:', err);
+    console.warn("[API] 更新资料失败:", err);
     return false;
   }
 }
-
-// ===== 以下不变 =====
 
 // ===== 评论区 =====
 
@@ -342,191 +220,120 @@ export interface CommentDoc {
   content: string;
   authorEmail: string;
   authorName: string;
-  parentId: string | null;  // null = 顶层评论, string = 回复某条评论
+  parentId: string | null;
   likes: number;
   likedBy: string[];
   createdAt: number;
 }
 
-/** 获取所有评论 */
 export async function getComments(): Promise<CommentDoc[]> {
-  if (!tcbReady || !tcbDb) return [];
   try {
-    const res = await tcbDb.collection('comments').limit(1000).get();
-    const allDocs = (res.data || []) as any[];
-    // 提取标记文档
-    const deletedIds = new Set<string>();
-    const likeRecords: any[] = [];
-    for (const d of allDocs) {
-      if (d.type === '_deletion') deletedIds.add(d.commentId);
-      else if (d.type === '_like') likeRecords.push(d);
-    }
-    likeRecords.sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
-    // 计算点赞状态
-    const likeState = new Map<string, string>();
-    for (const a of likeRecords) likeState.set(`${a.commentId}:${a.userEmail}`, a.action);
-    // 过滤并计算
-    return allDocs
-      .filter(d => !d.type && !deletedIds.has(d._id))
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-      .map(c => {
-        let likes = 0; const likedBy: string[] = [];
-        for (const [key, action] of likeState) {
-          if (key.startsWith(c._id + ':') && action === 'like') { likes++; likedBy.push(key.slice(c._id.length + 1)); }
-        }
-        return { ...c, likes, likedBy };
-      }) as CommentDoc[];
+    return await apiFetch<CommentDoc[]>("/api/comments");
   } catch (err) {
-    console.warn('[CloudBase] 获取评论失败:', err);
+    console.warn("[API] 获取评论失败:", err);
     return [];
   }
 }
 
-/** 发表评论或回复 */
 export async function addComment(
   content: string,
   authorEmail: string,
   authorName: string,
-  parentId: string | null,
+  parentId: string | null
 ): Promise<CommentDoc | null> {
-  if (!tcbReady || !tcbDb) return null;
   try {
-    const res = await tcbDb.collection('comments').add({
-      content,
-      authorEmail,
-      authorName,
-      parentId,
-      likes: 0,
-      likedBy: [],
-      createdAt: Date.now(),
+    return await apiFetch<CommentDoc>("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, authorEmail, authorName, parentId }),
     });
-    return {
-      _id: res.id || '',
-      content,
-      authorEmail,
-      authorName,
-      parentId,
-      likes: 0,
-      likedBy: [],
-      createdAt: Date.now(),
-    };
   } catch (err) {
-    console.warn('[CloudBase] 发表评论失败:', err);
+    console.warn("[API] 发表评论失败:", err);
     return null;
   }
 }
 
-/** 删除评论（作者或管理员可删） */
 export async function deleteComment(commentId: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('comments').add({ type: '_deletion', commentId, timestamp: Date.now() });
+    await apiFetch(`/api/comments/${commentId}`, { method: "DELETE" });
     return true;
   } catch (err) {
-    console.warn('[CloudBase] 删除评论失败:', err);
+    console.warn("[API] 删除评论失败:", err);
     return false;
   }
 }
 
-/** 检查当前用户是否为管理员 */
 export function isAdmin(): boolean {
   const session = getSession();
   return session?.isAdmin === true;
 }
 
-// 暴露到全局，方便一次性设置管理员的同学在控制台调用
+// 暴露到全局
 (window as any).__setAdmin = async (email: string) => {
-  await initCloudBase();
-  const ok = await setUserAsAdmin(email);
-  if (ok) alert('管理员设置成功！请重新登录。');
-  else alert('设置失败，请检查邮箱是否正确。');
+  try {
+    await apiFetch("/api/users/set-admin", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email }),
+    });
+    alert("管理员设置成功！请重新登录。");
+  } catch {
+    alert("设置失败，请检查邮箱是否正确。");
+  }
 };
 
-/** 将指定邮箱的用户设为管理员并改名为"管理员"（仅管理员可调用） */
 export async function setUserAsAdmin(targetEmail: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb!
-      .collection('users')
-      .where({ email: targetEmail.toLowerCase() })
-      .limit(1)
-      .get();
-    if (!res.data || res.data.length === 0) return false;
-    await tcbDb.collection('users').doc(res.data[0]._id).update({
-      isAdmin: true,
-      username: '管理员',
-      name: '管理员',
+    await apiFetch("/api/users/set-admin", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email: targetEmail.toLowerCase() }),
     });
-    console.log('[CloudBase] 已设置管理员:', targetEmail);
     return true;
-  } catch (err) {
-    console.warn('[CloudBase] 设置管理员失败:', err);
+  } catch {
     return false;
   }
 }
 
-/** 点赞/取消点赞 */
-export async function toggleLike(commentId: string, userEmail: string): Promise<CommentDoc | null> {
-  if (!tcbReady || !tcbDb) return null;
+export async function toggleLike(
+  commentId: string,
+  userEmail: string
+): Promise<CommentDoc | null> {
   try {
-    // 查当前该用户对该评论的点赞状态
-    const existing = await tcbDb.collection('comments')
-      .where({ type: '_like', commentId, userEmail }).limit(50).get();
-    const records = ((existing.data || []) as any[]).sort((a: any, b: any) => (b.timestamp || 0) - (a.timestamp || 0));
-    const cur = records.length > 0 ? records[0].action : 'unlike';
-    // 添加新记录
-    await tcbDb.collection('comments').add({
-      type: '_like', commentId, userEmail,
-      action: cur === 'like' ? 'unlike' : 'like',
-      timestamp: Date.now(),
+    return await apiFetch<CommentDoc>(`/api/comments/${commentId}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userEmail }),
     });
-    // 计算最新状态
-    const all = await tcbDb.collection('comments')
-      .where({ type: '_like', commentId }).limit(500).get();
-    const userMap = new Map<string, string>();
-    for (const a of ((all.data || []) as any[]).sort((x: any, y: any) => (x.timestamp || 0) - (y.timestamp || 0))) {
-      userMap.set(a.userEmail, a.action);
-    }
-    let likes = 0; const likedBy: string[] = [];
-    for (const [email, action] of userMap) {
-      if (action === 'like') { likes++; likedBy.push(email); }
-    }
-    return { _id: commentId, content: '', authorEmail: '', authorName: '', parentId: null, likes, likedBy, createdAt: 0 };
   } catch (err) {
-    console.warn('[CloudBase] 点赞失败:', err);
+    console.warn("[API] 点赞失败:", err);
     return null;
   }
 }
 
+// ===== 体验卡计数 =====
+
 export async function getCardCounts(): Promise<Record<string, number>> {
-  if (!tcbReady || !tcbDb) return {};
   try {
-    const res = await tcbDb.collection('card_counters').limit(1000).get();
-    const counts: Record<string, number> = {};
-    if (res.data) {
-      for (const doc of res.data) {
-        const cid = doc.cardId;
-        if (cid) counts[cid] = (counts[cid] || 0) + 1;
-      }
-    }
-    return counts;
-  } catch (err) {
-    console.warn('[CloudBase] 读取计数失败:', err);
+    return await apiFetch<Record<string, number>>("/api/card-counts");
+  } catch {
     return {};
   }
 }
 
 export async function incrementCardCount(cardId: string) {
-  if (!tcbReady || !tcbDb) return;
   try {
-    await tcbDb.collection('card_counters').add({
-      cardId,
-      timestamp: Date.now(),
+    await apiFetch("/api/card-counts/increment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId }),
     });
   } catch (err) {
-    console.warn('[CloudBase] 更新计数失败:', err);
+    console.warn("[API] 更新计数失败:", err);
   }
 }
+
+// ===== 问诊记录 =====
 
 export async function saveConsultation(data: {
   cardId: string;
@@ -536,21 +343,16 @@ export async function saveConsultation(data: {
   persona?: string;
 }) {
   const session = getSession();
-  if (!session) return; // 游客不保存
+  if (!session) return;
 
-  const record = {
-    ...data,
-    userEmail: session.email,
-    username: session.username,
-    timestamp: Date.now(),
-  };
-
-  if (!tcbReady || !tcbDb) return;
   try {
-    await tcbDb.collection('consultations').add(record);
-    console.log('[CloudBase] 问诊记录已保存');
-  } catch (err: unknown) {
-    console.warn('[CloudBase] 保存问诊失败:', err instanceof Error ? err.message : err);
+    await apiFetch("/api/consultations", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+  } catch (err: any) {
+    console.warn("[API] 保存问诊失败:", err.message);
   }
 }
 
@@ -565,21 +367,16 @@ export async function savePrescription(data: {
   advice: string;
 }) {
   const session = getSession();
-  if (!session) return; // 游客不保存
+  if (!session) return;
 
-  const record = {
-    ...data,
-    userEmail: session.email,
-    username: session.username,
-    timestamp: Date.now(),
-  };
-
-  if (!tcbReady || !tcbDb) return;
   try {
-    await tcbDb.collection('prescriptions').add(record);
-    console.log('[CloudBase] 处方数据已保存');
-  } catch (err: unknown) {
-    console.warn('[CloudBase] 保存处方失败:', err instanceof Error ? err.message : err);
+    await apiFetch("/api/prescriptions", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+  } catch (err: any) {
+    console.warn("[API] 保存处方失败:", err.message);
   }
 }
 
@@ -594,6 +391,7 @@ interface ConsultationRecord {
   userEmail: string;
   username: string;
   timestamp: number;
+  _id?: string;
 }
 
 interface PrescriptionRecord {
@@ -610,62 +408,43 @@ interface PrescriptionRecord {
   timestamp: number;
 }
 
-/** 从 CloudBase 拉取当前登录用户的问诊记录 */
 export async function getMyConsultations(): Promise<ConsultationRecord[]> {
-  const session = getSession();
-  if (!session || !tcbReady || !tcbDb) return [];
-
   try {
-    const [cmtRes, delRes] = await Promise.all([
-      tcbDb!.collection('consultations').where({ userEmail: session.email }).orderBy('timestamp', 'desc').limit(200).get(),
-      tcbDb!.collection('users').limit(1000).get(),
-    ]);
-    const deletedIds = new Set((delRes.data || []).filter((d: any) => d.type === '_consultation_deletion' && d.userEmail === session.email).map((d: any) => d.consultationId));
-    return ((cmtRes.data || []) as ConsultationRecord[]).filter(c => !deletedIds.has((c as any)._id));
+    return await apiFetch<ConsultationRecord[]>("/api/consultations", {
+      headers: getAuthHeaders(),
+    });
   } catch {
     return [];
   }
 }
 
-/** 删除问诊记录 */
 export async function deleteConsultation(consultationId: string): Promise<boolean> {
-  const session = getSession();
-  if (!session || !tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('users').add({
-      type: '_consultation_deletion',
-      consultationId,
-      userEmail: session.email,
-      timestamp: Date.now(),
+    await apiFetch(`/api/consultations/${consultationId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
     });
     return true;
-  } catch (err) { console.error('[deleteConsultation] 失败:', err); return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 根据 cardId + 时间范围 查处方 */
-export async function getPrescriptionFor(cardId: string, ts: number): Promise<PrescriptionRecord | null> {
-  const session = getSession();
-  if (!session || !tcbReady || !tcbDb) return null;
-
+export async function getPrescriptionFor(
+  cardId: string,
+  ts: number
+): Promise<PrescriptionRecord | null> {
   try {
-    const res = await tcbDb!
-      .collection('prescriptions')
-      .where({ userEmail: session.email, cardId })
-      .orderBy('timestamp', 'desc')
-      .limit(50)
-      .get();
-    const list: PrescriptionRecord[] = (res.data || []) as PrescriptionRecord[];
-    let best: PrescriptionRecord | null = null;
-    let minDiff = 5000;
-    for (const p of list) {
-      const diff = Math.abs(p.timestamp - ts);
-      if (diff < minDiff) { minDiff = diff; best = p; }
-    }
-    return best;
-  } catch { return null; }
+    return await apiFetch<PrescriptionRecord | null>(
+      `/api/prescriptions/${cardId}?ts=${ts}`,
+      { headers: getAuthHeaders() }
+    );
+  } catch {
+    return null;
+  }
 }
 
-// ===== 管理员：用户管理（在 users 集合中写入 _admin_action 标记文档） =====
+// ===== 管理员：用户管理 =====
 
 interface UserRecord {
   _id: string;
@@ -678,90 +457,64 @@ interface UserRecord {
   createdAt?: number;
 }
 
-/** 获取所有用户列表（管理员用） */
 export async function getAllUsers(): Promise<UserRecord[]> {
-  if (!tcbReady || !tcbDb) return [];
   try {
-    const res = await tcbDb.collection('users').limit(500).get();
-    const allDocs = (res.data || []) as any[];
-    // 分离用户文档和管理操作标记
-    const users = allDocs.filter(d => d.type !== '_admin_action') as UserRecord[];
-    const actions = allDocs.filter(d => d.type === '_admin_action');
-    actions.sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
-    const emailState = new Map<string, { banned: boolean; mutedUntil: number | null }>();
-    for (const r of actions) {
-      const e = r.targetEmail; if (!e) continue;
-      let s = emailState.get(e) || { banned: false, mutedUntil: null as number | null };
-      if (r.action === 'ban') s = { banned: true, mutedUntil: null };
-      else if (r.action === 'mute') s = { banned: false, mutedUntil: r.mutedUntil || null };
-      else if (r.action === 'unban') s = { banned: false, mutedUntil: null };
-      emailState.set(e, s);
-    }
-    for (const u of users) {
-      const s = emailState.get(u.email);
-      if (s) {
-        if (s.mutedUntil && s.mutedUntil <= Date.now()) { s.banned = false; s.mutedUntil = null; }
-        u.banned = s.banned;
-        u.mutedUntil = s.mutedUntil ?? undefined;
-      }
-    }
-    return users;
-  } catch { return []; }
+    return await apiFetch<UserRecord[]>("/api/users", { headers: getAuthHeaders() });
+  } catch {
+    return [];
+  }
 }
 
-/** 拉黑用户 */
 export async function banUser(email: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('users').add({ type: '_admin_action', action: 'ban', targetEmail: email, timestamp: Date.now() });
-    return true;
-  } catch (err) { console.error('[banUser] 失败:', err); return false; }
-}
-
-/** 禁言用户 */
-export async function muteUser(email: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
-  try {
-    await tcbDb.collection('users').add({
-      type: '_admin_action', action: 'mute', targetEmail: email,
-      mutedUntil: Date.now() + 24 * 60 * 60 * 1000, timestamp: Date.now(),
+    await apiFetch("/api/users/ban", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email }),
     });
     return true;
-  } catch (err) { console.error('[muteUser] 失败:', err); return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 解除拉黑/禁言 */
-export async function unbanUser(email: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
+export async function muteUser(email: string): Promise<boolean> {
   try {
-    await tcbDb.collection('users').add({ type: '_admin_action', action: 'unban', targetEmail: email, timestamp: Date.now() });
+    await apiFetch("/api/users/mute", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email }),
+    });
     return true;
-  } catch (err) { console.error('[unbanUser] 失败:', err); return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 检查当前用户是否可以评论 */
+export async function unbanUser(email: string): Promise<boolean> {
+  try {
+    await apiFetch("/api/users/unban", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email }),
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function checkCanComment(): Promise<{ ok: boolean; reason: string }> {
   const session = getSession();
-  if (!session) return { ok: false, reason: '请先登录后再评论' };
-  if (!tcbReady || !tcbDb) return { ok: true, reason: '' };
+  if (!session) return { ok: false, reason: "请先登录后再评论" };
   try {
-    const res = await tcbDb.collection('users').limit(500).get();
-    const records = ((res.data || []) as any[])
-      .filter((d: any) => d.type === '_admin_action' && d.targetEmail === session.email)
-      .sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
-    let banned = false; let mutedUntil: number | null = null;
-    for (const r of records) {
-      if (r.action === 'ban') { banned = true; mutedUntil = null; }
-      else if (r.action === 'mute') { banned = false; mutedUntil = r.mutedUntil || null; }
-      else if (r.action === 'unban') { banned = false; mutedUntil = null; }
-    }
-    if (mutedUntil && mutedUntil <= Date.now()) { banned = false; mutedUntil = null; }
-    if (banned) return { ok: false, reason: '你已被管理员拉黑，无法发表评论' };
-    if (mutedUntil && mutedUntil > Date.now()) {
-      return { ok: false, reason: `你已被管理员禁言，${Math.ceil((mutedUntil - Date.now()) / 3600000)} 小时后恢复` };
-    }
-    return { ok: true, reason: '' };
-  } catch { return { ok: true, reason: '' }; }
+    return await apiFetch<{ ok: boolean; reason: string }>(
+      `/api/comments/check?t=${Date.now()}`,
+      { headers: getAuthHeaders() }
+    );
+  } catch {
+    return { ok: true, reason: "" };
+  }
 }
 
 // ===== 申诉 =====
@@ -771,112 +524,90 @@ interface AppealRecord {
   userEmail: string;
   username: string;
   reason: string;
-  status: 'pending' | 'approved' | 'rejected' | 'replied';
+  status: "pending" | "approved" | "rejected" | "replied";
   reply?: string;
   createdAt: number;
   resolvedAt?: number;
 }
 
-/** 普通用户发起申诉 */
 export async function submitAppeal(reason: string): Promise<boolean> {
-  const session = getSession();
-  if (!session) return false;
-  await initCloudBase();
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('appeals').add({
-      userEmail: session.email,
-      username: session.username,
-      reason: reason.trim(),
-      status: 'pending',
-      createdAt: Date.now(),
+    await apiFetch("/api/appeals", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ reason: reason.trim() }),
     });
-    console.log('[CloudBase] 申诉已提交:', session.email);
     return true;
-  } catch (err) {
-    console.warn('[CloudBase] 提交申诉失败:', err);
+  } catch {
     return false;
   }
 }
 
-/** 获取当前用户的申诉列表 */
 export async function getMyAppeals(): Promise<AppealRecord[]> {
-  const session = getSession();
-  if (!session) return [];
-  await initCloudBase();
-  if (!tcbReady || !tcbDb) return [];
   try {
-    const res = await tcbDb!
-      .collection('appeals')
-      .where({ userEmail: session.email })
-      .orderBy('createdAt', 'desc')
-      .limit(50)
-      .get();
-    return (res.data || []) as AppealRecord[];
-  } catch { return []; }
+    return await apiFetch<AppealRecord[]>("/api/appeals", { headers: getAuthHeaders() });
+  } catch {
+    return [];
+  }
 }
 
-/** 管理员获取所有申诉 */
 export async function getAllAppeals(): Promise<AppealRecord[]> {
-  await initCloudBase();
-  if (!tcbReady || !tcbDb) return [];
   try {
-    const res = await tcbDb.collection('appeals').orderBy('createdAt', 'desc').limit(200).get();
-    return (res.data || []) as AppealRecord[];
-  } catch { return []; }
+    return await apiFetch<AppealRecord[]>("/api/appeals/all", { headers: getAuthHeaders() });
+  } catch {
+    return [];
+  }
 }
 
-/** 撤回申诉（仅待处理状态可撤回） */
 export async function withdrawAppeal(appealId: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb.collection('appeals').doc(appealId).get();
-    if (!res.data || res.data.length === 0) return false;
-    if (res.data[0].status !== 'pending') return false;
-    await tcbDb.collection('appeals').doc(appealId).remove();
+    await apiFetch(`/api/appeals/${appealId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 重新编辑申诉（仅待处理状态可编辑） */
 export async function editAppeal(appealId: string, newReason: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    const res = await tcbDb.collection('appeals').doc(appealId).get();
-    if (!res.data || res.data.length === 0) return false;
-    if (res.data[0].status !== 'pending') return false;
-    await tcbDb.collection('appeals').doc(appealId).update({
-      reason: newReason.trim(),
-      createdAt: Date.now(),
+    await apiFetch(`/api/appeals/${appealId}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ action: "edit", reason: newReason.trim() }),
     });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 管理员回复申诉（回复即已处理） */
 export async function replyToAppeal(appealId: string, reply: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('appeals').doc(appealId).update({
-      status: 'replied',
-      reply: reply.trim(),
-      resolvedAt: Date.now(),
+    await apiFetch(`/api/appeals/${appealId}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ action: "reply", reply: reply.trim() }),
     });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 管理员处理申诉 */
 export async function resolveAppeal(appealId: string, approved: boolean): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('appeals').doc(appealId).update({
-      status: approved ? 'approved' : 'rejected',
-      reply: null,
-      resolvedAt: Date.now(),
+    await apiFetch(`/api/appeals/${appealId}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ action: "resolve", approved }),
     });
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 // ===== 查看用户公开资料 =====
@@ -890,27 +621,20 @@ interface PublicProfile {
 }
 
 export async function getPublicProfile(email: string): Promise<PublicProfile | null> {
-  await initCloudBase();
-  if (!tcbReady || !tcbDb) return null;
   try {
-    const res = await tcbDb!
-      .collection('users')
-      .where({ email: email.toLowerCase() })
-      .limit(1)
-      .get();
-    if (!res.data || res.data.length === 0) return null;
-    const user = res.data[0];
+    const profile = await apiFetch<PublicProfile>(`/api/users/profile/${encodeURIComponent(email)}`);
+    // 补充 localStorage 中的数据
     return {
-      username: user.username || user.name || email,
-      email: user.email || email,
-      bio: localStorage.getItem(`caiber_bio_${user.email}`) || '',
-      avatar: localStorage.getItem(`caiber_avatar_${user.email}`) || user.avatar || '😶',
-      createdAt: user.createdAt,
+      ...profile,
+      bio: localStorage.getItem(`caiber_bio_${email}`) || "",
+      avatar: localStorage.getItem(`caiber_avatar_${email}`) || "😶",
     };
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
-// ===== 管理员：卡片管理（保存在 users 集合 _card_data 标记文档中） =====
+// ===== 管理员：卡片管理 =====
 
 export interface CardRecord {
   id: string;
@@ -926,55 +650,52 @@ export interface CardRecord {
 }
 
 export async function saveCard(card: CardRecord): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('users').add({
-      type: '_card_data', action: 'save',
-      cardId: card.id, cardData: card,
-      timestamp: Date.now(),
+    await apiFetch("/api/cards", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ cardId: card.id, cardData: card }),
     });
     return true;
-  } catch (err) { console.error('[saveCard] 失败:', err); return false; }
+  } catch {
+    return false;
+  }
 }
 
 export async function deleteCard(cardId: string): Promise<boolean> {
-  if (!tcbReady || !tcbDb) return false;
   try {
-    await tcbDb.collection('users').add({
-      type: '_card_data', action: 'delete',
-      cardId, timestamp: Date.now(),
+    await apiFetch(`/api/cards/${cardId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
     });
     return true;
-  } catch (err) { console.error('[deleteCard] 失败:', err); return false; }
+  } catch {
+    return false;
+  }
 }
 
-/** 从 CloudBase 加载管理员编辑过的卡片数据，合并到静态卡片列表 */
-export async function loadCardEdits<T extends { id: string }>(baseCards: T[]): Promise<{ cards: T[]; deletedIds: Set<string> }> {
-  if (!tcbReady || !tcbDb) return { cards: baseCards, deletedIds: new Set() };
+export async function loadCardEdits<T extends { id: string }>(
+  baseCards: T[]
+): Promise<{ cards: T[]; deletedIds: Set<string> }> {
   try {
-    const res = await tcbDb.collection('users').limit(2000).get();
-    const actions = ((res.data || []) as any[])
-      .filter((d: any) => d.type === '_card_data')
-      .sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0));
-    const deletedIds = new Set<string>();
+    const data = await apiFetch<{ cards: any[]; deletedIds: string[] }>("/api/cards/edits");
+
+    const deletedIds = new Set<string>(data.deletedIds || []);
     const cardMap = new Map<string, any>();
-    for (const a of actions) {
-      if (a.action === 'delete') {
-        deletedIds.add(a.cardId);
-        cardMap.delete(a.cardId);
-      } else if (a.action === 'save' && a.cardData) {
-        cardMap.set(a.cardId, a.cardData);
-        deletedIds.delete(a.cardId);
-      }
+    for (const c of data.cards || []) {
+      cardMap.set(c.id, c);
     }
-    // 合并：baseCards 中用编辑版覆盖，去掉已删除的
-    const baseMap = new Map(baseCards.map(c => [c.id, c]));
-    for (const [id, data] of cardMap) {
-      baseMap.set(id, { ...baseMap.get(id), ...data, id } as any);
+
+    const baseMap = new Map(baseCards.map((c) => [c.id, c]));
+    for (const [id, cd] of cardMap) {
+      baseMap.set(id, { ...baseMap.get(id), ...cd, id } as any);
     }
-    const cards = [...baseMap.values()].filter(c => !deletedIds.has(c.id));
+
+    const cards = [...baseMap.values()].filter((c) => !deletedIds.has(c.id));
     return { cards, deletedIds };
-  } catch { return { cards: baseCards, deletedIds: new Set() }; }
+  } catch {
+    return { cards: baseCards, deletedIds: new Set() };
+  }
 }
 
 // ===== AI 聊天记录存储 =====
@@ -982,20 +703,24 @@ export async function loadCardEdits<T extends { id: string }>(baseCards: T[]): P
 export async function saveAIChat(
   cardId: string,
   messages: { role: string; text: string }[],
-  result: { personalityId: number; persona: string; dia: string; med: string; usage: string; advice: string },
+  result: {
+    personalityId: number;
+    persona: string;
+    dia: string;
+    med: string;
+    usage: string;
+    advice: string;
+  }
 ): Promise<void> {
-  if (!tcbReady || !tcbDb) return;
-  const session = getSession();
   try {
-    await tcbDb.collection('users').add({
-      type: '_ai_chat',
-      cardId,
-      userEmail: session?.email || '',
-      messages,
-      result,
-      timestamp: Date.now(),
+    await apiFetch("/api/ai-chat", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ cardId, messages, result }),
     });
-  } catch (err) { console.warn('[CloudBase] 保存AI聊天失败:', err); }
+  } catch (err) {
+    console.warn("[API] 保存AI聊天失败:", err);
+  }
 }
 
 export type { ConsultationRecord, PrescriptionRecord, UserRecord, AppealRecord };

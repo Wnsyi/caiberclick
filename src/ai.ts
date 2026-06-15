@@ -1,10 +1,9 @@
 // AI 大模型调用模块
-// OpenAI 兼容接口: http://jxnujwc.top:28000/v1
+// DeepSeek API (OpenAI 兼容接口)
 
-// AI 调用支持三种模式（按优先级）：
-// 1. 云函数模式：VITE_AI_CLOUDBASE_FUNCTION 有值时通过 HTTP 公开端点调用（用于 CloudBase HTTPS 部署）
-// 2. 直连模式：VITE_AI_API_BASE 有值时直接调用 AI API（用于 Electron / 支持 HTTPS 的部署）
-// 3. 代理模式：回退到 server.js 代理（用于本地开发）
+// AI 调用支持两种模式（按优先级）：
+// 1. 直连模式：VITE_AI_API_BASE 有值时直接调用 AI API
+// 2. 代理模式：回退到 server.js 代理 /api/ai/chat（默认）
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -29,22 +28,11 @@ export interface AIChatItem {
 
 /** AI 调用模式 */
 type AIMode =
-  | { type: 'cloudfunction'; url: string }
   | { type: 'direct'; url: string; headers: Record<string, string>; model: string }
   | { type: 'proxy' };
 
 function getAIMode(): AIMode {
-  // 1. 云函数模式（优先）— HTTP 公开端点，不需要 SDK 权限
-  const funcName = import.meta.env.VITE_AI_CLOUDBASE_FUNCTION;
-  if (funcName) {
-    const envId = import.meta.env.VITE_CLOUDBASE_ENV_ID || 'game-one-d1gx1gwhbee34fff7';
-    return {
-      type: 'cloudfunction',
-      url: `https://${envId}.service.tcloudbase.com/${funcName}`,
-    };
-  }
-
-  // 2. 直连模式
+  // 1. 直连模式
   const base = import.meta.env.VITE_AI_API_BASE;
   const key = import.meta.env.VITE_AI_API_KEY;
   if (base && key) {
@@ -55,32 +43,16 @@ function getAIMode(): AIMode {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${key}`,
       },
-      model: import.meta.env.VITE_AI_MODEL || 'ds',
+      model: import.meta.env.VITE_AI_MODEL || 'deepseek-chat',
     };
   }
 
-  // 3. 代理模式（回退）
+  // 2. 代理模式（默认）
   return { type: 'proxy' };
 }
 
 async function callAI(messages: ChatMessage[], responseFormat?: 'text' | 'json_object'): Promise<string> {
   const mode = getAIMode();
-
-  if (mode.type === 'cloudfunction') {
-    // 云函数 HTTP 公开端点 — 直接 fetch
-    const res = await fetch(mode.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, response_format: responseFormat }),
-    });
-    if (!res.ok) {
-      const errText = await res.text().catch(() => 'Unknown');
-      throw new Error(`云函数 HTTP ${res.status}: ${errText}`);
-    }
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return data.content || '';
-  }
 
   if (mode.type === 'direct') {
     // 直连模式

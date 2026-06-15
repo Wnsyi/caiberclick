@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-
-"start": "node server.js",
+    "start": "node server.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -16,10 +15,10 @@
     "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "@capacitor/electron": "^2.5.0",
-    "@cloudbase/js-sdk": "^2.28.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "html2canvas": "^1.4.1",
+    "mysql2": "^3.22.5",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2"

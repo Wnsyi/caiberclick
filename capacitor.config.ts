@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: '开药吗',
   webDir: 'dist',
   server: {
-    url: 'https://game-one-d1gx1gwhbee34fff7-1428019926.tcloudbaseapp.com/mental-hospital/',
+    url: 'http://39.105.51.168:8081/',
     cleartext: true
   }
 };

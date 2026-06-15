@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
     base,
     server: {
       proxy: {
-        '/api': 'http://localhost:3000',
+        '/api': 'http://localhost:8081',
       },
     },
     build: {
